@@ -1,0 +1,15 @@
+VoraX aims to be a simple, yet a powerful IDE for Oracle databases. Instead of reinventing the wheel, VoraX 
+relies on the well-known SqlPLUS which is actually used to connect to the database, to execute SQL statements 
+and to get the results back. However, this interaction is hidden from the user who just uses his/her Vim 
+environment without knowing that, behind, a SqlPLUS process does all the work.
+
+The big advantage of this approach is that almost all SqlPLUS commands may be used without a problem. You 
+can format columns, set pagination, autotrace queries etc. Basically, everything you used to type on your 
+SqlPLUS prompt is guaranteed to work in VoraX, except maybe for some exotic cases (e.g. using vim in console 
+mode, having the EDITOR set to a terminal editor and executing the "ed" sqlplus command).
+
+Another advantage is that you'll get an efficient Oracle IDE with a very small footprint. For Oracle DBAs this 
+is huge because they don't need heavy tools with a lot of features they never use. Hence, the fact that VoraX 
+may be used within a regular console makes it suitable for server environments. 
+
+For additional details see: http://code.google.com/p/vorax/
