@@ -148,6 +148,11 @@ if !exists('g:vorax_profiles_window_size')
   " The size of the profile window. 
   let g:vorax_profiles_window_size = 30
 endif"}}}
+" g:vorax_test_constr
+if !exists('g:vorax_test_constr')
+	" This global variable is used by vorax unit tests.
+	let g:vorax_test_constr = 'vorax/vorax@your_db'
+endif
 " ===========================================================================================================================
 
 " *** COMMANDS SECTION

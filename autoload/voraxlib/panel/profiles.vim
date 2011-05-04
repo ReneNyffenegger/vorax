@@ -251,8 +251,6 @@ EORC
   function! s:profiles.CreateSecureKeys(master_password)"{{{
     ruby Vorax::ProfilesManager.create(VIM::evaluate('g:vorax_home_dir'), VIM::evaluate('a:master_password'))
     ruby $vorax_profiles.master_password = VIM::evaluate('a:master_password')
-    echo 'Created. Passwords ready to be stored in a secure way.'
-    echo ''
   endfunction"}}}
 
   " Opens up the master repository using the provided master password. It
@@ -263,8 +261,6 @@ EORC
       $vorax_profiles.master_password=VIM::evaluate('a:master_password')
       VIM::command('return 1')
     rescue OpenSSL::PKey::RSAError
-      VIM::command('call voraxlib#utils#Warn("Wrong password!")')
-      VIM::command('echo ""')
       VIM::command('return 0')
     rescue => e
       puts e.message
@@ -401,6 +397,12 @@ EORC
     echo profile_name . ' deleted.'
   endfunction"}}}
 
+  " Disposes the profiles manager.
+  function! s:profiles.Destroy()"{{{
+    call self.window.Close()
+    unlet s:initialized
+  endfunction"}}}
+  
 endfunction"}}}
 
 " Prepare the secure repository for passwords management. It receives the
@@ -439,12 +441,13 @@ function! s:AskForMasterPassword()"{{{
       let master_password = inputsecret('Master password: ')
       if s:profiles.OpenMasterRepository(master_password)
         break
+      else
+        call voraxlib#utils#Warn("Wrong password!\n")
       endif
     endwhile
     return 1
   else
-    call voraxlib#utils#Warn('Cannot access the secure repository!')
-    echo ''
+    call voraxlib#utils#Warn('Cannot access the secure repository!\n')
     return 0
   endif
 endfunction"}}}
