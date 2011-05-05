@@ -148,11 +148,12 @@ if !exists('g:vorax_profiles_window_size')
   " The size of the profile window. 
   let g:vorax_profiles_window_size = 30
 endif"}}}
-" g:vorax_test_constr
+" g:vorax_test_constr"{{{
 if !exists('g:vorax_test_constr')
-	" This global variable is used by vorax unit tests.
+	" This global variable is used by vorax unit tests. Ignore it if you do not
+	" intend to run the test suite.
 	let g:vorax_test_constr = 'vorax/vorax@your_db'
-endif
+endif"}}}
 " ===========================================================================================================================
 
 " *** COMMANDS SECTION
@@ -179,6 +180,10 @@ if g:vorax_profiles_window_toggle_key != ''
       \ && !hasmapto('<Plug>VoraxProfilesWindowToggle') 
       \ && !hasmapto(g:vorax_profiles_window_toggle_key, 'n')
   exe "nmap <unique> " . g:vorax_profiles_window_toggle_key . " <Plug>VoraxProfilesWindowToggle"
+endif"}}}
+" g:vorax_profiles_window_menu_key"{{{
+if !exists('g:vorax_profiles_window_menu_key')
+  let g:vorax_profiles_window_menu_key = "m"
 endif"}}}
 " ===========================================================================================================================
 

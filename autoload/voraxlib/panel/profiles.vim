@@ -110,12 +110,11 @@ function! s:ExtendProfiles()"{{{
     syn match Error  '^\s*!.\+'
     hi link Directory  Comment
 
-    " set mappings
+    " set key mappings
     noremap <silent> <buffer> o :call <SID>Click()<CR>
-    noremap <silent> <buffer> a :call <SID>Add()<CR>
-    noremap <silent> <buffer> m :call <SID>InvokeMenu()<CR>
-    noremap <silent> <buffer> ! :call <SID>ToggleImportantCurrentNode()<CR>
     noremap <silent> <buffer> <CR> :call <SID>Click()<CR>
+    exe "noremap <silent> <buffer> " . g:vorax_profiles_window_menu_key . " :call <SID>InvokeMenu()<CR>"
+    noremap <silent> <buffer> ! :call <SID>ToggleImportantCurrentNode()<CR>
   endfunction"}}}
 
   " What to do when a profile node is clicked.
@@ -520,12 +519,6 @@ function! s:Click()"{{{
   call s:profiles.ClickNode(s:profiles.GetCurrentNode())
 endfunction"}}}
 
-" Add a profile. This function is invoked from the profile window via a key
-" map.
-function s:Add()"{{{
-  call s:profiles.Add('', {})
-endfunction"}}}
-
 " Toggle the important flag for the provided node.
 function! s:ToggleImportantCurrentNode()"{{{
   let crr_node = s:profiles.GetCurrentNode()
@@ -546,7 +539,7 @@ function! s:InvokeMenu()"{{{
           \ 'Profiles MENU:',
           \ ['(A)dd new profile'])
     if response == 'A'
-      call s:Add()
+      call s:profiles.Add('', {})
     endif
   elseif s:profiles.IsCategory(crr_node)
     " a category node
@@ -554,7 +547,7 @@ function! s:InvokeMenu()"{{{
           \ 'Profiles MENU:',
           \ ['(A)dd new profile', 'Add new profile (h)ere'])
     if response == 'A'
-      call s:Add()
+      call s:profiles.Add('', {'category' : s:profiles.GetCategory(crr_node)})
     elseif response == 'h'
       call s:profiles.Add('', {'category' : s:profiles.GetCategory(crr_node)})
     endif
@@ -564,7 +557,7 @@ function! s:InvokeMenu()"{{{
           \ 'Profiles MENU:',
           \ ['(A)dd new profile', 'Add new profile (h)ere', '(R)emove profile', 'Toggle (i)mportant'])
     if response == 'A'
-      call s:Add()
+      call s:profiles.Add('', {})
     elseif response == 'h'
       call s:profiles.Add('', {'category' : s:profiles.GetCategory(crr_node)})
     elseif response == 'R'
