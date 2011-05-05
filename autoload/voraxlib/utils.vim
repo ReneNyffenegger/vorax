@@ -19,7 +19,8 @@ function! voraxlib#utils#LiteralRegexp(text)
 endfunction
 
 " Sort the provided list but eliminates the duplicates. Optionaly, a
-" comparator may be provided.
+" comparator may be provided. The sorted list elements are always converted to
+" strings.
 function! voraxlib#utils#SortUnique(list, ...)
   let dictionary = {}
   for i in a:list
