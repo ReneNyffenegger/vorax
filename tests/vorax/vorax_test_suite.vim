@@ -26,7 +26,6 @@ function! TestSuiteForVorax()
   " don't mess up the current vorax home dir. Create a new vorax home dir just
   " for tests.
   let save_vorax_home_dir = g:vorax_home_dir
-  echo g:vorax_home_dir
   let g:vorax_home_dir = substitute(expand('$HOME') . '/.vorax_test', '\\\\\|\\', '/', 'g')
   if !isdirectory(g:vorax_home_dir)
     call mkdir(g:vorax_home_dir, '')
