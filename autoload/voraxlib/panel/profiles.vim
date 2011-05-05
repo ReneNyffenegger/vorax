@@ -67,15 +67,17 @@ function! s:ExtendProfiles()"{{{
     let profiles = self.GetAll()
     if a:path == self.root
       " profiles under root
-      let simple_profiles =  map(filter(copy(profiles), '!has_key(v:val, "category") || v:val.category == ""'), '(has_key(v:val, "important") && v:val.important == "1" ? "!" : "") . (v:val.id) . (has_key(v:val, "password") ? "*": "")')
-      let categories =  map(filter(copy(profiles), 'has_key(v:val, "category") && v:val.category != ""'), '"[".(v:val.category)."]"')
+      let simple_profiles =  map(filter(copy(profiles), '!has_key(v:val, "category") || v:val.category == ""'), 
+                                \ 'self.ToString(v:val)')
+      let categories =  map(filter(copy(profiles), 'has_key(v:val, "category") && v:val.category != ""'), 
+                          \ '"[".(v:val.category)."]"')
       return voraxlib#utils#SortUnique(extend(simple_profiles, categories))
     elseif self.IsCategory(a:path)
       " profiles under a category
       let category = self.GetCategory(a:path)
       return voraxlib#utils#SortUnique(map(filter(copy(profiles), 
             \ 'has_key(v:val, "category") && v:val.category == "' . escape(category, '"') . '"'), 
-            \ '(has_key(v:val, "important") && v:val.important == "1" ? "!" : "") . (v:val.id) . (has_key(v:val, "password") ? "*": "")'))
+            \ 'self.ToString(v:val)'))
     endif
   endfunction"}}}
 
@@ -122,6 +124,14 @@ function! s:ExtendProfiles()"{{{
     call vorax#Connect(self.GetConnectionString(profile_name), '!')
   endfunction"}}}
 
+  " Convert a profile into its string representation. This is used to actually
+  " represent/show the profile within the profiles window tree.
+  function! s:profiles.ToString(profile)"{{{
+      return (has_key(a:profile, "important") && a:profile.important == "1" ? "!" : "") 
+            \ . (a:profile.id)
+            \ . (has_key(a:profile, "password") ? "*": "")
+  endfunction"}}}
+
   " Toggle the profiles window.
   function! s:profiles.Toggle() dict"{{{
     if self.root == ''
@@ -146,9 +156,7 @@ EORC
   " profile name.
   function! s:profiles.ExtractProfileNameFromCdata(cdata)"{{{
     let profile = a:cdata['user']
-    if a:cdata['osauth']
-      let profile .= " " . a:cdata['db']
-    else
+    if !a:cdata['osauth']
       let profile .= "@" . a:cdata['db']
     endif
     return profile
@@ -292,12 +300,11 @@ EORC
       let profile['important'] = '1'
     endif
     ruby <<EORC
-    if p = $vorax_profiles.exists?(VIM::evaluate('a:profile.id'))
-    	p.add_attribute('important', (VIM::evaluate('has_key(profile, "important")') == '1' ? '1' : nil))
+    if p = $vorax_profiles.exists?(VIM::evaluate('profile.id'))
+    	p.add_attribute('important', (VIM::evaluate('has_key(profile, "important")') == 1 && VIM::evaluate('profile.important') == '1' ? '1' : nil))
       $vorax_profiles.save
     end
 EORC
-    call self.RefreshProfile(profile)
   endfunction"}}}
 
   " Given a profile it computes the path into the connection window tree. The
@@ -338,9 +345,21 @@ EORC
 
   " Given a node path in tree it builds a corresponding profile structure.
   function! s:profiles.BuildProfileFromPath(path)"{{{
-    let category = self.GetCategory(a:path)
     let id = self.GetProfileNameFromPath(a:path)
-    return { 'id' : id, 'category': category }
+    let profile = { 'id' : id }
+    let category = self.GetCategory(a:path)
+    if category != ''
+      let profile['category'] = category
+    endif
+    if self.IsImportant(a:path)
+      let profile['important'] = '1'
+    endif
+    return profile
+  endfunction"}}}
+
+  " Whenever or not the provided path leads to an important profile.
+  function! s:profiles.IsImportant(path)"{{{
+    return a:path =~ voraxlib#utils#LiteralRegexp(self.path_separator) . '!'
   endfunction"}}}
 
   " Get the profile object corresponding to the provided name/id.
@@ -394,13 +413,13 @@ EORC
     else
     	let s:must_refresh = 1
     endif
-    echo profile_name . ' deleted.'
   endfunction"}}}
 
   " Disposes the profiles manager.
   function! s:profiles.Destroy()"{{{
     call self.window.Close()
     unlet s:initialized
+    ruby $vorax_profiles = nil
   endfunction"}}}
   
 endfunction"}}}
@@ -514,6 +533,7 @@ function! s:ToggleImportantCurrentNode()"{{{
     let profile_name = s:profiles.GetProfileNameFromPath(crr_node)
     let profile = s:profiles.GetProfile(profile_name)
     call s:profiles.ToggleImportant(profile)
+    call s:profiles.RefreshProfile(profile)
   endif
 endfunction"}}}
 
@@ -549,6 +569,7 @@ function! s:InvokeMenu()"{{{
       call s:profiles.Add('', {'category' : s:profiles.GetCategory(crr_node)})
     elseif response == 'R'
       call s:profiles.RemoveProfile(s:profiles.BuildProfileFromPath(crr_node))
+      echo crr_node . ' deleted.'
     elseif response == 'i'
       call s:ToggleImportantCurrentNode()
     endif
