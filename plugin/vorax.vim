@@ -33,8 +33,17 @@ else
   " is it ruby 1.8?
   let rver = ''
   ruby VIM.command("let rver='" + RUBY_VERSION + "'")
-  if strpart(rver, 0, 3) != '1.9'
-    call voraxlib#utils#Warn("***warning*** VoraX needs ruby 1.9 support 1.9. Found " . rver)
+  let rver_parts = split(rver, '\.')
+  if type(rver_parts) ==  3 && len(rver_parts) >= 3
+    if (rver_parts[0] == '1' && rver_parts[1] == '8' && rver_parts[2] == '7') ||
+          \ (rver_parts[0] == '1' && rver_parts[1] == '9')
+      " good to go
+    else
+      call voraxlib#utils#Warn("***warning*** VoraX needs ruby 1.8.7 or ruby 1.9 support. Found " . rver)
+      finish
+    endif
+  else
+    call voraxlib#utils#Warn("***warning*** Could not detect the version of your ruby support.")
     finish
   endif
 endif
