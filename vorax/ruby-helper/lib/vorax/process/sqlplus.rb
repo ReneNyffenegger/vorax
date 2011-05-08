@@ -178,9 +178,10 @@ module Vorax
           if tail_str =~ /#{END_OF_REQUEST}/
             # GREAT: the end of the request has been detected!
             # everything after END_OF_REQUEST save as residual stuff
-            @residual = tail_str[Regexp.last_match.end(0)..-1]
-            # remove END_OF_REQUEST from chunk
-            chunk.slice!(/#{END_OF_REQUEST}[^\Z]*/)
+            #@residual = tail_str[Regexp.last_match.end(0)..-1]
+            @residual = ''
+            # remove the line containing the END_OF_REQUEST from chunk
+            chunk.slice!(/[^\n]*#{END_OF_REQUEST}[^\Z]*/)
             # get rid of the tail content... we don't need it anymore
             @tail.clear
             # the sqlplus is no longer busy

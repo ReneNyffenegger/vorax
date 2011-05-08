@@ -111,22 +111,22 @@ endfunction
 function! s:FetchResults()
   let sqlplus = vorax#GetSqlplusHandler()
   let chunk = sqlplus.Read()
-  if chunk != '' && len(s:head_lines) > 0
-    "get rid of the first line. This first line is the command sent to the
-    "sqlplus process but is not echoed. However, the sqlprompt is shown and is
-    "messing up the output, therefore it's better to simply remove that line.
-    let new_chunk = s:RemoveHead(chunk)
-    if new_chunk != chunk
-      let chunk = new_chunk
-      let s:first = 0
-    endif
-  end
-  if !sqlplus.IsBusy()
-    " get rid of the last line. The last line is the sqlprompt waiting for new
-    " commands to be inputed. That's ugly and the output looks much better
-    " without it.
-    let chunk = s:RemoveTail(chunk)
-  endif
+  "if chunk != '' && len(s:head_lines) > 0
+    ""get rid of the first line. This first line is the command sent to the
+    ""sqlplus process but is not echoed. However, the sqlprompt is shown and is
+    ""messing up the output, therefore it's better to simply remove that line.
+    "let new_chunk = s:RemoveHead(chunk)
+    "if new_chunk != chunk
+      "let chunk = new_chunk
+      "let s:first = 0
+    "endif
+  "end
+  "if !sqlplus.IsBusy()
+    "" get rid of the last line. The last line is the sqlprompt waiting for new
+    "" commands to be inputed. That's ugly and the output looks much better
+    "" without it.
+    "let chunk = s:RemoveTail(chunk)
+  "endif
   " spit the results
   call s:output_window.AppendText(chunk)
   " simulate a key press in order to fire the CursorHold auto command.

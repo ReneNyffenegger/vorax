@@ -56,7 +56,7 @@ function! vorax#Exec(command)
   call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')')
   " exec the command in bg, prefixed with a CR. this is important especially
   " in connection with set echo on.
-  call s:sqlplus.NonblockExec(s:sqlplus.Pack("\n" . a:command))
+  call s:sqlplus.NonblockExec(s:sqlplus.Pack(a:command))
   call s:output.StartMonitor()
   call s:log.trace('END vorax#Exec')
 endfunction
