@@ -105,6 +105,18 @@ function! voraxlib#utils#PickOption(prompt, choices)
   return key
 endfunction
 
+" Get the currently selected block.
+function! voraxlib#utils#SelectedBlock() range
+    let save = @"
+    silent normal gvy
+    let vis_cmd = @"
+    let @" = save
+    return vis_cmd
+endfunction 
+
+function! voraxlib#utils#SqlUnderCursor()
+endfunction
+
 let &cpo=s:cpo
 unlet s:cpo
 

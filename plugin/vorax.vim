@@ -160,8 +160,13 @@ endif"}}}
 " ===========================================================================================================================
 " :VoraxConnect"{{{
 if !exists(':VoraxConnect')
-  command! -nargs=1 -complete=customlist,vorax#ProfilesForCompletion -bang VoraxConnect :call vorax#Connect(<q-args>, '<bang>')
+  command! -nargs=? -complete=customlist,vorax#ProfilesForCompletion -bang VoraxConnect :call vorax#Connect(<q-args>, '<bang>')
   nmap <unique> <script> <Plug>VoraxConnect :VoraxConnect<CR>
+endif"}}}
+" :VoraxExec"{{{
+if !exists(':VoraxExec')
+  command! -nargs=? VoraxExec :call vorax#Exec(<q-args>)
+  nmap <unique> <script> <Plug>VoraxExec :VoraxExec<CR>
 endif"}}}
 " :VoraxProfilesWindowToggle"{{{
 if !exists(':VoraxProfilesWindowToggle')
@@ -172,6 +177,15 @@ endif"}}}
 
 " *** KEY MAPPINGS SECTION 
 " ===========================================================================================================================
+" g:vorax_exec_key"{{{
+if !exists('g:vorax_exec_key')
+  let g:vorax_exec_key = "<Leader>e"
+endif
+if g:vorax_exec_key != '' 
+      \ && !hasmapto('<Plug>VoraxExec') 
+      \ && !hasmapto(g:vorax_exec_key, 'n')
+  exe "nmap <unique> " . g:vorax_exec_key . " <Plug>VoraxExec"
+endif"}}}
 " g:vorax_profiles_window_toggle_key"{{{
 if !exists('g:vorax_profiles_window_toggle_key')
   let g:vorax_profiles_window_toggle_key = "<Leader>co"
