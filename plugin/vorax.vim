@@ -19,8 +19,8 @@ set cpo&vim
 " *** BOOTSTRAP SECTION {{{
 " ===========================================================================================================================
 " Check Vim version
-if v:version < 700
-  call voraxlib#utils#Warn("***warning*** this version of VoraX needs vim 7.0")
+if v:version < 703
+  call voraxlib#utils#Warn("***warning*** this version of VoraX needs vim 7.3")
   finish
 endif
 
@@ -32,9 +32,18 @@ if !has('ruby')
 else
   " is it ruby 1.8?
   let rver = ''
-  ruby VIM.command("let rver='" + VERSION + "'")
-  if strpart(rver, 0, 3) != '1.8'
-    call voraxlib#utils#Warn("***warning*** VoraX needs ruby 1.8 support 1.8. Found " . rver)
+  ruby VIM.command("let rver='" + RUBY_VERSION + "'")
+  let rver_parts = split(rver, '\.')
+  if type(rver_parts) ==  3 && len(rver_parts) >= 3
+    if (rver_parts[0] == '1' && rver_parts[1] == '8' && rver_parts[2] == '7') ||
+          \ (rver_parts[0] == '1' && rver_parts[1] == '9')
+      " good to go
+    else
+      call voraxlib#utils#Warn("***warning*** VoraX needs ruby 1.8.7 or ruby 1.9 support. Found " . rver)
+      finish
+    endif
+  else
+    call voraxlib#utils#Warn("***warning*** Could not detect the version of your ruby support.")
     finish
   endif
 endif
