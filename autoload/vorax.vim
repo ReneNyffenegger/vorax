@@ -42,8 +42,12 @@ function! vorax#Connect(cstr, bang)"{{{
             \  'sqlplus_options' : [{'option' : 'sqlprompt', 'value' : "''"}]})
       if s:sqlplus.GetPid()
         " only if sqlplus process is still alive
-        call s:output.AppendText(s:sqlplus.GetBanner())
-        call s:output.AppendText(output)
+        call s:output.AppendText(s:sqlplus.GetBanner() . "\n\n")
+        if !voraxlib#utils#HasErrors(output)
+          call s:output.AppendText(s:sqlplus.Exec("prompt &_O_VERSION", 
+                \ {'sqlplus_options' : [{'option' : 'define', 'value' : '"&"'}]}))
+        endif
+        call s:output.AppendText("\n" . output)
       endif
     else
       echo 'Aborted!'
@@ -52,14 +56,28 @@ function! vorax#Connect(cstr, bang)"{{{
   call s:log.trace("END vorax#Connect")
 endfunction"}}}
 
-function! vorax#Exec(command)
+" Execute the provided command and spit the result into the output window.
+function! vorax#Exec(command)"{{{
   call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')')
   " exec the command in bg, prefixed with a CR. this is important especially
   " in connection with set echo on.
   call s:sqlplus.NonblockExec(s:sqlplus.Pack(a:command))
   call s:output.StartMonitor()
   call s:log.trace('END vorax#Exec')
-endfunction
+endfunction"}}}
+
+" Execute the statement under cursor form the current buffer.
+function! vorax#ExecCurrent()"{{{
+  call s:log.trace('BEGIN vorax#ExecCurrent()')
+  let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
+  let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
+  call voraxlib#utils#HighlightRange('TODO', start_l, start_c, end_l, end_c)
+  au VoraX CursorMoved <buffer> call s:ClearHighlight()
+  let statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
+  let statement = voraxlib#utils#TrimSqlComments(statement)
+  call vorax#Exec(statement)
+  call s:log.trace('END vorax#ExecCurrent')
+endfunction"}}}
 
 " Provides completion for profile names. It is used in the VoraxConnect
 " command.
@@ -83,12 +101,18 @@ function! vorax#GetSqlplusHandler()"{{{
 endfunction"}}}
 
 " Get the default throbber
-function! vorax#GetDefaultThrobber()
+function! vorax#GetDefaultThrobber()"{{{
   return s:default_throbber
-endfunction
+endfunction"}}}
 
 " Get the output window object.
 function! vorax#GetOutputWindowHandler()"{{{
   return s:output
 endfunction"}}}
 
+" This function is internally called from an autocommand in order to clear the
+" highlighting of the current executed SQL statement.
+function! s:ClearHighlight()"{{{
+  match none
+  au! VoraX CursorMoved <buffer>
+endfunction"}}}

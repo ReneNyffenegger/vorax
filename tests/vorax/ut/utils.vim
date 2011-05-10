@@ -88,6 +88,9 @@ function! TestVoraxUtils()
     call VUAsserFail('voraxlib#utils#Get...OfCurrentSql should not work without a syntax file.')
   catch /^A sql syntax must be enabled for the current buffer.$/
   endtry
+  call VUAssertEquals(voraxlib#utils#GetTextFromRange(6, 11, 6, 43), 'select /* ; */ '';'' ";" from dual;', 'voraxlib#utils#GetTextFromRange Test 1')
+  call VUAssertEquals(voraxlib#utils#GetTextFromRange(7, 1, 11, 18), "select *\nfrom\ncat,\nmuci\nwhere rownum < 10;", 'voraxlib#utils#GetTextFromRange Test 2')
+  call VUAssertEquals(voraxlib#utils#GetTextFromRange(1, 1, 1, 1), "s", 'voraxlib#utils#GetTextFromRange Test 3')
   bwipe!
   
 endfunction

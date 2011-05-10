@@ -177,6 +177,11 @@ if !exists(':VoraxExec')
   command! -nargs=? VoraxExec :call vorax#Exec(<q-args>)
   nmap <unique> <script> <Plug>VoraxExec :VoraxExec<CR>
 endif"}}}
+" :VoraxExecCurrent"{{{
+if !exists(':VoraxExecCurrent')
+  command! -nargs=0 VoraxExecCurrent :call vorax#ExecCurrent()
+  nmap <unique> <script> <Plug>VoraxExecCurrent :VoraxExecCurrent<CR>
+endif"}}}
 " :VoraxProfilesWindowToggle"{{{
 if !exists(':VoraxProfilesWindowToggle')
   command! -nargs=0 VoraxProfilesWindowToggle :call vorax#GetProfilesHandler().Toggle()
@@ -191,9 +196,9 @@ if !exists('g:vorax_exec_key')
   let g:vorax_exec_key = "<Leader>e"
 endif
 if g:vorax_exec_key != '' 
-      \ && !hasmapto('<Plug>VoraxExec') 
-      \ && !hasmapto(g:vorax_exec_key, 'n')
-  exe "nmap <unique> " . g:vorax_exec_key . " <Plug>VoraxExec"
+      \ && !hasmapto('<Plug>VoraxExecCurrent') 
+      \ && maparg(g:vorax_exec_key, 'n') == ""
+  exe "nmap <unique> " . g:vorax_exec_key . " <Plug>VoraxExecCurrent"
 endif"}}}
 " g:vorax_profiles_window_toggle_key"{{{
 if !exists('g:vorax_profiles_window_toggle_key')

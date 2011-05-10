@@ -48,6 +48,10 @@ function! s:ExtendWindow()
     setlocal nonu
     setlocal cursorline
     setlocal modifiable
+    setlocal bufhidden=delete
+    setlocal nolist
+    setlocal foldcolumn=0 nofoldenable
+    setlocal noreadonly
   endfunction"}}}
 
   " Write the provided text at the end of the output window. If 
@@ -137,6 +141,7 @@ function! s:FetchResults()
     " add an empty line at the end
     call s:output_window.AppendText("\n")
   	call s:output_window.StopMonitor()
+    wincmd p
     echon 'Done.'
   else
     " feedback to the user please.
