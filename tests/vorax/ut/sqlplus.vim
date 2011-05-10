@@ -57,7 +57,7 @@ function! TestVoraxSqlplusExec()
   call VUAssertTrue(sqlplus.Exec("prompt talek's vorax") =~ "talek's vorax", 'Test basic exec')
   " test with options preserved
   call sqlplus.Exec('set sqlprompt "SQL> "')
-  let output = sqlplus.Exec("prompt abc", {'sqlplus_options' : [{'option' : 'sqlprompt', 'value' : '"vorax_muci> "'}] })
+  let output = sqlplus.Exec("show sqlprompt", {'sqlplus_options' : [{'option' : 'sqlprompt', 'value' : '"vorax_muci> "'}] })
   call VUAssertTrue(output =~ 'vorax_muci> ', 'Test vorax_muci> output')
   call VUAssertTrue(sqlplus.GetConfigFor('sqlprompt')[0] =~ 'SQL> ', 'Test if the sqlprompt is preserved.')
   " test non-block exec/read stuff

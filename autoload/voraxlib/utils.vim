@@ -5,6 +5,10 @@
 let s:cpo=&cpo
 set cpo-=C
 
+" How statements are sepparated
+let s:sql_delimitator_pattern = ';\|^\s*\/\s*$'
+let s:sql_strip_comments_pattern = '((\s*\/\*[^*\/]*\*\/\s*)|(\s*--[^\n]*\n\s*)|(\s*\r?\n))*'
+
 " Display a warning message.
 function! voraxlib#utils#Warn(text)
   echohl WarningMsg
@@ -115,6 +119,120 @@ function! voraxlib#utils#SelectedBlock() range
 endfunction 
 
 function! voraxlib#utils#SqlUnderCursor()
+  " find the start
+endfunction
+
+" Highlights the provided range
+function! voraxlib#utils#HighlightRange(hi_group, start_l, start_c, end_l, end_c)
+  " highlight the first line
+  if a:end_l - a:start_l > 0
+    " the statement spans multiple lines
+    let cmd = 'match ' . hi_group . ' /\%' . a:start_l . 'l' . '\%>' . (a:start_c - 1) . 'c' .
+          \ '\|\%>' . a:start_l . 'l' . '\%<' . a:end_l . 'l.' .
+          \ '\|\%' . a:end_l . 'l' . '\%<' . (a:end_c + 1) . 'c./'
+  else
+    " the statement is on one line
+    let cmd = 'match ' . hi_group . ' /\%' . a:start_l . 'l' . '\%>' . (a:start_c - 1) . 'c' .
+          \ '\%<' . (a:end_c + 1) . 'c./'
+  endif
+  exe cmd
+endfunction
+
+" Get the start of the current statement. If a:move is 1 then the cursor is
+" moved to the beginning of the statement. The return value is an [line, col] array.
+" This function relies to a valid sql syntax applied. If the syntax for the
+" current buffer is not 'sql' then the execution is aborted and an exception
+" is raised.
+function! voraxlib#utils#GetStartOfCurrentSql(move)
+  if !exists('b:current_syntax') || b:current_syntax != 'sql'
+    throw 'A sql syntax must be enabled for the current buffer.'
+  endif
+  if !a:move
+    " if not move requested then save state
+    let state = winsaveview()
+  endif
+  let [l, c] = [0, 0]
+  while 1
+    let [l, c] = searchpos(s:sql_delimitator_pattern, 'beW')  
+    if [l, c] == [0, 0] || synIDattr(synIDtrans(synID(l, c, 1)), "name") == ''
+      break
+    endif
+  endwhile
+  if [l, c] != [0, 0]
+    " not at the beginning of the buffer
+    if c == col('$')-1 && l < line('$')
+      " if at the end of the current line and not at the end of the buffer
+      " set as the first position of the next line.
+      let [l, c] = [l+1, 1]
+    elseif c < col('$')-1
+      " increment column just to skip the current delimitator
+      let [l, c] = [l, c+1]
+    endif
+  else
+  	let [l, c] = [1, 1]
+  endif
+  if !a:move
+    " if not move requested then restore state
+    call winrestview(state)
+  else
+    call setpos('.', [bufnr('%'), l, c, 0])
+  endif
+  return [l, c]
+endfunction
+
+" Get the end of the current statement. If a:move is 1 then the cursor is
+" moved to the end of the statement. The return value is an [line, col] array.
+" This function relies to a valid sql syntax applied. If the syntax for the
+" current buffer is not 'sql' then the execution is aborted and an exception
+" is raised.
+function! voraxlib#utils#GetEndOfCurrentSql(move)
+  if !exists('b:current_syntax') || b:current_syntax != 'sql'
+    throw 'A sql syntax must be enabled for the current buffer.'
+  endif
+  if !a:move
+    " if not move requested then save state
+    let state = winsaveview()
+  endif
+  let [l, c] = [0, 0]
+  let first = 1
+  while 1
+    let [l, c] = searchpos(s:sql_delimitator_pattern, 'W'. (first ? 'c' : ''))  
+    let first = 0
+    if [l, c] == [0, 0] || synIDattr(synIDtrans(synID(l, c, 1)), "name") == ''
+      break
+    endif
+  endwhile
+  if [l, c] == [0, 0]
+  	let [l, c] = [1, 1]
+  endif
+  if !a:move
+    " if not move requested then restore state
+    call winrestview(state)
+  else
+    call setpos('.', [bufnr('%'), l, c, 0])
+  endif
+  return [l, c]
+endfunction
+
+" Get rid of all SQL comments along with the empty lines from the beginning of the provided command.
+function! voraxlib#utils#LTrimSqlComments(command)
+  ruby <<EORC
+  result = VIM::evaluate("a:command").gsub(/\A#{VIM::evaluate('s:sql_strip_comments_pattern')}/, '')
+  VIM::command("return #{result.inspect}")
+EORC
+endfunction
+
+" Get rid of all SQL comments along with the empty lines from the end of the provided command.
+function! voraxlib#utils#RTrimSqlComments(command)
+  ruby <<EORC
+  result = VIM::evaluate("a:command").gsub(/#{VIM::evaluate('s:sql_strip_comments_pattern')}\Z/, '')
+  VIM::command("return #{result.inspect}")
+EORC
+endfunction
+
+" Get rid of sourrounding comments for the provided sql command.
+function! voraxlib#utils#TrimSqlComments(command)
+  return voraxlib#utils#RTrimSqlComments(voraxlib#utils#LTrimSqlComments(a:command))
 endfunction
 
 let &cpo=s:cpo
