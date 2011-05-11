@@ -6,7 +6,7 @@ let s:cpo=&cpo
 set cpo-=C
 
 " the sqlplus object
-let s:sqlplus = {'ruby_key' : ''}
+let s:sqlplus = {'ruby_key' : '', 'last_stmt' : ''}
 
 " the current object count. it is incremented on each new sqlplus object
 " creation
@@ -268,7 +268,19 @@ endfunction"}}}
 " Cancel the currently executing command. On some platforms (Windows) this is
 " not possible and this cancel operation ends up in an actual process kill.
 function! s:sqlplus.Cancel() dict"{{{
-  ruby $sqlplus_factory[VIM::evaluate('self.ruby_key')].cancel
+  ruby <<EORC
+  begin
+    $sqlplus_factory[VIM::evaluate('self.ruby_key')].cancel
+    $sqlplus_factory[VIM::evaluate('self.ruby_key')]<<"\n"
+    $sqlplus_factory[VIM::evaluate('self.ruby_key')].exec("\n") do
+      VIM::command('redraw')
+      VIM::command('echon "Cancelling..."')
+    end
+    VIM::command('return 1')
+  rescue
+    VIM::command('return 0')
+  end
+EORC
 endfunction"}}}
 
 " Destroy the sqlplus process

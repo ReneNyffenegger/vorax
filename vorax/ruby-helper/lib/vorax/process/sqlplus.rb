@@ -231,7 +231,9 @@ module Vorax
       @busy
     end
 
-    # Cancel the currently executing statement.
+    # Send a cancel signal to the sqlplus process. The control is returned
+    # immediatelly therefore is up to the caller to ensure that the statement was
+    # actually cancelled.
     def cancel
       @process.cancel
     end

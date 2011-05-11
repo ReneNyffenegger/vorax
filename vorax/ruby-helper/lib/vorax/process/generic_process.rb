@@ -24,7 +24,7 @@ module Vorax
 
     # Cancel the current operation in sqlplus
     def cancel
-      Process.kill(INT, pid)
+      Process.kill("INT", pid)
     end
 
     # Kill the attached process

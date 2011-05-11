@@ -23,10 +23,12 @@ let s:default_throbber = voraxlib#widget#throbber#New(g:vorax_throbber_chars)
 " accepts incomplete formats like user@db or just user, the
 " user being prompted afterwards for the missing parts.
 function! vorax#Connect(cstr, bang)"{{{
-  call s:log.trace('BEGIN vorax#Connect(' . string(a:cstr) . ')')
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Connect(' . string(a:cstr) . ')') | endif
+  " reset the last executed statement
+  let s:sqlplus.last_stmt = ''
   if s:sqlplus.GetPid() && a:bang == '!'
     " destroy the sqlplus process if any attached
-    call s:log.debug('Connect with bang. Destroy the old attached sqlplus process.')
+    if s:log.isDebugEnabled() | call s:log.debug('Connect with bang. Destroy the old attached sqlplus process.') | endif
     call s:sqlplus.Destroy()
     let s:sqlplus = voraxlib#sqlplus#New()
   endif
@@ -53,30 +55,57 @@ function! vorax#Connect(cstr, bang)"{{{
       echo 'Aborted!'
     endif
   endif
-  call s:log.trace("END vorax#Connect")
+  if s:log.isTraceEnabled() | call s:log.trace("END vorax#Connect") | endif
 endfunction"}}}
 
 " Execute the provided command and spit the result into the output window.
 function! vorax#Exec(command)"{{{
-  call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')')
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
+  " save the last command. this is require in order to be able to replay it.
+  let s:sqlplus.last_stmt = a:command
   " exec the command in bg, prefixed with a CR. this is important especially
   " in connection with set echo on.
-  call s:sqlplus.NonblockExec(s:sqlplus.Pack(a:command))
+  call s:sqlplus.NonblockExec(s:sqlplus.Pack(s:sqlplus.last_stmt))
   call s:output.StartMonitor()
-  call s:log.trace('END vorax#Exec')
+  if s:log.isTraceEnabled() | call s:log.trace('END vorax#Exec') | endif
 endfunction"}}}
 
 " Execute the statement under cursor form the current buffer.
 function! vorax#ExecCurrent()"{{{
-  call s:log.trace('BEGIN vorax#ExecCurrent()')
-  let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
-  let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
-  call voraxlib#utils#HighlightRange('TODO', start_l, start_c, end_l, end_c)
-  au VoraX CursorMoved <buffer> call s:ClearHighlight()
-  let statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
-  let statement = voraxlib#utils#TrimSqlComments(statement)
-  call vorax#Exec(statement)
-  call s:log.trace('END vorax#ExecCurrent')
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#ExecCurrent()') | endif
+  if voraxlib#utils#IsSqlOracleBuffer()
+    try
+      let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
+      let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
+      if voraxlib#utils#IsHighlightEnabled()
+        " highlight the statement under cursor
+        call voraxlib#utils#HighlightRange(g:vorax_statement_highlight_group, 
+              \ start_l, start_c, end_l, end_c)
+      endif
+      let statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
+      let statement = voraxlib#utils#TrimSqlComments(statement)
+      call vorax#Exec(statement)
+    catch /^A sql syntax must be enabled for the current buffer.$/
+      call voraxlib#utils#Warn("Cannot detect the current statement if syntax is not enabled!")
+      if s:log.isErrorEnabled() | call s:log.error('Syntax is not enabled! Cannot detect the current statement.') | endif
+    endtry
+  else
+    call voraxlib#utils#Warn("Cannot execute the current statement from a non sql oracle buffer.")
+    if s:log.isErrorEnabled() | call s:log.error('The originating buffer is not an sql oracle one.') | endif
+  endif
+  if s:log.isTraceEnabled() | call s:log.trace('END vorax#ExecCurrent') | endif
+endfunction"}}}
+
+" Execute the currently selected block in the current buffer.
+function! vorax#ExecSelection()"{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#ExecSelection()') | endif
+  if voraxlib#utils#IsHighlightEnabled()
+    " highlight the statement under cursor
+    call voraxlib#utils#HighlightRange(g:vorax_statement_highlight_group, 
+          \ getpos("'<")[1], virtcol("'<"), getpos("'>")[1], virtcol("'>"))
+  endif
+  call vorax#Exec(voraxlib#utils#SelectedBlock())
+  if s:log.isTraceEnabled() | call s:log.trace('END vorax#ExecSelection') | endif
 endfunction"}}}
 
 " Provides completion for profile names. It is used in the VoraxConnect
@@ -97,6 +126,9 @@ endfunction"}}}
 
 " Get the sqlplus wrapper object.
 function! vorax#GetSqlplusHandler()"{{{
+  if !s:sqlplus.GetPid()
+    let s:sqlplus = voraxlib#sqlplus#New()
+  endif
   return s:sqlplus
 endfunction"}}}
 
@@ -110,9 +142,3 @@ function! vorax#GetOutputWindowHandler()"{{{
   return s:output
 endfunction"}}}
 
-" This function is internally called from an autocommand in order to clear the
-" highlighting of the current executed SQL statement.
-function! s:ClearHighlight()"{{{
-  match none
-  au! VoraX CursorMoved <buffer>
-endfunction"}}}

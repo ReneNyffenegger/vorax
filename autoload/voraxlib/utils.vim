@@ -261,7 +261,20 @@ endfunction"}}}
 
 " whenever or not the provided output contains oracle error messages
 function! voraxlib#utils#HasErrors(output)"{{{
-  return a:output =~ '^\(ORA\|SP\|PLS\)-[0-9]\+'
+  return a:output =~ '^\(ORA\|SP[0-9]\?\|PLS\)-[0-9]\+'
+endfunction"}}}
+
+" whenever or not the current buffer is an oracle sql one.
+function! voraxlib#utils#IsSqlOracleBuffer()"{{{
+  " If g:sql_type_default is not initialized then assume Oracle.
+  return (exists('g:sql_type_default') && g:sql_type_default == 'sqloracle' && &ft == 'sql' )
+      \ || (!exists('g:sql_type_default'))
+endfunction"}}}
+
+" whenever or not the executing statement should be highlighted.
+function! voraxlib#utils#IsHighlightEnabled()"{{{
+  return exists('g:vorax_statement_highlight_group') 
+        \ && g:vorax_statement_highlight_group != ''
 endfunction"}}}
 
 let &cpo=s:cpo
