@@ -90,9 +90,9 @@ endfunction
 function! TestVoraxSqlplusPack()
   let sqlplus = voraxlib#sqlplus#New()
   " pack as an array of commands
-  call VUAssertTrue(sqlplus.Pack(['set linesize 1000', 'select * from cat;'], 'my_pack_file.sql') == '@my_pack_file.sql', 'Test pack 1')
+  call VUAssertTrue(sqlplus.Pack(['set linesize 1000', 'select * from cat;'], {'target_file' : 'my_pack_file.sql'}) == '@my_pack_file.sql', 'Test pack 1')
   " pack as CR delimited list of commands
-  call VUAssertTrue(sqlplus.Pack("set linesize 1000\nselect * from cat;", 'my_pack_file.sql') == '@my_pack_file.sql', 'Test pack 2')
+  call VUAssertTrue(sqlplus.Pack("set linesize 1000\nselect * from cat;", {'target_file': 'my_pack_file.sql'}) == '@my_pack_file.sql', 'Test pack 2')
   call sqlplus.Destroy()
 endfunction
 
