@@ -296,7 +296,7 @@ function! s:sqlplus.Cancel(message) dict"{{{
       VIM::command('redraw | echon ' + VIM::evaluate('a:message').inspect)
     end
     VIM::command('return 1')
-  rescue
+  rescue NotImplementedError
     VIM::command('return 0')
   end
 EORC

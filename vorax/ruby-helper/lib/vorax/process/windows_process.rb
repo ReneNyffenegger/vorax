@@ -46,6 +46,11 @@ module Vorax
     def read(bytes)
       read_file(@reader, bytes) unless peek_named_pipe(@reader).zero?
     end
+
+    def cancel
+      # On Windows cancelling the currently executing statement is not supported.
+      raise NotImplementedError.new
+    end
     
     private
 
@@ -84,8 +89,6 @@ module Vorax
         msg.gsub!(/\000/, '')
         msg.strip!
         raise msg
-      else
-        raise 'GetLastError returned ERROR_SUCCESS'
       end
     end
 

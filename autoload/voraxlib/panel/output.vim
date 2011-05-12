@@ -121,7 +121,9 @@ function! s:FetchResults()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
   let chunk = sqlplus.Read()
   " spit the results
-  call s:output_window.AppendText(chunk)
+  if chunk != ""
+    call s:output_window.AppendText(chunk)
+  endif
   " simulate a key press in order to fire the CursorHold auto command.
   call feedkeys("f\e")  
   " if that's the last chunk of data which also means the command has
@@ -147,7 +149,7 @@ endfunction"}}}
 " ACCEPT sqlplus commands, prompting for values etc.
 function! s:SetupInteractivity()"{{{
   au VoraX InsertEnter <buffer> call s:PrepareInsertMode()
-  au VoraX CursorMovedI <buffer> call s:ForceAnchor()
+  au VoraX CursorMovedI <buffer> call s:EnforceAnchor()
   " define special mappings
   noremap <buffer> <esc> :call <SID>CancelExec()<cr>
   inoremap <buffer> <cr> <C-o>:call <SID>ProcessUserInput()<cr>
@@ -215,9 +217,19 @@ function! s:CancelExec()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
   if sqlplus.IsBusy()
     if !sqlplus.Cancel('Please wait. Aborting...')
-      if s:log.isWarnEnabled() | call s:log.warn('Could not cancel! Reconnect is needed.') | endif
-      call voraxlib#utils#Warn("Could not gracefully cancel the currently executing statement.\n".
-            \ "You must reconnect!")
+      if s:log.isWarnEnabled() | call s:log.warn('Could not cancel on this platform! Reconnect is needed.') | endif
+      call voraxlib#utils#Warn("Can not gracefully cancel the currently executing statement on your current OS platform.\n")
+      let response = voraxlib#utils#PickOption(
+            \ 'Do you want to abort this session? (if yes, reconnect is needed)',
+            \ ['(Y)es', '(N)o'])
+      if response == 'Y'
+        if s:log.isDebugEnabled() | call s:log.debug('User opts for aborting the session.') | endif
+        call vorax#ResetSqlplusHandler()
+      else
+        if s:log.isDebugEnabled() | call s:log.debug('User opts to NOT abort the session.') | endif
+      	redraw
+      	return
+      endif
     endif
     if getline('.') != ""
       " if the last line is not empty then it means we are just in the middle
@@ -283,12 +295,12 @@ endfunction"}}}
 " the InsertEnter autocmd.
 function! s:SetCursorAtTail()"{{{
   call setpos('.', [bufnr('%'), line('$'), 0, 0])
-  call setpos('.', [bufnr('%'), line('$'), col('$') + 1, 0])
+  call setpos('.', [bufnr('%'), line('$'), col('$') + 2, 0])
 endfunction"}}}
 
 " This function is invoked by the CursorMovedI autocommand and prohibits the
 " user to move the cursor beyond the current prompter.
-function! s:ForceAnchor()"{{{
+function! s:EnforceAnchor()"{{{
   if exists('s:anchor') &&
         \ (line('.') < s:anchor[0] || col('.') < s:anchor[1] - 1)
     let line = getline('.')

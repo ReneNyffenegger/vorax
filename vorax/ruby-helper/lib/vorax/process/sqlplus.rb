@@ -233,21 +233,17 @@ module Vorax
 
     # Cancel the currently executing statement.
     def cancel
+      # send cancel signal
       @process.cancel
       self << "\n"
       self << "prompt #{CANCEL_MARKER}\n"
-      chunk = ""
+      chunk = "" 
       while true
         buf = @process.read(@read_buffer_size)
         yield if block_given?
         if buf
           chunk << buf
           if chunk =~ /#{CANCEL_MARKER}/
-            # not busy anymore
-            @busy = false
-            # some dirty output still remains after a cancel. The following is a
-            # workaround to trash it!
-            exec("\n")
             break
           end
         else
@@ -255,6 +251,11 @@ module Vorax
           sleep READ_SLEEP_TICK
         end
       end
+      # not busy anymore.
+      @busy = false
+      # some dirty output still remains after a cancel. The following is a
+      # workaround to trash it!
+      exec("\n")
     end
 
     # Kill the attached sqlplus process

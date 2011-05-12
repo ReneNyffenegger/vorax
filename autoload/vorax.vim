@@ -29,8 +29,7 @@ function! vorax#Connect(cstr, bang)"{{{
   if s:sqlplus.GetPid() && a:bang == '!'
     " destroy the sqlplus process if any attached
     if s:log.isDebugEnabled() | call s:log.debug('Connect with bang. Destroy the old attached sqlplus process.') | endif
-    call s:sqlplus.Destroy()
-    let s:sqlplus = voraxlib#sqlplus#New()
+    call vorax#ResetSqlplusHandler()
   endif
   if s:sqlplus.GetPid()
     " set the session owner monitor policy
@@ -130,6 +129,12 @@ function! vorax#GetSqlplusHandler()"{{{
     let s:sqlplus = voraxlib#sqlplus#New()
   endif
   return s:sqlplus
+endfunction"}}}
+
+" Destroys the current sqlplus handler and creates a new one.
+function! vorax#ResetSqlplusHandler()"{{{
+  call s:sqlplus.Destroy()
+  let s:sqlplus = voraxlib#sqlplus#New()
 endfunction"}}}
 
 " Get the default throbber
