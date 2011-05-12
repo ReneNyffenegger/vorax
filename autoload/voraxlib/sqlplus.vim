@@ -193,9 +193,19 @@ EORC
 endfunction "}}}
 
 " Asynchronously exec the provided command without waiting for the output. The
-" result may be read in chunks afterwards using Read() calls.
-function! s:sqlplus.NonblockExec(command) dict "{{{
-  ruby $sqlplus_factory[VIM::evaluate('self.ruby_key')].nonblock_exec(VIM::evaluate('a:command'))
+" result may be read in chunks afterwards using Read() calls. The optional
+" parameter is for providing the option of including the END_OF_REQUEST mark
+" at the end of the command. By default it is added automatically. If 0 is
+" provided then no mark is inserted.
+function! s:sqlplus.NonblockExec(command, ...) dict "{{{
+  if a:0 > 0 
+    let include_eor = a:1
+  endif
+  ruby <<EORC
+  params = [VIM::evaluate('a:command')]
+  params << (VIM::evaluate('include_eor') == 1 ? true : false) if VIM::evaluate('exists("include_eor")') == 1
+  $sqlplus_factory[VIM::evaluate('self.ruby_key')].nonblock_exec(*params)
+EORC
 endfunction "}}}
 
 " Asynchronously read the output from an sqlplus process. It is tipically
@@ -238,15 +248,17 @@ function! s:sqlplus.GetConfigFor(...) dict"{{{
   endif
 endfunction"}}}
 
-" Pack several SQL commands provided through the a:commands array into the
-" given optional target_file, specified as relative to the sqlplus run_dir. 
+" Pack several SQL commands provided through the a:commands array. The
+" optional parameter is a dictionary with the following structure:
+" {'target_file' : '<filename relative to the sqlplus run_dir>',
+"  'include_eor' : '0|1 whenever or not to include the END_OF_REQUEST marker}
 " Packing before executing is recommended especially in
 " case of sending a lot of statements to be executed (e.g. packages,
 " procedures, types etc.) but also if the SET ECHO ON feature is enabled and
 " the user wants to have the list of executed statement displayed within the
-" output window. 
+" output window.
 " It returns the sqlplus command to actually execute all commands via the 
-" pack file (e.g. @target_file)
+" pack file (e.g. @target_file).
 function! s:sqlplus.Pack(commands, ...)"{{{
   if type(a:commands) == 3
     let commands = a:commands
@@ -259,22 +271,29 @@ function! s:sqlplus.Pack(commands, ...)"{{{
   	return
   endif
   if a:0 > 0
-    ruby VIM::command(%!return #{$sqlplus_factory[VIM::evaluate('self.ruby_key')].pack(VIM::evaluate('commands'), VIM::evaluate('a:1')).inspect}!)
-  else
-    ruby VIM::command(%!return #{$sqlplus_factory[VIM::evaluate('self.ruby_key')].pack(VIM::evaluate('commands')).inspect}!)
+    if has_key(a:1, 'target_file')
+      let target_file = a:1.target_file
+    endif
+    if has_key(a:1, 'include_eor')
+    	let include_eor = a:1.include_eor
+    endif
+  endif
+  ruby <<EORC
+  params = [VIM::evaluate('commands')]
+  params << (VIM::evaluate('exists("target_file")') == 1 ? VIM::evaluate('target_file') : nil)
+  params << (VIM::evaluate('include_eor') == 1 ? true : false) if VIM::evaluate('exists("include_eor")') == 1
+  VIM::command(%!return #{$sqlplus_factory[VIM::evaluate('self.ruby_key')].pack(*params).inspect}!)
+EORC
   endif
 endfunction"}}}
 
 " Cancel the currently executing command. On some platforms (Windows) this is
 " not possible and this cancel operation ends up in an actual process kill.
-function! s:sqlplus.Cancel() dict"{{{
+function! s:sqlplus.Cancel(message) dict"{{{
   ruby <<EORC
   begin
-    $sqlplus_factory[VIM::evaluate('self.ruby_key')].cancel
-    $sqlplus_factory[VIM::evaluate('self.ruby_key')]<<"\n"
-    $sqlplus_factory[VIM::evaluate('self.ruby_key')].exec("\n") do
-      VIM::command('redraw')
-      VIM::command('echon "Cancelling..."')
+    $sqlplus_factory[VIM::evaluate('self.ruby_key')].cancel do
+      VIM::command('redraw | echon ' + VIM::evaluate('a:message').inspect)
     end
     VIM::command('return 1')
   rescue

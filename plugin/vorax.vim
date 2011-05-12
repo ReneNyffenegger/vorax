@@ -222,6 +222,10 @@ endif"}}}
 if !exists('g:vorax_exec_key')
   let g:vorax_exec_key = "<Leader>e"
 endif"}}}
+" g:vorax_output_window_clear_key"{{{
+if !exists('g:vorax_output_window_clear_key')
+  let g:vorax_output_window_clear_key = "cle"
+endif"}}}
 " g:vorax_profiles_window_toggle_key"{{{
 if !exists('g:vorax_profiles_window_toggle_key')
   let g:vorax_profiles_window_toggle_key = "<Leader>co"

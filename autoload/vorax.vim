@@ -65,7 +65,7 @@ function! vorax#Exec(command)"{{{
   let s:sqlplus.last_stmt = a:command
   " exec the command in bg, prefixed with a CR. this is important especially
   " in connection with set echo on.
-  call s:sqlplus.NonblockExec(s:sqlplus.Pack(s:sqlplus.last_stmt))
+  call s:sqlplus.NonblockExec(s:sqlplus.Pack(s:sqlplus.last_stmt, {'include_eor' : 1}), 0)
   call s:output.StartMonitor()
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#Exec') | endif
 endfunction"}}}

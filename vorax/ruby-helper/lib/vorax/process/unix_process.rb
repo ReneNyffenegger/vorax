@@ -17,7 +17,6 @@ module Vorax
       require 'pty'
       @reader, @writer, @pid = PTY.spawn(command)
       @writer.sync = true
-      @reader.sync = true
     end
 
     # send text to the process

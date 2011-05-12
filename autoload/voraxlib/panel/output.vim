@@ -49,6 +49,11 @@ function! s:ExtendWindow()"{{{
     setlocal nolist
     setlocal foldcolumn=0 nofoldenable
     setlocal noreadonly
+
+    " define mappings
+    if exists('g:vorax_output_window_clear_key') && g:vorax_output_window_clear_key != ''
+      exe 'nnoremap <buffer> ' . g:vorax_output_window_clear_key . ' :call <SID>ClearOutputWindow()<cr>'
+    endif
   endfunction"}}}
 
   " Write the provided text at the end of the output window. If 
@@ -90,25 +95,16 @@ function! s:ExtendWindow()"{{{
       let s:originating_window = winnr()
     endif
     call self.Focus()
-    "if g:vorax_inline_prompt
-      "inoremap <buffer> <cr> <esc>:call <SID>ProcessUserInput()<cr>
-    "else
-      "nmap <buffer> <cr> :call <SID>ProcessUserInput()<cr>
-    "endif
-    noremap <buffer> <esc> :call <SID>CancelExec()<cr>
     au VoraX CursorHold <buffer> call s:FetchResults()
-    call feedkeys("f\e")  
+    call s:SetupInteractivity()
   endfunction"}}}
 
   " Stop the monitor for the output window.
   function s:output_window.StopMonitor()"{{{
     call self.Focus()
-    "mapclear <buffer>
-    "imapclear <buffer>
-    "" still, the registered keys should remain
-    "call s:RegisterKeys()
     au VoraX CursorHold <buffer> call s:FetchResults()
     autocmd! VoraX CursorHold <buffer>
+    call s:RemoveInteractivity()
     if !g:vorax_output_window_keep_focus_after_exec
       " restore focus to the originating window
       exe s:originating_window.'wincmd w'
@@ -136,7 +132,7 @@ function! s:FetchResults()"{{{
     echon 'Done.'
   else
     " feedback to the user please.
-    call s:UpdateThrobber('Executing...', vorax#GetDefaultThrobber())
+    call s:UpdateThrobber('Executing... Press <esc> to cancel.', vorax#GetDefaultThrobber())
   endif
 endfunction"}}}
 
@@ -147,6 +143,45 @@ function! s:UpdateThrobber(msg, throbber)"{{{
   "let &titlestring=a:msg . ' '. a:throbber.Spin()
 endfunction"}}}
 
+" This function prepares the output window for interactivity like: respond to
+" ACCEPT sqlplus commands, prompting for values etc.
+function! s:SetupInteractivity()"{{{
+  au VoraX InsertEnter <buffer> call s:PrepareInsertMode()
+  au VoraX CursorMovedI <buffer> call s:ForceAnchor()
+  " define special mappings
+  noremap <buffer> <esc> :call <SID>CancelExec()<cr>
+  inoremap <buffer> <cr> <C-o>:call <SID>ProcessUserInput()<cr>
+endfunction"}}}
+
+" Remove the interactivity features.
+function! s:RemoveInteractivity()"{{{
+  " remove autocommands
+  au! VoraX InsertEnter <buffer>
+  au! VoraX CursorMovedI <buffer>
+  " remove keys
+  let map = maparg('<esc>', 'n', 0, 1)
+  if has_key(map, 'buffer') && map.buffer == 1
+    unmap <buffer> <esc>
+  endif
+  let map = maparg('<cr>', 'i', 0, 1)
+  if has_key(map, 'buffer') && map.buffer == 1
+    inoremap <buffer> <cr> <cr>
+  endif
+  if exists('s:anchor')
+  	unlet s:anchor
+  endif
+endfunction"}}}
+
+" This function is used to get what the user inputed in the output window and
+" to send that text to the sqlplus process.
+function! s:ProcessUserInput()"{{{
+  let val = strpart(getline('.'), s:anchor[1] - 2)
+  if s:log.isDebugEnabled() | call s:log.debug('s:ProcessUserInput(): val=' .string(val)) | endif
+  call s:output_window.AppendText("\n")
+  call vorax#GetSqlplusHandler().SendText(val . "\n")
+  stopinsert
+endfunction"}}}
+
 " Registers an autocommand for the current buffer to clear any highlighting
 " when the cursor moves. This is done only if it's an oracle sql buffer and a
 " highlight group was setup.
@@ -155,7 +190,8 @@ function! s:RegisterClearHighlight()"{{{
         \ voraxlib#utils#IsHighlightEnabled()
     " store the current cursor position
     let [s:crr_l, s:crr_c] = [line('.'), col('.')]
-    au VoraX CursorHold <buffer> call s:ClearHighlight()
+    if s:log.isDebugEnabled() | call s:log.debug('s:RegisterClearHighlight(): [s:crr_l, s:crr_c]=' .string([s:crr_l, s:crr_c])) | endif
+    au VoraX CursorMoved <buffer> call s:ClearHighlight()
   endif
 endfunction"}}}
 
@@ -167,21 +203,22 @@ function! s:ClearHighlight()"{{{
     " only if the cursor was really moved. This event is quite impredictible
     " and may be triggered by other plugins.
     match none
-    au! VoraX CursorHold <buffer>
+    au! VoraX CursorMoved <buffer>
     unlet s:crr_l
     unlet s:crr_c
   endif
 endfunction"}}}
 
 " Aborts the execution of the current statement.
-function! s:CancelExec()
+function! s:CancelExec()"{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:CancelExec()') | endif
   let sqlplus = vorax#GetSqlplusHandler()
   if sqlplus.IsBusy()
-    if !sqlplus.Cancel()
+    if !sqlplus.Cancel('Please wait. Aborting...')
+      if s:log.isWarnEnabled() | call s:log.warn('Could not cancel! Reconnect is needed.') | endif
       call voraxlib#utils#Warn("Could not gracefully cancel the currently executing statement.\n".
             \ "You must reconnect!")
     endif
-    call s:output_window.StopMonitor()
     if getline('.') != ""
       " if the last line is not empty then it means we are just in the middle
       " of the output of the last cancelled statement. Let's add 2 empty lines
@@ -189,12 +226,80 @@ function! s:CancelExec()
       " cancelled one.
       call s:output_window.AppendText("\n\n")
     endif
+    call s:output_window.StopMonitor()
     redraw
     echon "Done!"
   else
+    if s:log.isWarnEnabled() | call s:log.warn('You want to cancel what?') | endif
   	call voraxlib#utils#Warn("Nothing to cancel!")
   endif
-endfunction
+  if s:log.isTraceEnabled() | call s:log.trace('END s:CancelExec') | endif
+endfunction"}}}
+
+" This function is invoked by the clear window mapping.
+function! s:ClearOutputWindow()"{{{
+  call s:output_window.Clear()
+endfunction"}}}
+
+" This function is invokde by an autocommand before entering in insert mode.
+" It places the cursor at the end of the buffer and remember this position.
+function! s:PrepareInsertMode()"{{{
+  " put the cursor at the end
+  call s:SetCursorAtTail()
+  " save this position in order to be able to prohibit the user to change the
+  " buffer beyond this anchor.
+  let s:anchor = [line('$'), col('$') + 1, strpart(getline('.'), 0, col('$')+1)]
+  " remap the <esc> mapping in order to discard the inputed text in case the
+  " user press <esc>
+  if &cpo !~ 'k'
+    " remaping the <esc> key creates some problems with other special keys
+    " like arrows, pgup/pgdown etc. because they are prefixed with ^[ which
+    " triggers the vorax defined <esc> map. As an workaround we temporary
+    " add the 'k' flag into the current &cpo setting.
+    let s:saved_cpo = &cpo
+    exe 'set cpo+=k'
+  endif
+  inoremap <buffer> <esc> <C-o>:call <SID>CancelPrompt()<cr>
+endfunction"}}}
+
+" Discards what the user entered at the sqlplus ACCEPT prompt.
+function! s:CancelPrompt()"{{{
+  echom 'a intrat'
+  stopinsert
+  " restore the old prompt
+  if exists('s:anchor')
+    call setline(s:anchor[0], s:anchor[2])
+  endif
+  " restore the default <esc> mapping
+  inoremap <buffer> <esc> <esc>
+  if exists('s:saved_cpo')
+    " restore the old &cpo setting
+    let &cpo = s:saved_cpo
+    unlet s:saved_cpo
+  endif
+endfunction"}}}
+
+" This function place the cursor at the end of the last line. It is invoked by
+" the InsertEnter autocmd.
+function! s:SetCursorAtTail()"{{{
+  call setpos('.', [bufnr('%'), line('$'), 0, 0])
+  call setpos('.', [bufnr('%'), line('$'), col('$') + 1, 0])
+endfunction"}}}
+
+" This function is invoked by the CursorMovedI autocommand and prohibits the
+" user to move the cursor beyond the current prompter.
+function! s:ForceAnchor()"{{{
+  if exists('s:anchor') &&
+        \ (line('.') < s:anchor[0] || col('.') < s:anchor[1] - 1)
+    let line = getline('.')
+    let tail = strpart(line, col('.'))
+    if strpart(line, 0, s:anchor[1]) != s:anchor[2]
+      let line = s:anchor[2] . tail
+      call setline(s:anchor[0], line)
+    endif
+    call s:SetCursorAtTail()
+  endif
+endfunction"}}}
 
 let &cpo=s:cpo
 unlet s:cpo

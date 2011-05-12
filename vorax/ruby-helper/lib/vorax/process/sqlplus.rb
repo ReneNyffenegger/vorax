@@ -93,13 +93,13 @@ module Vorax
     # method returns immediatelly but it's up to the caller to async
     # read the corresponding output. The sqlplus process will remain
     # busy unless the output is read till the END_OF_REQUEST marker.
-    def nonblock_exec(command)
+    def nonblock_exec(command, include_eor = true)
       raise "Sqlplus busy executing another command." if busy?
       # set as busy in order to prohibit executing other commands
       @busy = true
       self << "#{command}\n"
       # mark the end of the request
-      self << "prompt #{END_OF_REQUEST}\n"
+      self << "prompt #{END_OF_REQUEST}\n" if include_eor
     end
 
     # Set the session owner monitor mode. If activated, after every exec
@@ -231,11 +231,30 @@ module Vorax
       @busy
     end
 
-    # Send a cancel signal to the sqlplus process. The control is returned
-    # immediatelly therefore is up to the caller to ensure that the statement was
-    # actually cancelled.
+    # Cancel the currently executing statement.
     def cancel
       @process.cancel
+      self << "\n"
+      self << "prompt #{CANCEL_MARKER}\n"
+      chunk = ""
+      while true
+        buf = @process.read(@read_buffer_size)
+        yield if block_given?
+        if buf
+          chunk << buf
+          if chunk =~ /#{CANCEL_MARKER}/
+            # not busy anymore
+            @busy = false
+            # some dirty output still remains after a cancel. The following is a
+            # workaround to trash it!
+            exec("\n")
+            break
+          end
+        else
+          # just wait a little bit
+          sleep READ_SLEEP_TICK
+        end
+      end
     end
 
     # Kill the attached sqlplus process
@@ -245,13 +264,14 @@ module Vorax
 
     # pack the provided commands into a sql file. It returns
     # the name of the sql file prefixed with @.
-    def pack(commands = [], filename = "run_this.sql", include_eor = false)
+    def pack(commands = [], filename = DEFAULT_PACK_FILE, include_eor = false)
       # the bootstrap file is created in the current directory. However,
       # it is expected that VoraX will arrange things so that the crr
       # directory will be under $TEMP.
       cmds = (commands.nil? ? [] : commands)
       file_content = cmds.join("\n")
       file_content << "\nprompt #{END_OF_REQUEST}\n" if include_eor
+      filename = DEFAULT_PACK_FILE if filename.nil?
       File.open("#@run_dir/#{filename}", 'w') {|f| f.write(file_content) }
       "@#{filename}"
     end
@@ -282,6 +302,12 @@ module Vorax
     # the sqlplus process must be read after executing
     # a statement.
     END_OF_REQUEST = '>>> VORAX_END_OF_REQUEST <<<'
+
+    # This marker is used to mark a cancel request.
+    CANCEL_MARKER = '>>> VORAX_CANCEL_REQUEST <<<'
+
+    # Where to pack the sql commands by default.
+    DEFAULT_PACK_FILE = "run_this.sql"
 
     # If there's no data to read from the sqlplus output how long
     # (in seconds) to wait till the next read.
