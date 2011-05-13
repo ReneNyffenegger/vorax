@@ -253,25 +253,34 @@ function! s:ClearOutputWindow()"{{{
   call s:output_window.Clear()
 endfunction"}}}
 
+" This function is called by an CursorHoldI autocommand in order to force the
+" user to insert text at the end of the buffer.
+function! s:ForceInsertAtTheEnd()
+  call s:SetCursorAtTail()
+  au! VoraX CursorHoldI <buffer>
+endfunction
+
 " This function is invokde by an autocommand before entering in insert mode.
 " It places the cursor at the end of the buffer and remember this position.
 function! s:PrepareInsertMode()"{{{
-  " put the cursor at the end
-  call s:SetCursorAtTail()
+  if line('.') == line('$') && col('.') == col('$')
+    " it's okey
+  else
+    call voraxlib#utils#Warn("You are not allowed to edit here but at the end of the output.")
+    " wait a second to allow user to read
+    sleep 1
+    " register an autoevent to exit from the insert mode
+    au VoraX CursorHoldI <buffer> call s:ForceInsertAtTheEnd()
+  endif
   " save this position in order to be able to prohibit the user to change the
   " buffer beyond this anchor.
-  let s:anchor = [line('$'), col('$') + 1, strpart(getline('.'), 0, col('$')+1)]
+  let [ll, lc] = [line('$'), len(getline('$'))]
+  let s:anchor = [ll, lc+1, strpart(getline('$'), 0, lc+1)]
   " remap the <esc> mapping in order to discard the inputed text in case the
   " user press <esc>
-  if &cpo !~ 'k'
-    " remaping the <esc> key creates some problems with other special keys
-    " like arrows, pgup/pgdown etc. because they are prefixed with ^[ which
-    " triggers the vorax defined <esc> map. As an workaround we temporary
-    " add the 'k' flag into the current &cpo setting.
-    let s:saved_cpo = &cpo
-    exe 'set cpo+=k'
-  endif
-  inoremap <buffer> <esc> <C-o>:call <SID>CancelPrompt()<cr>
+  inoremap <buffer> ^] <C-o>:call <SID>CancelPrompt()<cr>
+  redraw
+  echo 'Enter the value sqlplus asks for...'
 endfunction"}}}
 
 " Discards what the user entered at the sqlplus ACCEPT prompt.
@@ -284,11 +293,6 @@ function! s:CancelPrompt()"{{{
   endif
   " restore the default <esc> mapping
   inoremap <buffer> <esc> <esc>
-  if exists('s:saved_cpo')
-    " restore the old &cpo setting
-    let &cpo = s:saved_cpo
-    unlet s:saved_cpo
-  endif
 endfunction"}}}
 
 " This function place the cursor at the end of the last line. It is invoked by
@@ -303,6 +307,7 @@ endfunction"}}}
 function! s:EnforceAnchor()"{{{
   if exists('s:anchor') &&
         \ (line('.') < s:anchor[0] || col('.') < s:anchor[1] - 1)
+    call s:SetCursorAtTail()
     let line = getline('.')
     let tail = strpart(line, col('.'))
     if strpart(line, 0, s:anchor[1]) != s:anchor[2]
