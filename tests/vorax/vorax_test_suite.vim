@@ -17,9 +17,22 @@
 " In order to setup an oracle vorax test user you have to run the following
 " script: tests/vorax/sql/setup_vorax_test_user.sql.
 "
+" Some GUI features need to be tested with a remote vim in place. This means
+" that a new VIM process will be created by this test suite. The GUI testing
+" part is controlled by the following global variables:
+"
+" g:vorax_test_gui: enable or disable GUI testing (by default 1)
+" g:vorax_test_gui_servername: the name of the vim server
+" g:vorax_test_gui_vim_exe: the vim executable to use when launching the
+" remote vim server.
+"
 " To run the regression test use:
 "   :so %
 " and look at the displayed statistics.
+
+if !exists('g:vorax_test_gui') | let g:vorax_test_gui = 1 | endif
+if !exists('g:vorax_test_gui_servername') | let g:vorax_test_gui_servername = 'VORAX_TEST_SERVER' | endif
+if !exists('g:vorax_test_gui_vim_exe') | let g:vorax_test_gui_vim_exe = 'gvim' | endif
 
 " Create the suite.
 function! TestSuiteForVorax()
@@ -59,6 +72,21 @@ function! s:VoraxUnitTestsCleanup()
     exe 'delfunction ' . substitute(func_name, '()$', '', '')
   endfor
 endfunction
+
+" Initialize the vim server for GUI testing.
+function! s:InitVimServer()
+  for vim_server in split(serverlist(), "\n")
+    if vim_server == g:vorax_test_gui_servername
+      let pid = str2nr(remote_expr(g:vorax_test_gui_servername, 'getpid()'))
+      ruby Process.kill(9, VIM::evaluate('pid'))
+    end
+  endfor
+  " starts a new vim as a server
+  silent exe "!" . g:vorax_test_gui_vim_exe . " --servername " . g:vorax_test_gui_servername
+endfunction
+
+" Initialize the remote vim server
+if g:vorax_test_gui | call s:InitVimServer() | endif
 
 " Run suite.
 call VURunnerRunTest('TestSuiteForVorax')

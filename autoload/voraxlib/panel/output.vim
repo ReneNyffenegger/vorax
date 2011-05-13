@@ -152,7 +152,7 @@ function! s:SetupInteractivity()"{{{
   au VoraX CursorMovedI <buffer> call s:EnforceAnchor()
   " define special mappings
   noremap <buffer> <esc> :call <SID>CancelExec()<cr>
-  inoremap <buffer> <cr> <C-o>:call <SID>ProcessUserInput()<cr>
+  inoremap <buffer> <cr> <esc>:call <SID>ProcessUserInput()<cr>
 endfunction"}}}
 
 " Remove the interactivity features.
@@ -167,7 +167,7 @@ function! s:RemoveInteractivity()"{{{
   endif
   let map = maparg('<cr>', 'i', 0, 1)
   if has_key(map, 'buffer') && map.buffer == 1
-    inoremap <buffer> <cr> <cr>
+    iunmap <buffer> <cr>
   endif
   if exists('s:anchor')
   	unlet s:anchor
@@ -278,7 +278,7 @@ function! s:PrepareInsertMode()"{{{
   let s:anchor = [ll, lc+1, strpart(getline('$'), 0, lc+1)]
   " remap the <esc> mapping in order to discard the inputed text in case the
   " user press <esc>
-  inoremap <buffer> ^] <C-o>:call <SID>CancelPrompt()<cr>
+  inoremap <buffer> <esc> <C-o>:call <SID>CancelPrompt()<cr>
   redraw
   echo 'Enter the value sqlplus asks for...'
 endfunction"}}}
@@ -292,7 +292,7 @@ function! s:CancelPrompt()"{{{
     call setline(s:anchor[0], s:anchor[2])
   endif
   " restore the default <esc> mapping
-  inoremap <buffer> <esc> <esc>
+  iunmap <buffer> <esc>
 endfunction"}}}
 
 " This function place the cursor at the end of the last line. It is invoked by
