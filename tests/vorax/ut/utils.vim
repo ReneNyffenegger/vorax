@@ -58,29 +58,40 @@ function! TestVoraxUtils()
   call setpos('.', [bufnr('%'), 1, 5, 0])
   let [l, c] = voraxlib#utils#GetStartOfCurrentSql(0)
   call VUAssertEquals([l, c], [1, 1], 'voraxlib#utils#GetStartOfCurrentSql test 1')
+
   call setpos('.', [bufnr('%'), 4, 28, 0])
   let [l, c] = voraxlib#utils#GetStartOfCurrentSql(1)
   call VUAssertEquals([l, c], [3, 1], 'voraxlib#utils#GetStartOfCurrentSql test 2')
   call VUAssertEquals([line('.'), col('.')], [3, 1], 'voraxlib#utils#GetStartOfCurrentSql test 3')
+
   call setpos('.', [bufnr('%'), 6, 40, 0])
   let [l, c] = voraxlib#utils#GetStartOfCurrentSql(0)
   call VUAssertEquals([l, c], [6, 10], 'voraxlib#utils#GetStartOfCurrentSql test 4')
+
   call setpos('.', [bufnr('%'), 1, 1, 0])
   let [l, c] = voraxlib#utils#GetEndOfCurrentSql(0)
   call VUAssertEquals([l, c], [2, 1], 'voraxlib#utils#GetEndOfCurrentSql test 1')
+
   call setpos('.', [bufnr('%'), 3, 5, 0])
   let [l, c] = voraxlib#utils#GetEndOfCurrentSql(1)
   call VUAssertEquals([l, c], [4, 43], 'voraxlib#utils#GetEndOfCurrentSql test 2')
   call VUAssertEquals([line('.'), col('.')], [4, 43], 'voraxlib#utils#GetEndOfCurrentSql test 2')
+
   call setpos('.', [bufnr('%'), 5, 5, 0])
   let [l, c] = voraxlib#utils#GetEndOfCurrentSql(0)
   call VUAssertEquals([l, c], [6, 9], 'voraxlib#utils#GetEndOfCurrentSql test 3')
+
   call setpos('.', [bufnr('%'), 6, 9, 0])
   let [l, c] = voraxlib#utils#GetEndOfCurrentSql(0)
   call VUAssertEquals([l, c], [6, 9], 'voraxlib#utils#GetEndOfCurrentSql test 4')
+
   call setpos('.', [bufnr('%'), 6, 10, 0])
   let [l, c] = voraxlib#utils#GetEndOfCurrentSql(0)
   call VUAssertEquals([l, c], [6, 43], 'voraxlib#utils#GetEndOfCurrentSql test 5')
+
+  call setpos('.', [bufnr('%'), 12, 8, 0])
+  let [l, c] = voraxlib#utils#GetEndOfCurrentSql(0)
+  call VUAssertEquals([l, c], [13, 9], 'voraxlib#utils#GetEndOfCurrentSql test 6')
   syntax clear
   try
     let [l, c] = voraxlib#utils#GetStartOfCurrentSql(0)

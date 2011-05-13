@@ -225,7 +225,7 @@ function! voraxlib#utils#GetEndOfCurrentSql(move)"{{{
     endif
   endwhile
   if [l, c] == [0, 0]
-  	let [l, c] = [1, 1]
+  	let [l, c] = [line('$'), len(getline('$'))]
   endif
   if !a:move
     " if not move requested then restore state

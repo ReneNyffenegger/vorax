@@ -9,3 +9,5 @@ from
 cat,
 muci
 where rownum < 10; /* test */
+select *
+from dual

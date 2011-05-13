@@ -76,6 +76,7 @@ function! vorax#ExecCurrent()"{{{
     try
       let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
       let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
+      if s:log.isDebugEnabled() | call s:log.debug('[start_l, start_c, end_l, end_c] = [' . start_l . ', ' . start_c . ', ' . end_l . ', ' . end_c . ']') | endif
       if voraxlib#utils#IsHighlightEnabled()
         " highlight the statement under cursor
         call voraxlib#utils#HighlightRange(g:vorax_statement_highlight_group, 
