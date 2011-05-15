@@ -73,20 +73,30 @@ function! s:VoraxUnitTestsCleanup()
   endfor
 endfunction
 
+" Destroy the Vim server.
+function! s:DestroyVimServer()
+  let pid = str2nr(remote_expr(g:vorax_test_gui_servername, 'getpid()'))
+  ruby Process.kill(9, VIM::evaluate('pid'))
+endfunction
+
 " Initialize the vim server for GUI testing.
-function! s:InitVimServer()
+function! s:CreateVimServer()
   for vim_server in split(serverlist(), "\n")
     if vim_server == g:vorax_test_gui_servername
-      let pid = str2nr(remote_expr(g:vorax_test_gui_servername, 'getpid()'))
-      ruby Process.kill(9, VIM::evaluate('pid'))
+      call s:DestroyVimServer()
+      break
     end
   endfor
   " starts a new vim as a server
   silent exe "!" . g:vorax_test_gui_vim_exe . " --servername " . g:vorax_test_gui_servername
+  call foreground()
 endfunction
 
 " Initialize the remote vim server
-if g:vorax_test_gui | call s:InitVimServer() | endif
+if g:vorax_test_gui | call s:CreateVimServer() | endif
 
 " Run suite.
 call VURunnerRunTest('TestSuiteForVorax')
+
+" Destroy the remote vim server
+"if g:vorax_test_gui | call s:DestroyVimServer() | endif

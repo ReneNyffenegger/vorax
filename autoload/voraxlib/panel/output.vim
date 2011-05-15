@@ -266,9 +266,6 @@ function! s:PrepareInsertMode()"{{{
   if line('.') == line('$') && col('.') == col('$')
     " it's okey
   else
-    call voraxlib#utils#Warn("You are not allowed to edit here but at the end of the output.")
-    " wait a second to allow user to read
-    sleep 1
     " register an autoevent to exit from the insert mode
     au VoraX CursorHoldI <buffer> call s:ForceInsertAtTheEnd()
   endif
