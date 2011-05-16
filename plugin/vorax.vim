@@ -188,28 +188,28 @@ endif"}}}
 " ==============================================================================
 " :VoraxConnect"{{{
 if !exists(':VoraxConnect')
-  command! -nargs=? -complete=customlist,vorax#ProfilesForCompletion 
+  command! -nargs=? -bar -complete=customlist,vorax#ProfilesForCompletion 
         \ -bang VoraxConnect :call vorax#Connect(<q-args>, '<bang>')
   nmap <unique> <script> <Plug>VoraxConnect :VoraxConnect<CR>
 endif"}}}
 " :VoraxExec"{{{
 if !exists(':VoraxExec')
-  command! -nargs=? VoraxExec :call vorax#Exec(<q-args>)
+  command! -nargs=1 VoraxExec :call vorax#Exec(<q-args>)
   nmap <unique> <script> <Plug>VoraxExec :VoraxExec<CR>
 endif"}}}
 " :VoraxExecCurrent"{{{
 if !exists(':VoraxExecCurrent')
-  command! -nargs=0 VoraxExecCurrent :call vorax#ExecCurrent()
+  command! -nargs=0 -bar VoraxExecCurrent :call vorax#ExecCurrent()
   nmap <unique> <script> <Plug>VoraxExecCurrent :VoraxExecCurrent<CR>
 endif"}}}
 " :VoraxExecSelection"{{{
 if !exists(':VoraxExecSelection')
-  command! -nargs=0 -range VoraxExecSelection :call vorax#ExecSelection()
+  command! -nargs=0 -bar -range VoraxExecSelection :call vorax#ExecSelection()
   xmap <unique> <script> <Plug>VoraxExecSelection :VoraxExecSelection<CR>
 endif"}}}
 " :VoraxProfilesWindowToggle"{{{
 if !exists(':VoraxProfilesWindowToggle')
-  command! -nargs=0 VoraxProfilesWindowToggle 
+  command! -nargs=0 -bar VoraxProfilesWindowToggle 
         \:call vorax#GetProfilesHandler().Toggle()
   nmap <unique> <script> <Plug>VoraxProfilesWindowToggle 
         \:VoraxProfilesWindowToggle<CR>
