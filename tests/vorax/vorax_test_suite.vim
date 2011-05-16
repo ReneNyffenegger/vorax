@@ -1,6 +1,6 @@
 " This is the test suite (regresion) for VoraX.
 " It runs all tests and displays the overall testing statistics. The [vimunit]
-" plugin must be installed: https://github.com/dsummersl/vimunit
+" plugin must be installed: git://github.com/talek/vimunit.git
 "
 " By convention:
 "   1. every unit test script resides under tests/vorax/ut/*
@@ -23,6 +23,8 @@
 "
 " g:vorax_test_gui: enable or disable GUI testing (by default 1)
 " g:vorax_test_gui_servername: the name of the vim server
+" g:vorax_test_gui_timeout: how long to wait for a response from the server
+" (in miliseconds). For slow computers increase this value. (by default 3000)
 " g:vorax_test_gui_vim_exe: the vim executable to use when launching the
 " remote vim server.
 "
@@ -31,8 +33,6 @@
 " and look at the displayed statistics.
 
 if !exists('g:vorax_test_gui') | let g:vorax_test_gui = 1 | endif
-if !exists('g:vorax_test_gui_servername') | let g:vorax_test_gui_servername = 'VORAX_TEST_SERVER' | endif
-if !exists('g:vorax_test_gui_vim_exe') | let g:vorax_test_gui_vim_exe = 'gvim' | endif
 
 " Create the suite.
 function! TestSuiteForVorax()
@@ -50,7 +50,6 @@ function! TestSuiteForVorax()
   " every Vorax unit test starts with TestVorax*
   " loop through all the functions which match TestVorax*
   for func_name in s:GetVoraxUnitTests()
-    echo '   exec: ' . func_name
     exe 'call ' . func_name
   endfor
   " restore the old value
@@ -73,30 +72,9 @@ function! s:VoraxUnitTestsCleanup()
   endfor
 endfunction
 
-" Destroy the Vim server.
-function! s:DestroyVimServer()
-  let pid = str2nr(remote_expr(g:vorax_test_gui_servername, 'getpid()'))
-  ruby Process.kill(9, VIM::evaluate('pid'))
-endfunction
-
-" Initialize the vim server for GUI testing.
-function! s:CreateVimServer()
-  for vim_server in split(serverlist(), "\n")
-    if vim_server == g:vorax_test_gui_servername
-      call s:DestroyVimServer()
-      break
-    end
-  endfor
-  " starts a new vim as a server
-  silent exe "!" . g:vorax_test_gui_vim_exe . " --servername " . g:vorax_test_gui_servername
-  call foreground()
-endfunction
-
-" Initialize the remote vim server
-if g:vorax_test_gui | call s:CreateVimServer() | endif
+" setup for GUI testing
+if g:vorax_test_gui | runtime! tests/vorax/gui_setup.vim | endif
 
 " Run suite.
 call VURunnerRunTest('TestSuiteForVorax')
 
-" Destroy the remote vim server
-"if g:vorax_test_gui | call s:DestroyVimServer() | endif

@@ -177,7 +177,7 @@ endfunction"}}}
 " This function is used to get what the user inputed in the output window and
 " to send that text to the sqlplus process.
 function! s:ProcessUserInput()"{{{
-  let val = strpart(getline('.'), s:anchor[1] - 2)
+  let val = strpart(getline('.'), s:anchor[1] - 1)
   if s:log.isDebugEnabled() | call s:log.debug('s:ProcessUserInput(): val=' .string(val)) | endif
   call s:output_window.AppendText("\n")
   call vorax#GetSqlplusHandler().SendText(val . "\n")
@@ -238,6 +238,7 @@ function! s:CancelExec()"{{{
       " cancelled one.
       call s:output_window.AppendText("\n\n")
     endif
+    call s:output_window.AppendText("\n*** Cancelled ***\n")
     call s:output_window.StopMonitor()
     redraw
     echon "Done!"
@@ -255,10 +256,10 @@ endfunction"}}}
 
 " This function is called by an CursorHoldI autocommand in order to force the
 " user to insert text at the end of the buffer.
-function! s:ForceInsertAtTheEnd()
+function! s:ForceInsertAtTheEnd()"{{{
   call s:SetCursorAtTail()
   au! VoraX CursorHoldI <buffer>
-endfunction
+endfunction"}}}
 
 " This function is invokde by an autocommand before entering in insert mode.
 " It places the cursor at the end of the buffer and remember this position.
@@ -273,6 +274,7 @@ function! s:PrepareInsertMode()"{{{
   " buffer beyond this anchor.
   let [ll, lc] = [line('$'), len(getline('$'))]
   let s:anchor = [ll, lc+1, strpart(getline('$'), 0, lc+1)]
+  echom string(s:anchor)
   " remap the <esc> mapping in order to discard the inputed text in case the
   " user press <esc>
   inoremap <buffer> <esc> <C-o>:call <SID>CancelPrompt()<cr>
