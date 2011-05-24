@@ -59,12 +59,13 @@ endfunction"}}}
 
 " Execute the provided command and spit the result into the output window.
 function! vorax#Exec(command)"{{{
+  let sqlplus = vorax#GetSqlplusHandler()
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
   " save the last command. this is require in order to be able to replay it.
-  let s:sqlplus.last_stmt = a:command
+  let sqlplus.last_stmt = a:command
   " exec the command in bg, prefixed with a CR. this is important especially
   " in connection with set echo on.
-  call s:sqlplus.NonblockExec(s:sqlplus.Pack(s:sqlplus.last_stmt, {'include_eor' : 1}), 0)
+  call sqlplus.NonblockExec(sqlplus.Pack(sqlplus.last_stmt, {'include_eor' : 1}), 0)
   call s:output.StartMonitor()
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#Exec') | endif
 endfunction"}}}
@@ -107,6 +108,22 @@ function! vorax#ExecSelection()"{{{
   call vorax#Exec(voraxlib#utils#SelectedBlock())
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#ExecSelection') | endif
 endfunction"}}}
+
+function! vorax#ExecWithHtmlOutput(command)
+  let sqlplus = vorax#GetSqlplusHandler()
+  let ow = vorax#GetOutputWindowHandler()
+  let ofile = fnamemodify(sqlplus.GetRunDir() . '/' . 'output.html', ':8')
+  call delete(ofile)
+  let command = "spool " . ofile . "\n" . a:command . "\nspool off\n"
+  call sqlplus.Exec(sqlplus.Pack(command), 
+        \ { 'executing_msg'   : 'Executing...',
+        \   'throbber'        : vorax#GetDefaultThrobber(),
+        \   'done_msg'        : 'Done.',
+        \   'sqlplus_options' : [ {'option' : 'markup', 'value' : 'html on spool on entmap on preformat off'} ] })
+  call ow.Focus()
+  exe ':$!links -dump ' . ofile
+  call ow.AppendText("\n")
+endfunction
 
 " Provides completion for profile names. It is used in the VoraxConnect
 " command.

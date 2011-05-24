@@ -76,6 +76,7 @@ function! TestVoraxOutputWindowCancelCall()
       call VUAssertFail('TestVoraxOutputWindowCancelCall(): A 3 was expected on the first line!')
     endif
     " cancel an in progress command
+    let g:vorax_output_window_pause = 0
     call remote_send(g:vorax_test_gui_servername,
           \ ':VoraxConnect ' . g:vorax_test_constr . ' | VoraxExec select * from all_objects;<cr>')
     if IsGuiBuddyOk('bufname("__VoraxOutput__") != "" && line(".") >= 100')

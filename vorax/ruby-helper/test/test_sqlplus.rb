@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'test/common'
+require File.expand_path(File.join(File.dirname(__FILE__), 'common'))
 
 class TestSqlplus < Test::Unit::TestCase
 

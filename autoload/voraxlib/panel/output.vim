@@ -24,6 +24,8 @@ function! voraxlib#panel#output#New()"{{{
           \ 1)
     " Add additional functionality
     call s:ExtendWindow()
+    " The output buffer.
+    let s:buffer = ''
   endif
   return s:output_window
 endfunction"}}}
@@ -66,7 +68,9 @@ function! s:ExtendWindow()"{{{
     endif
     let lines_no = line('$')
     let last_line = getline(lines_no)
-    let lines = split(a:text, '\(\r\n\)\|\(\r\)\|\(\n\)', 1)
+    " get rid of CRs
+    let text = substitute(a:text, '\r', '', 'g')
+    let lines = split(text, '\n', 1)
     if len(lines) > 0
       call setline(lines_no, last_line . lines[0])
       call remove(lines, 0)
@@ -77,6 +81,29 @@ function! s:ExtendWindow()"{{{
     normal G
   endfunction"}}}
 
+  " Append the provided text to the output buffer.
+  function! s:output_window.PushToBuffer(text)"{{{
+    if a:text != ''
+      let s:buffer .= a:text
+    endif
+  endfunction"}}}
+
+  " Clear the content of the output buffer.
+  function! s:output_window.ClearBuffer()"{{{
+    let s:buffer = ''
+  endfunction"}}}
+
+  " Pop/retrieve the specified maximum number of lines from the output buffer.
+  function! s:output_window.PopFromBuffer(...)"{{{
+    if exists('a:1')
+      let retval = voraxlib#utils#ExtractLines(s:buffer, 1, a:1)
+    else
+    	let retval = s:buffer
+    endif
+    let s:buffer = strpart(s:buffer, len(retval))
+    return retval
+  endfunction"}}}
+
   " Clear the output window.
   function! s:output_window.Clear() dict"{{{
     call self.Focus()
@@ -85,6 +112,10 @@ function! s:ExtendWindow()"{{{
   endfunction"}}}
 
   function! s:output_window.StartMonitor()"{{{
+    let s:pause = 0
+    let s:lines = 0
+    let s:monitor_running = 1
+    call self.ClearBuffer()
     let s:start_time = localtime()
     if g:vorax_output_window_keep_focus_after_exec
       " register an autocommand to the originating buffer. This has to be done
@@ -99,8 +130,17 @@ function! s:ExtendWindow()"{{{
     call s:SetupInteractivity()
   endfunction"}}}
 
+  " Whenever or not the monitor is running
+  function! s:output_window.IsMonitorRunning()"{{{
+    return exists('s:monitor_running') && s:monitor_running
+  endfunction"}}}
+
   " Stop the monitor for the output window.
   function s:output_window.StopMonitor()"{{{
+    let s:pause = 0
+    let s:lines = 0
+    let s:monitor_running = 0
+    call self.ClearBuffer()
     call self.Focus()
     au VoraX CursorHold <buffer> call s:FetchResults()
     autocmd! VoraX CursorHold <buffer>
@@ -113,22 +153,56 @@ function! s:ExtendWindow()"{{{
     endif
   endfunction"}}}
 
+  " Whenever or not the monitor is paused.
+  function! s:output_window.IsMonitorPaused()"{{{
+    return exists('s:pause') && s:pause
+  endfunction"}}}
+
+endfunction"}}}
+
+" Whenever or not the output window should take care of the paginating.
+function! s:IsPaginatingEnabled()"{{{
+  return exists('g:vorax_output_window_pause') && g:vorax_output_window_pause
+endfunction"}}}
+
+" Read from the output buffer and taking into account pagination it spits the
+" corresponding output.
+function! s:SpitOutput()"{{{
+  if s:IsPaginatingEnabled()
+    " only if paginating is configured
+    let page_size = (g:vorax_output_window_page_size == 0 ? winheight('.') :
+          \ g:vorax_output_window_page_size)
+    let lines = s:output_window.PopFromBuffer(page_size - s:lines)
+    let s:lines += voraxlib#utils#CountMatch(lines, '\n')
+  else
+    " get all lines from the buffer
+    let lines = s:output_window.PopFromBuffer()
+  endif
+  " spit the results
+  if lines != ""
+    call s:output_window.AppendText(lines)
+    if exists('page_size') && s:lines == page_size
+      let s:lines = 0
+      let s:pause = 1
+    endif
+  endif
 endfunction"}}}
 
 " This function is called repeatably in order to fetch the results and to show
 " them within the output window.
 function! s:FetchResults()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
-  let chunk = sqlplus.Read()
-  " spit the results
-  if chunk != ""
-    call s:output_window.AppendText(chunk)
+  let chunk = ''
+  if !s:pause
+    let chunk = sqlplus.Read()
+    call s:output_window.PushToBuffer(chunk)
+    call s:SpitOutput()
   endif
   " simulate a key press in order to fire the CursorHold auto command.
   call feedkeys("f\e")  
   " if that's the last chunk of data which also means the command has
   " finished.
-  if !sqlplus.IsBusy()
+  if s:Eof()
     " Great! The executing statement has just finished!
   	call s:output_window.StopMonitor()
     echon 'Done.'
@@ -136,6 +210,16 @@ function! s:FetchResults()"{{{
     " feedback to the user please.
     call s:UpdateThrobber('Executing... Press <esc> to cancel.', vorax#GetDefaultThrobber())
   endif
+endfunction"}}}
+
+" Whenever or not the end of output has been reached.
+function! s:Eof()"{{{
+  if len(s:buffer) > 0
+    return 0
+  else
+    let sqlplus = vorax#GetSqlplusHandler()
+    return !sqlplus.IsBusy()
+  end
 endfunction"}}}
 
 " Update throbber.
@@ -152,6 +236,7 @@ function! s:SetupInteractivity()"{{{
   au VoraX CursorMovedI <buffer> call s:EnforceAnchor()
   " define special mappings
   noremap <buffer> <esc> :call <SID>CancelExec()<cr>
+  noremap <buffer> <Space> :call <SID>TogglePause()<cr>
   inoremap <buffer> <cr> <esc>:call <SID>ProcessUserInput()<cr>
 endfunction"}}}
 
@@ -165,6 +250,10 @@ function! s:RemoveInteractivity()"{{{
   if has_key(map, 'buffer') && map.buffer == 1
     unmap <buffer> <esc>
   endif
+  let map = maparg('<Space>', 'n', 0, 1)
+  if has_key(map, 'buffer') && map.buffer == 1
+    unmap <buffer> <Space>
+  endif
   let map = maparg('<cr>', 'i', 0, 1)
   if has_key(map, 'buffer') && map.buffer == 1
     iunmap <buffer> <cr>
@@ -172,6 +261,11 @@ function! s:RemoveInteractivity()"{{{
   if exists('s:anchor')
   	unlet s:anchor
   endif
+endfunction"}}}
+
+" Toggle PAUSE for the output window.
+function s:TogglePause()"{{{
+  let s:pause = !s:pause
 endfunction"}}}
 
 " This function is used to get what the user inputed in the output window and

@@ -179,7 +179,7 @@ EORC
     end
     # restore settings
     if VIM::evaluate('exists("current_options")') == 1
-      VIM::evaluate('current_options').each { |cmd| sqlplus.exec(cmd) }
+      sqlplus.exec(VIM::evaluate('current_options').join("\n"))
     end
     # update title
     VIM::command('let &titlestring=' + sqlplus.connected_to.inspect) if sqlplus.session_owner_monitor != :never

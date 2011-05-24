@@ -218,9 +218,20 @@ module Vorax
       settings.flatten.each { |s| patterns << "(^set #{s})" }
       match_pattern = /#{patterns.join('|')}/
       result = []
+      setting = ""
       File.open(settings_file) do |f|
         while line = f.gets
-          result << line.chomp if line =~ match_pattern
+          if line =~ match_pattern || setting != ""
+            if line =~ /-$/
+              # it means a very long value for the setting which continues on the next line
+              setting += line
+            else
+              setting += line.chomp
+              result << setting
+              # reset the setting
+              setting = ''
+            end
+          end
         end
       end
       result
@@ -302,10 +313,10 @@ module Vorax
     # This is the end marker till the output from
     # the sqlplus process must be read after executing
     # a statement.
-    END_OF_REQUEST = '>>> VORAX_END_OF_REQUEST <<<'
+    END_OF_REQUEST = '~~~ VORAX_END_OF_REQUEST ~~~'
 
     # This marker is used to mark a cancel request.
-    CANCEL_MARKER = '>>> VORAX_CANCEL_REQUEST <<<'
+    CANCEL_MARKER = '~~~ VORAX_CANCEL_REQUEST ~~~'
 
     # Where to pack the sql commands by default.
     DEFAULT_PACK_FILE = "run_this.sql"

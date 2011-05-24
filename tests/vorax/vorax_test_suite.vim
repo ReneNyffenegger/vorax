@@ -32,6 +32,8 @@
 "   :so %
 " and look at the displayed statistics.
 
+let g:vorax_test_gui = 1
+
 if !exists('g:vorax_test_gui') | let g:vorax_test_gui = 1 | endif
 
 " Create the suite.

@@ -277,6 +277,56 @@ function! voraxlib#utils#IsHighlightEnabled()"{{{
         \ && g:vorax_statement_highlight_group != ''
 endfunction"}}}
 
+" returns the a range of lines from the provide a:text starting from the
+" line number given by a:start. The meaning of the optional param is how many
+" lines to return counting from a:start. If this param is not provided then
+" all lines till the end are returned.
+function! voraxlib#utils#ExtractLines(text, start, ...)"{{{
+  let retval = ''
+  " find the start point
+  let start_idx = -1
+  for i in range(a:start-1)
+    let start_idx = stridx(a:text, "\n", start_idx + 1)
+  endfor
+  " find the end point
+  if a:0 > 0
+    " okey, the optional param was provided
+    if a:1 > 0
+      let end_idx = start_idx
+      for i in range(a:1)
+        let end_idx = stridx(a:text, "\n", end_idx + 1)
+        if end_idx == -1
+          let end_idx = len(a:text)
+          break
+        endif
+      endfor
+    else
+      let end_idx = -1
+    endif
+  else
+    let end_idx = len(a:text)
+  endif
+  " convert zero base in 1 based
+  let start_idx += 1
+  let end_idx += 1
+  return strpart(a:text, start_idx, end_idx - start_idx)
+endfunction"}}}
+
+" How many time the provided a:pattern is found within the a:text.
+function! voraxlib#utils#CountMatch(text, pattern)
+  let c = 0
+  let last_match = -1
+  while 1
+    let last_match = match(a:text, a:pattern, last_match + 1)
+    if last_match == -1
+      " not found, just exit
+      break
+    endif
+    let c += 1
+  endwhile
+  return c
+endfunction
+
 let &cpo=s:cpo
 unlet s:cpo
 

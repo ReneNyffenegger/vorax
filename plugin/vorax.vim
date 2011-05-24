@@ -159,6 +159,26 @@ if !exists('g:vorax_output_keep_focus_after_exec')
   " focused. If 0 then the window from which the exec comes from is focused.
   let g:vorax_output_window_keep_focus_after_exec = 0
 endif"}}}
+" g:vorax_output_window_pause"{{{
+if !exists('g:vorax_output_window_pause')
+  " wherever or not the results printed to the output window to be displayed
+  " page by page. After the first page is spit the execution is susspended.
+  " The user has the possibility to get the next page or to simply cancel the
+  " current request.
+  let g:vorax_output_window_pause = 0
+endif"}}}
+" g:vorax_output_window_page_size"{{{
+if !exists('g:vorax_output_window_page_size')
+  " this global variable is used in connection with the
+  " g:vorax_output_window_pause and is used to configure how many lines a page
+  " should have. If g:vorax_output_window_pause is 1 then, after reaching the
+  " limit set by this variable, VoraX will stop writting into the output
+  " window until the user requests the next page. If
+  " g:vorax_output_window_page_size is 0 then the value is automatically computed 
+  " as the height of the output window. Negative values are not valid and
+  " they fall back to 0, with the above described meaning.
+  let g:vorax_output_window_page_size = 0
+endif"}}}
 " g:vorax_profiles_window_anchor"{{{
 if !exists('g:vorax_profiles_window_anchor')
 	" The anchor of the profile window. The allowed values are: topleft or
