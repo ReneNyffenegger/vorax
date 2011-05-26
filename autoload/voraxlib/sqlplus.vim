@@ -6,7 +6,7 @@ let s:cpo=&cpo
 set cpo-=C
 
 " the sqlplus object
-let s:sqlplus = {'ruby_key' : '', 'last_stmt' : ''}
+let s:sqlplus = {'ruby_key' : '', 'last_stmt' : '', 'html' : 0}
 
 " the current object count. it is incremented on each new sqlplus object
 " creation
@@ -287,6 +287,22 @@ EORC
   endif
 endfunction"}}}
 
+" Enable html output.
+function! s:sqlplus.EnableHtml()"{{{
+  if !self.html
+    ruby $sqlplus_factory[VIM::evaluate('self.ruby_key')].exec("set markup html on entmap on preformat off")
+    let self.html = 1
+  endif
+endfunction"}}}
+
+" Disable the html output.
+function! s:sqlplus.DisableHtml()"{{{
+  if self.html
+    ruby $sqlplus_factory[VIM::evaluate('self.ruby_key')].exec("set markup html off")
+    let self.html = 0
+  endif
+endfunction"}}}
+
 " Cancel the currently executing command. On some platforms (Windows) this is
 " not possible and this cancel operation ends up in an actual process kill.
 function! s:sqlplus.Cancel(message) dict"{{{
@@ -300,6 +316,16 @@ function! s:sqlplus.Cancel(message) dict"{{{
     VIM::command('return 0')
   end
 EORC
+endfunction"}}}
+
+" Whenever or not the set pause sqlplus option is ON.
+function! s:sqlplus.IsPauseOn()"{{{
+  for s in self.GetConfigFor(['pause'])
+    if s =~? '^set pause ON$'
+    	return 1
+    endif
+  endfor
+  return 0
 endfunction"}}}
 
 " Destroy the sqlplus process

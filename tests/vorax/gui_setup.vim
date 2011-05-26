@@ -7,7 +7,7 @@ if !exists('g:vorax_test_gui_vim_exe') | let g:vorax_test_gui_vim_exe = 'gvim' |
 function! VoraxCreateGuiBuddy()
   for vim_server in split(serverlist(), "\n")
     if vim_server == g:vorax_test_gui_servername
-      call s:DestroyVimServer()
+      call VoraxKillGuiBuddy()
       break
     end
   endfor
@@ -27,7 +27,10 @@ endfunction
 " Destroy the Vim server.
 function! VoraxKillGuiBuddy()
   let pid = str2nr(remote_expr(g:vorax_test_gui_servername, 'getpid()'))
-  ruby Process.kill(9, VIM::evaluate('pid'))
+  if pid != getpid()
+    " no suicide please
+    ruby Process.kill(9, VIM::evaluate('pid'))
+  endif
 endfunction
 
 " Evaluates a boolean expression on the remote server taking into account the

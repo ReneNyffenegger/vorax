@@ -136,6 +136,14 @@ if !exists('g:vorax_statement_highlight_group')
 	" variable on an empty string.
 	let g:vorax_statement_highlight_group = 'TODO'
 endif"}}}
+" g:vorax_sqlplus_pause_warning"{{{
+if !exists('g:vorax_sqlplus_pause_warning')
+	" VoraX do not get along with the sqlplus PAUSE ON option. If this variable
+	" is 1 then a check is performed before every exec and a warning is
+	" displayed in case this option is enabled. If you don't care and you rely
+	" to the sqlplus SET PAUSE ON you can disable this warning.
+	let g:vorax_sqlplus_pause_warning = 1
+endif"}}}
 " g:vorax_output_window_anchor"{{{
 if !exists('g:vorax_output_window_anchor')
 	" The anchor of the output window. The allowed values are: topleft or
@@ -245,6 +253,14 @@ endif"}}}
 " g:vorax_output_window_clear_key"{{{
 if !exists('g:vorax_output_window_clear_key')
   let g:vorax_output_window_clear_key = "cle"
+endif"}}}
+" g:vorax_output_window_pause_key"{{{
+if !exists('g:vorax_output_window_pause_key')
+  let g:vorax_output_window_pause_key = "<Space>"
+endif"}}}
+" g:vorax_output_window_toggle_compressed_output_key"{{{
+if !exists('g:vorax_output_window_toggle_compressed_output_key')
+  let g:vorax_output_window_toggle_compressed_output_key = "tco"
 endif"}}}
 " g:vorax_profiles_window_toggle_key"{{{
 if !exists('g:vorax_profiles_window_toggle_key')

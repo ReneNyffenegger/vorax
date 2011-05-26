@@ -285,7 +285,7 @@ function! voraxlib#utils#ExtractLines(text, start, ...)"{{{
   let retval = ''
   " find the start point
   let start_idx = -1
-  for i in range(a:start-1)
+  for i in range((a:start > 0 ? a:start - 1 : 0))
     let start_idx = stridx(a:text, "\n", start_idx + 1)
   endfor
   " find the end point
@@ -313,7 +313,7 @@ function! voraxlib#utils#ExtractLines(text, start, ...)"{{{
 endfunction"}}}
 
 " How many time the provided a:pattern is found within the a:text.
-function! voraxlib#utils#CountMatch(text, pattern)
+function! voraxlib#utils#CountMatch(text, pattern)"{{{
   let c = 0
   let last_match = -1
   while 1
@@ -325,7 +325,7 @@ function! voraxlib#utils#CountMatch(text, pattern)
     let c += 1
   endwhile
   return c
-endfunction
+endfunction"}}}
 
 let &cpo=s:cpo
 unlet s:cpo

@@ -60,13 +60,17 @@ endfunction"}}}
 " Execute the provided command and spit the result into the output window.
 function! vorax#Exec(command)"{{{
   let sqlplus = vorax#GetSqlplusHandler()
-  if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
-  " save the last command. this is require in order to be able to replay it.
-  let sqlplus.last_stmt = a:command
-  " exec the command in bg, prefixed with a CR. this is important especially
-  " in connection with set echo on.
-  call sqlplus.NonblockExec(sqlplus.Pack(sqlplus.last_stmt, {'include_eor' : 1}), 0)
-  call s:output.StartMonitor()
+  if s:ShouldGoOnWithPauseOn()
+    if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
+    " save the last command. this is require in order to be able to replay it.
+    let sqlplus.last_stmt = a:command
+    " exec the command in bg, prefixed with a CR. this is important especially
+    " in connection with set echo on.
+    call sqlplus.NonblockExec(sqlplus.Pack(sqlplus.last_stmt, {'include_eor' : 1}), 0)
+    call s:output.StartMonitor()
+  else
+    if s:log.isDebugEnabled() | call s:log.debug('User decided to cancel the exec because of the pause on.') | endif
+  endif
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#Exec') | endif
 endfunction"}}}
 
@@ -165,3 +169,30 @@ function! vorax#GetOutputWindowHandler()"{{{
   return s:output
 endfunction"}}}
 
+" === PRIVATE FUNCTIONS ==="{{{
+
+" Display a warning if the sqlplus pause option is on but only if
+" g:vorax_sqlplus_pause_warning is 1.
+function! s:ShouldGoOnWithPauseOn()"{{{
+  let sqlplus = vorax#GetSqlplusHandler()
+  if exists('g:vorax_sqlplus_pause_warning') && 
+        \ g:vorax_sqlplus_pause_warning && 
+        \ sqlplus.IsPauseOn()
+    " if sqlplus is configured with PAUSE ON
+    call voraxlib#utils#Warn("Warning: sqlplus PAUSE option is on.\n" . 
+          \ "It's better to user VoraX paginating feature!\n".
+          \ "If you decide to continue then, don't forget that in order\n" .
+          \ "to fetch the next page you have to press <cr> twice.\n")
+    let response = voraxlib#utils#PickOption(
+        \ 'Are you sure you want to continue?',
+        \ ['(Y)es', '(N)o'])
+    if response == 'N'
+    	redraw
+    	echo 'Cancelled.'
+    	return 0
+    end
+  endif
+  return 1
+endfunction"}}}
+
+"}}}

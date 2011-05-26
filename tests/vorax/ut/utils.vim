@@ -151,6 +151,9 @@ function! TestVoraxUtilsExtractLines()
   let text = "line1\r\nline2\r\nline3\r\nline4\r\nline5\r\nline6\r\nline7"
   call VUAssertEquals(voraxlib#utils#ExtractLines(text, 6, 10), "line6\r\nline7", "voraxlib#utils#ExtracLines test 10")
   call VUAssertEquals(voraxlib#utils#ExtractLines(text, 1, 1), "line1\r\n", "voraxlib#utils#ExtracLines test 11")
+  let text = "Enter x"
+  call VUAssertEquals(voraxlib#utils#ExtractLines(text, 1, 1), "Enter x", "voraxlib#utils#ExtracLines test 12")
+  call VUAssertEquals(voraxlib#utils#ExtractLines(text, 0, 1), "Enter x", "voraxlib#utils#ExtracLines test 13")
 endfunction
 
 function! TestVoraxUtilsCountMatch()

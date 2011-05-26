@@ -22,12 +22,23 @@ function! voraxlib#panel#output#New()"{{{
           \ g:vorax_output_window_anchor, 
           \ g:vorax_output_window_size,
           \ 1)
+    " Status info
+    let s:output_window['status'] = ''
+    " The output buffer.
+    let s:output_window['buffer'] = { 'text' : '', 'html' : 0 } 
     " Add additional functionality
     call s:ExtendWindow()
-    " The output buffer.
-    let s:buffer = ''
   endif
   return s:output_window
+endfunction"}}}
+
+" Returns the status line format for the output window.
+function! voraxlib#panel#output#StatusLine()"{{{
+  let sqlplus = vorax#GetSqlplusHandler()
+  return ' ' . sqlplus.GetConnectedTo() . ' | Position: %l/%L - %P%= Compressed: ' . 
+    \ (sqlplus.html ? 'Y' : 'N') . ' | Spool: ' . 
+    \ (exists('g:vorax_logging') && g:vorax_logging ? 'Y' : 'N') . ' | Bell: ' . 
+    \ (exists('g:vorax_monitor_end_exec') && g:vorax_monitor_end_exec ? 'Y' : 'N') . ' '
 endfunction"}}}
 
 " This functions exend the base window widget with methods
@@ -51,10 +62,14 @@ function! s:ExtendWindow()"{{{
     setlocal nolist
     setlocal foldcolumn=0 nofoldenable
     setlocal noreadonly
+    setlocal statusline=%!voraxlib#panel#output#StatusLine() 
 
     " define mappings
     if exists('g:vorax_output_window_clear_key') && g:vorax_output_window_clear_key != ''
-      exe 'nnoremap <buffer> ' . g:vorax_output_window_clear_key . ' :call <SID>ClearOutputWindow()<cr>'
+      exe 'silent nnoremap <silent> <buffer> ' . g:vorax_output_window_clear_key . ' :call <SID>ClearOutputWindow()<cr>'
+    endif
+    if exists('g:vorax_output_window_toggle_compressed_output_key') && g:vorax_output_window_toggle_compressed_output_key != ''
+      exe 'nnoremap <silent>  <buffer> ' . g:vorax_output_window_toggle_compressed_output_key . ' :call <SID>ToggleCompressedOutput()<cr>'
     endif
   endfunction"}}}
 
@@ -82,41 +97,49 @@ function! s:ExtendWindow()"{{{
   endfunction"}}}
 
   " Append the provided text to the output buffer.
-  function! s:output_window.PushToBuffer(text)"{{{
+  function! s:output_window.PushToBuffer(text, html)"{{{
     if a:text != ''
-      let s:buffer .= a:text
+      let self.buffer.text .= a:text
+      let self.buffer.html = a:html
     endif
   endfunction"}}}
 
   " Clear the content of the output buffer.
   function! s:output_window.ClearBuffer()"{{{
-    let s:buffer = ''
+    let self.buffer.text = ''
+    let self.buffer.html = 0
   endfunction"}}}
 
   " Pop/retrieve the specified maximum number of lines from the output buffer.
   function! s:output_window.PopFromBuffer(...)"{{{
     if exists('a:1')
-      let retval = voraxlib#utils#ExtractLines(s:buffer, 1, a:1)
+      let retval = voraxlib#utils#ExtractLines(self.buffer.text, 1, a:1)
     else
-    	let retval = s:buffer
+    	let retval = self.buffer.text
     endif
-    let s:buffer = strpart(s:buffer, len(retval))
+    let self.buffer.text = strpart(self.buffer.text, len(retval))
     return retval
   endfunction"}}}
 
+  " Convert the buffer content from html to text.
+  function! s:output_window.CompressHtmlBuffer()"{{{
+    if self.buffer.html
+      redraw
+      echo 'Compressing output...'
+      let self.buffer.text = voraxlib#parser#output#Compress(self.buffer.text)
+      let self.buffer.html = 0
+    endif
+  endfunction"}}}
+
   " Clear the output window.
-  function! s:output_window.Clear() dict"{{{
+  function! s:output_window.Clear() "{{{
     call self.Focus()
     " delete everything with nothing saved in registers
     normal gg"_dG
   endfunction"}}}
 
   function! s:output_window.StartMonitor()"{{{
-    let s:pause = 0
-    let s:lines = 0
-    let s:monitor_running = 1
-    call self.ClearBuffer()
-    let s:start_time = localtime()
+    call s:ResetWork()
     if g:vorax_output_window_keep_focus_after_exec
       " register an autocommand to the originating buffer. This has to be done
       " now because after stopping the monitor the originating window will not
@@ -137,10 +160,7 @@ function! s:ExtendWindow()"{{{
 
   " Stop the monitor for the output window.
   function s:output_window.StopMonitor()"{{{
-    let s:pause = 0
-    let s:lines = 0
-    let s:monitor_running = 0
-    call self.ClearBuffer()
+    call s:ResetWork()
     call self.Focus()
     au VoraX CursorHold <buffer> call s:FetchResults()
     autocmd! VoraX CursorHold <buffer>
@@ -158,6 +178,42 @@ function! s:ExtendWindow()"{{{
     return exists('s:pause') && s:pause
   endfunction"}}}
 
+endfunction"}}}
+
+" Compute the status feedback based on the provided chunk.
+function s:SetStatusFeedback(chunk)"{{{
+  if a:chunk != ''
+    let s:last_set = localtime()
+    let last_line = voraxlib#utils#CountMatch(a:chunk, '\n')
+    let s:output_window['status'] .= voraxlib#utils#ExtractLines(a:chunk, last_line + 1)
+    let s:output_window['status'] = strpart(substitute(s:output_window['status'], '\(\r\n\)\|\r\|\n', " ... ", "g"), len(s:output_window['status'])-20)
+    if s:output_window.buffer.html
+      let s:output_window.status = voraxlib#parser#output#Compress(s:output_window.status)
+    endif
+  endif
+  if s:pause
+    if exists('g:vorax_output_window_pause_key') && g:vorax_output_window_pause_key != ''
+      call s:UpdateFeedback('*** PAUSED ***. Press ' . g:vorax_output_window_pause_key . ' to resume or <Esc> to cancel...')
+    else
+      call s:UpdateFeedback('*** PAUSED ***')
+    end
+  else
+    if localtime() - s:last_set > 1
+      call s:UpdateFeedback('(Waiting in prompt/pause or slow fetch). <CR> to input at prompt = [...' . s:output_window['status'] . ']', vorax#GetDefaultThrobber())
+    else
+      call s:UpdateFeedback(' Executing...' , vorax#GetDefaultThrobber())
+    endif
+  endif
+endfunction"}}}
+
+" This function is internally used to reset various counters.
+function! s:ResetWork()"{{{
+  let s:pause = 0
+  let s:lines = 0
+  let s:monitor_running = 0
+  let s:last_set = localtime()
+  let s:output_window['status'] = ''
+  call s:output_window.ClearBuffer()
 endfunction"}}}
 
 " Whenever or not the output window should take care of the paginating.
@@ -195,8 +251,19 @@ function! s:FetchResults()"{{{
   let chunk = ''
   if !s:pause
     let chunk = sqlplus.Read()
-    call s:output_window.PushToBuffer(chunk)
-    call s:SpitOutput()
+    call s:output_window.PushToBuffer(chunk, sqlplus.html)
+    if sqlplus.html
+      " pretty print. do not display anything unless the whole output is
+      " obtained.
+      if !sqlplus.IsBusy()
+        " it's done... pretty print please
+        call s:output_window.CompressHtmlBuffer()
+        call s:SpitOutput()
+      endif
+    else
+      " normal output
+      call s:SpitOutput()
+    endif
   endif
   " simulate a key press in order to fire the CursorHold auto command.
   call feedkeys("f\e")  
@@ -208,13 +275,13 @@ function! s:FetchResults()"{{{
     echon 'Done.'
   else
     " feedback to the user please.
-    call s:UpdateThrobber('Executing... Press <esc> to cancel.', vorax#GetDefaultThrobber())
+    call s:SetStatusFeedback(chunk)
   endif
 endfunction"}}}
 
 " Whenever or not the end of output has been reached.
 function! s:Eof()"{{{
-  if len(s:buffer) > 0
+  if len(s:output_window.buffer.text) > 0
     return 0
   else
     let sqlplus = vorax#GetSqlplusHandler()
@@ -222,22 +289,22 @@ function! s:Eof()"{{{
   end
 endfunction"}}}
 
-" Update throbber.
-function! s:UpdateThrobber(msg, throbber)"{{{
+" Update feedback info to the user. An optional throbber may be  provided.
+function! s:UpdateFeedback(msg, ...)"{{{
   redraw
-  echon a:msg . ' '. a:throbber.Spin()
+  echon (exists('a:1') ? a:1.Spin() . ' ' : '') . a:msg
   "let &titlestring=a:msg . ' '. a:throbber.Spin()
 endfunction"}}}
 
 " This function prepares the output window for interactivity like: respond to
 " ACCEPT sqlplus commands, prompting for values etc.
 function! s:SetupInteractivity()"{{{
-  au VoraX InsertEnter <buffer> call s:PrepareInsertMode()
-  au VoraX CursorMovedI <buffer> call s:EnforceAnchor()
   " define special mappings
   noremap <buffer> <esc> :call <SID>CancelExec()<cr>
-  noremap <buffer> <Space> :call <SID>TogglePause()<cr>
-  inoremap <buffer> <cr> <esc>:call <SID>ProcessUserInput()<cr>
+  if exists('g:vorax_output_window_pause_key') && g:vorax_output_window_pause_key != ''
+    exe 'noremap <buffer> ' . g:vorax_output_window_pause_key . ' :call <SID>TogglePause()<cr>'
+  endif
+  noremap <buffer> <cr> <esc>:call <SID>ProcessUserInput()<cr>
 endfunction"}}}
 
 " Remove the interactivity features.
@@ -250,13 +317,15 @@ function! s:RemoveInteractivity()"{{{
   if has_key(map, 'buffer') && map.buffer == 1
     unmap <buffer> <esc>
   endif
-  let map = maparg('<Space>', 'n', 0, 1)
-  if has_key(map, 'buffer') && map.buffer == 1
-    unmap <buffer> <Space>
+  if exists('g:vorax_output_window_pause_key') && g:vorax_output_window_pause_key != ''
+    let map = maparg(g:vorax_output_window_pause_key, 'n', 0, 1)
+    if has_key(map, 'buffer') && map.buffer == 1
+      unmap <buffer> <Space>
+    endif
   endif
-  let map = maparg('<cr>', 'i', 0, 1)
+  let map = maparg('<cr>', 'n', 0, 1)
   if has_key(map, 'buffer') && map.buffer == 1
-    iunmap <buffer> <cr>
+    unmap <buffer> <cr>
   endif
   if exists('s:anchor')
   	unlet s:anchor
@@ -271,11 +340,17 @@ endfunction"}}}
 " This function is used to get what the user inputed in the output window and
 " to send that text to the sqlplus process.
 function! s:ProcessUserInput()"{{{
-  let val = strpart(getline('.'), s:anchor[1] - 1)
+  let sqlplus = vorax#GetSqlplusHandler()
+  let val = input(s:output_window['status'])
   if s:log.isDebugEnabled() | call s:log.debug('s:ProcessUserInput(): val=' .string(val)) | endif
-  call s:output_window.AppendText("\n")
+  if sqlplus.html
+    " compressed output is active, postpone to the output buffer
+    call s:output_window.PushToBuffer(val . "\n", 1)
+  else
+    " normal output. just put the inputed value to the output window
+    call s:output_window.AppendText(val . "\n")
+  endif
   call vorax#GetSqlplusHandler().SendText(val . "\n")
-  stopinsert
 endfunction"}}}
 
 " Registers an autocommand for the current buffer to clear any highlighting
@@ -408,6 +483,19 @@ function! s:EnforceAnchor()"{{{
       call setline(s:anchor[0], line)
     endif
     call s:SetCursorAtTail()
+  endif
+endfunction"}}}
+
+" Toggle pretty print for the sqlplus output.
+function! s:ToggleCompressedOutput()"{{{
+  let sqlplus = vorax#GetSqlplusHandler()
+  redraw
+  if sqlplus.html
+    call sqlplus.DisableHtml()
+    echo 'Compressed output disabled!'
+  else
+    call sqlplus.EnableHtml()
+    echo 'Compressed output enabled!'
   endif
 endfunction"}}}
 
