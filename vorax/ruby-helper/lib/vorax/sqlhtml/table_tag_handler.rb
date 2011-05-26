@@ -18,7 +18,7 @@ module Vorax
       if node.name == 'table'
         buffer = ''
         # how many columns do we have?
-        cols = node.xpath('tr[1]/th').count
+        cols = node.xpath('tr[1]/th|tr[1]/td').count
         # compute the structure of the table as [[<length of the column>, <number_or_right_align_flag>] ... ]
         structure = []
         (0..cols-1).each do |rn|

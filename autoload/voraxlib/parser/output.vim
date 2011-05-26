@@ -23,7 +23,6 @@ function voraxlib#parser#output#Compress(html)
     else
       let underline = matchstr(params[3], '"\@<=[^"]\+')
     endif
-    echom 'colsep='.colsep.' recsep='.recsep.' recsepchar='.recsepchar.' underline='.underline
   endif
   ruby <<EORC
     vorax_html = Vorax::SqlHtmlBeautifier.new()
