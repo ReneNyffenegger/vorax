@@ -341,7 +341,9 @@ endfunction"}}}
 " to send that text to the sqlplus process.
 function! s:ProcessUserInput()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
+  call inputsave()
   let val = input(s:output_window['status'])
+  call inputrestore()
   if s:log.isDebugEnabled() | call s:log.debug('s:ProcessUserInput(): val=' .string(val)) | endif
   if sqlplus.html
     " compressed output is active, postpone to the output buffer
@@ -363,6 +365,7 @@ function! s:RegisterClearHighlight()"{{{
     let [s:crr_l, s:crr_c] = [line('.'), col('.')]
     if s:log.isDebugEnabled() | call s:log.debug('s:RegisterClearHighlight(): [s:crr_l, s:crr_c]=' .string([s:crr_l, s:crr_c])) | endif
     au VoraX CursorMoved <buffer> call s:ClearHighlight()
+    au VoraX CursorMovedI <buffer> call s:ClearHighlight()
   endif
 endfunction"}}}
 
@@ -375,8 +378,9 @@ function! s:ClearHighlight()"{{{
     " and may be triggered by other plugins.
     match none
     au! VoraX CursorMoved <buffer>
-    unlet s:crr_l
-    unlet s:crr_c
+    au! VoraX CursorMovedI <buffer>
+    if exists('s:crr_l') | unlet s:crr_l | endif
+    if exists('s:crr_c') | unlet s:crr_c | endif
   endif
 endfunction"}}}
 
@@ -421,69 +425,6 @@ endfunction"}}}
 " This function is invoked by the clear window mapping.
 function! s:ClearOutputWindow()"{{{
   call s:output_window.Clear()
-endfunction"}}}
-
-" This function is called by an CursorHoldI autocommand in order to force the
-" user to insert text at the end of the buffer.
-function! s:ForceInsertAtTheEnd()"{{{
-  call s:SetCursorAtTail()
-  au! VoraX CursorHoldI <buffer>
-endfunction"}}}
-
-" This function is invokde by an autocommand before entering in insert mode.
-" It places the cursor at the end of the buffer and remember this position.
-function! s:PrepareInsertMode()"{{{
-  if line('.') == line('$') && col('.') == col('$')
-    " it's okey
-  else
-    " register an autoevent to exit from the insert mode
-    au VoraX CursorHoldI <buffer> call s:ForceInsertAtTheEnd()
-  endif
-  " save this position in order to be able to prohibit the user to change the
-  " buffer beyond this anchor.
-  let [ll, lc] = [line('$'), len(getline('$'))]
-  let s:anchor = [ll, lc+1, strpart(getline('$'), 0, lc+1)]
-  echom string(s:anchor)
-  " remap the <esc> mapping in order to discard the inputed text in case the
-  " user press <esc>
-  inoremap <buffer> <esc> <C-o>:call <SID>CancelPrompt()<cr>
-  redraw
-  echo 'Enter the value sqlplus asks for...'
-endfunction"}}}
-
-" Discards what the user entered at the sqlplus ACCEPT prompt.
-function! s:CancelPrompt()"{{{
-  echom 'a intrat'
-  stopinsert
-  " restore the old prompt
-  if exists('s:anchor')
-    call setline(s:anchor[0], s:anchor[2])
-  endif
-  " restore the default <esc> mapping
-  iunmap <buffer> <esc>
-endfunction"}}}
-
-" This function place the cursor at the end of the last line. It is invoked by
-" the InsertEnter autocmd.
-function! s:SetCursorAtTail()"{{{
-  call setpos('.', [bufnr('%'), line('$'), 0, 0])
-  call setpos('.', [bufnr('%'), line('$'), col('$') + 2, 0])
-endfunction"}}}
-
-" This function is invoked by the CursorMovedI autocommand and prohibits the
-" user to move the cursor beyond the current prompter.
-function! s:EnforceAnchor()"{{{
-  if exists('s:anchor') &&
-        \ (line('.') < s:anchor[0] || col('.') < s:anchor[1] - 1)
-    call s:SetCursorAtTail()
-    let line = getline('.')
-    let tail = strpart(line, col('.'))
-    if strpart(line, 0, s:anchor[1]) != s:anchor[2]
-      let line = s:anchor[2] . tail
-      call setline(s:anchor[0], line)
-    endif
-    call s:SetCursorAtTail()
-  endif
 endfunction"}}}
 
 " Toggle pretty print for the sqlplus output.
