@@ -300,18 +300,15 @@ endfunction"}}}
 " ACCEPT sqlplus commands, prompting for values etc.
 function! s:SetupInteractivity()"{{{
   " define special mappings
-  noremap <buffer> <esc> :call <SID>CancelExec()<cr>
+  noremap <buffer> <silent> <esc> :call <SID>CancelExec()<cr>
   if exists('g:vorax_output_window_pause_key') && g:vorax_output_window_pause_key != ''
     exe 'noremap <buffer> ' . g:vorax_output_window_pause_key . ' :call <SID>TogglePause()<cr>'
   endif
-  noremap <buffer> <cr> <esc>:call <SID>ProcessUserInput()<cr>
+  noremap <buffer> <silent> <cr> <esc>:call <SID>ProcessUserInput()<cr>
 endfunction"}}}
 
 " Remove the interactivity features.
 function! s:RemoveInteractivity()"{{{
-  " remove autocommands
-  au! VoraX InsertEnter <buffer>
-  au! VoraX CursorMovedI <buffer>
   " remove keys
   let map = maparg('<esc>', 'n', 0, 1)
   if has_key(map, 'buffer') && map.buffer == 1
@@ -326,9 +323,6 @@ function! s:RemoveInteractivity()"{{{
   let map = maparg('<cr>', 'n', 0, 1)
   if has_key(map, 'buffer') && map.buffer == 1
     unmap <buffer> <cr>
-  endif
-  if exists('s:anchor')
-  	unlet s:anchor
   endif
 endfunction"}}}
 
