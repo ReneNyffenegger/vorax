@@ -187,6 +187,13 @@ if !exists('g:vorax_output_window_page_size')
   " they fall back to 0, with the above described meaning.
   let g:vorax_output_window_page_size = 0
 endif"}}}
+" g:vorax_output_window_default_spool_file"{{{
+if !exists('g:vorax_output_window_default_spool_file')
+  " the default file to spool output window content. The value of this
+  " variable should be a valid VimL expression which evaluates to a valid file
+  " name. This expression is evaluated on every spooling activation.
+  let g:vorax_output_window_default_spool_file = 'g:vorax_home_dir."/".strftime("%Y-%m-%d").".spool"'
+endif"}}}
 " g:vorax_profiles_window_anchor"{{{
 if !exists('g:vorax_profiles_window_anchor')
 	" The anchor of the profile window. The allowed values are: topleft or
@@ -242,6 +249,16 @@ if !exists(':VoraxProfilesWindowToggle')
   nmap <unique> <script> <Plug>VoraxProfilesWindowToggle 
         \:VoraxProfilesWindowToggle<CR>
 endif"}}}
+" :VoraxSpoolingToggle"{{{
+if !exists(':VoraxSpoolingToggle')
+  command! -nargs=0 -bar VoraxSpoolingToggle :call vorax#ToggleSpooling()
+  nmap <unique> <script> <Plug>VoraxSpoolingToggle :VoraxSpoolingToggle<CR>
+endif"}}}
+" :VoraxCompressedOutputToggle"{{{
+if !exists(':VoraxCompressedOutputToggle')
+  command! -nargs=0 -bar VoraxCompressedOutputToggle :call vorax#ToggleCompressedOutput()
+  nmap <unique> <script> <Plug>VoraxCompressedOutputToggle :VoraxCompressedOutputToggle<CR>
+endif"}}}
 " ==============================================================================
 
 " *** KEY MAPPINGS SECTION 
@@ -250,6 +267,18 @@ endif"}}}
 if !exists('g:vorax_exec_key')
   let g:vorax_exec_key = "<Leader>e"
 endif"}}}
+" g:vorax_spooling_toggle_key"{{{
+if !exists('g:vorax_spooling_toggle_key')
+  let g:vorax_spooling_toggle_key = "<Leader>sp"
+endif
+exe "nmap <silent> <unique> " . g:vorax_spooling_toggle_key . " <Plug>VoraxSpoolingToggle"
+"}}}
+" g:vorax_compressed_output_toggle_key"{{{
+if !exists('g:vorax_compressed_output_toggle_key')
+  let g:vorax_compressed_output_toggle_key = "<Leader>co"
+endif
+exe "nmap <silent> <unique> " . g:vorax_compressed_output_toggle_key . " <Plug>VoraxCompressedOutputToggle"
+"}}}
 " g:vorax_output_window_clear_key"{{{
 if !exists('g:vorax_output_window_clear_key')
   let g:vorax_output_window_clear_key = "cle"
@@ -258,13 +287,9 @@ endif"}}}
 if !exists('g:vorax_output_window_pause_key')
   let g:vorax_output_window_pause_key = "<Space>"
 endif"}}}
-" g:vorax_output_window_toggle_compressed_output_key"{{{
-if !exists('g:vorax_output_window_toggle_compressed_output_key')
-  let g:vorax_output_window_toggle_compressed_output_key = "tco"
-endif"}}}
 " g:vorax_profiles_window_toggle_key"{{{
 if !exists('g:vorax_profiles_window_toggle_key')
-  let g:vorax_profiles_window_toggle_key = "<Leader>co"
+  let g:vorax_profiles_window_toggle_key = "<Leader>pr"
 endif
 if g:vorax_profiles_window_toggle_key != '' 
       \ && !hasmapto('<Plug>VoraxProfilesWindowToggle') 

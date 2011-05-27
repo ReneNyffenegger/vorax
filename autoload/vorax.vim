@@ -113,22 +113,6 @@ function! vorax#ExecSelection()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#ExecSelection') | endif
 endfunction"}}}
 
-function! vorax#ExecWithHtmlOutput(command)
-  let sqlplus = vorax#GetSqlplusHandler()
-  let ow = vorax#GetOutputWindowHandler()
-  let ofile = fnamemodify(sqlplus.GetRunDir() . '/' . 'output.html', ':8')
-  call delete(ofile)
-  let command = "spool " . ofile . "\n" . a:command . "\nspool off\n"
-  call sqlplus.Exec(sqlplus.Pack(command), 
-        \ { 'executing_msg'   : 'Executing...',
-        \   'throbber'        : vorax#GetDefaultThrobber(),
-        \   'done_msg'        : 'Done.',
-        \   'sqlplus_options' : [ {'option' : 'markup', 'value' : 'html on spool on entmap on preformat off'} ] })
-  call ow.Focus()
-  exe ':$!links -dump ' . ofile
-  call ow.AppendText("\n")
-endfunction
-
 " Provides completion for profile names. It is used in the VoraxConnect
 " command.
 function! vorax#ProfilesForCompletion(arglead, cmdline, cursorpos)"{{{
@@ -138,6 +122,49 @@ function! vorax#ProfilesForCompletion(arglead, cmdline, cursorpos)"{{{
               \ 'has_key(v:val, "id") && v:val.id =~ ''^'' . a:arglead'), 
               \ 'v:val.id'))
   return profile_names
+endfunction"}}}
+
+" Toggle the spooling of output to the configured spool file.
+function! vorax#ToggleSpooling()"{{{
+  let output_window = vorax#GetOutputWindowHandler()
+  if output_window.spooling
+    " disable spooling
+    call output_window.StopSpooling()
+    " redraw here because the statusline of the output window must also be
+    " refreshed after disabling.
+    redraw!
+    echo 'Spooling stopped.'
+  else
+    let spool_file = output_window.spool_file
+    if exists('g:vorax_output_window_default_spool_file') &&
+          \ g:vorax_output_window_default_spool_file != ''
+      let spool_file = eval(g:vorax_output_window_default_spool_file)
+    endif
+    " enable spooling
+    call output_window.StartSpooling(spool_file)
+    " redraw here because the statusline of the output window must also be
+    " refreshed after enabling.
+    redraw!
+    echo 'Spooling started in ' . output_window.spool_file
+  endif
+endfunction"}}}
+
+" Toggle pretty print for the sqlplus output.
+function! vorax#ToggleCompressedOutput()"{{{
+  let sqlplus = vorax#GetSqlplusHandler()
+  if sqlplus.html
+    call sqlplus.DisableHtml()
+    " redraw here because the statusline of the output window must also be
+    " refreshed after disabling.
+    redraw!
+    echo 'Compressed output disabled!'
+  else
+    call sqlplus.EnableHtml()
+    " redraw here because the statusline of the output window must also be
+    " refreshed after enabling.
+    redraw!
+    echo 'Compressed output enabled!'
+  endif
 endfunction"}}}
 
 " Get the profiles manager object.

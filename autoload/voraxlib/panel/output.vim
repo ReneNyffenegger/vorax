@@ -26,6 +26,10 @@ function! voraxlib#panel#output#New()"{{{
     let s:output_window['status'] = ''
     " The output buffer.
     let s:output_window['buffer'] = { 'text' : '', 'html' : 0 } 
+    " Spooling flag.
+    let s:output_window['spooling'] = 0
+    " Log destination.
+    let s:output_window['spool_file'] = ''
     " Add additional functionality
     call s:ExtendWindow()
   endif
@@ -35,10 +39,11 @@ endfunction"}}}
 " Returns the status line format for the output window.
 function! voraxlib#panel#output#StatusLine()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
-  return ' ' . sqlplus.GetConnectedTo() . ' | Position: %l/%L - %P%= Compressed: ' . 
-    \ (sqlplus.html ? 'Y' : 'N') . ' | Spool: ' . 
-    \ (exists('g:vorax_logging') && g:vorax_logging ? 'Y' : 'N') . ' | Bell: ' . 
-    \ (exists('g:vorax_monitor_end_exec') && g:vorax_monitor_end_exec ? 'Y' : 'N') . ' '
+  return ' %l/%L - %P%= '.
+        \ (sqlplus.html ? 'compressed ' : '') . 
+        \ (s:output_window.spooling ? '[spool to: ' . simplify(s:output_window.spool_file) . '] ' : '') . 
+        \ (exists('g:vorax_monitor_end_exec') && g:vorax_monitor_end_exec ? 'bell ' : '' ) . 
+        \ sqlplus.GetConnectedTo() . ' '
 endfunction"}}}
 
 " This functions exend the base window widget with methods
@@ -66,10 +71,7 @@ function! s:ExtendWindow()"{{{
 
     " define mappings
     if exists('g:vorax_output_window_clear_key') && g:vorax_output_window_clear_key != ''
-      exe 'silent nnoremap <silent> <buffer> ' . g:vorax_output_window_clear_key . ' :call <SID>ClearOutputWindow()<cr>'
-    endif
-    if exists('g:vorax_output_window_toggle_compressed_output_key') && g:vorax_output_window_toggle_compressed_output_key != ''
-      exe 'nnoremap <silent>  <buffer> ' . g:vorax_output_window_toggle_compressed_output_key . ' :call <SID>ToggleCompressedOutput()<cr>'
+      exe 'nnoremap <silent> <buffer> ' . g:vorax_output_window_clear_key . ' :call <SID>ClearOutputWindow()<cr>'
     endif
   endfunction"}}}
 
@@ -138,6 +140,7 @@ function! s:ExtendWindow()"{{{
     normal gg"_dG
   endfunction"}}}
 
+  " Start the monitor for the output window.
   function! s:output_window.StartMonitor()"{{{
     call s:ResetWork()
     if g:vorax_output_window_keep_focus_after_exec
@@ -178,6 +181,66 @@ function! s:ExtendWindow()"{{{
     return exists('s:pause') && s:pause
   endfunction"}}}
 
+  " Start spooling in the provided file
+  function! s:output_window.StartSpooling(file)"{{{
+    let file = a:file
+    if a:file == ''
+      " prompt the user for a file
+      let file = input('Spool file: ', '', "file")
+    endif
+    if file != ''
+      ruby <<EORC
+      begin
+        $spool_file = File.open(File.expand_path(VIM::evaluate('file')), 'a')
+        VIM::command('let s:output_window.spooling=1')
+        VIM::command("let s:output_window.spool_file=#{VIM::evaluate('file').inspect}")
+      rescue Errno::ENOENT
+        VIM::command("call voraxlib#utils#Warn('The spool file could not be created. Invalid path?')")
+      rescue => err
+        VIM::command("call voraxlib#utils#Warn('The spool file could not be created.')")
+        VIM::command("call voraxlib#utils#Warn(#{err.message.inspect})")
+      end
+EORC
+    else
+    endif
+  endfunction"}}}
+
+  " Stop spooling.
+  function! s:output_window.StopSpooling()"{{{
+    ruby <<EORC
+    begin
+      if defined?($spool_file) && $spool_file
+        $spool_file.close
+      end
+    rescue
+      VIM::command("voraxlib#utils#Warn('The spool file could not be closed.')")
+    end
+EORC
+    let s:output_window.spooling=0
+  endfunction"}}}
+
+endfunction"}}}
+
+" Write text to the spool file.
+function! s:WriteToSpool(text)"{{{
+  ruby <<EORC
+  begin
+    $spool_file.print(VIM::evaluate('a:text'))
+    $spool_file.flush
+  rescue => err
+    VIM::command("voraxlib#utils#Warn('Cannot write to spool file.')")
+    VIM::command("voraxlib#utils#Warn(#{err.message.inspect})")
+    VIM::command("let err=1")
+  end
+EORC
+  if exists('err')
+    let response = voraxlib#utils#PickOption(
+          \ 'Do you want to stop spooling?',
+          \ ['(Y)es', '(N)o'])
+    if response == 'Y'
+      s:output_window.StopSpooling()
+    end
+  endif
 endfunction"}}}
 
 " Compute the status feedback based on the provided chunk.
@@ -237,6 +300,9 @@ function! s:SpitOutput()"{{{
   " spit the results
   if lines != ""
     call s:output_window.AppendText(lines)
+    if s:output_window.spooling
+      call s:WriteToSpool(lines)
+    endif
     if exists('page_size') && s:lines == page_size
       let s:lines = 0
       let s:pause = 1
@@ -419,19 +485,6 @@ endfunction"}}}
 " This function is invoked by the clear window mapping.
 function! s:ClearOutputWindow()"{{{
   call s:output_window.Clear()
-endfunction"}}}
-
-" Toggle pretty print for the sqlplus output.
-function! s:ToggleCompressedOutput()"{{{
-  let sqlplus = vorax#GetSqlplusHandler()
-  redraw
-  if sqlplus.html
-    call sqlplus.DisableHtml()
-    echo 'Compressed output disabled!'
-  else
-    call sqlplus.EnableHtml()
-    echo 'Compressed output enabled!'
-  endif
 endfunction"}}}
 
 let &cpo=s:cpo
