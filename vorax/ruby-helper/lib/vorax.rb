@@ -6,6 +6,7 @@ require 'rubygems'
 require 'nokogiri'
 require 'encoding/character/utf-8'
 require 'antlr3'
+require 'cgi'
 
 module Vorax
 

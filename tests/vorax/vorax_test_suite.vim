@@ -44,7 +44,7 @@ function! VoraxReloadEnvironment()
   ruby $vorax_testing=true
   ruby load "vorax.rb"
   ruby $vorax_testing=false
-  " because some ruby warnings messup the screen
+  " because some ruby warnings mess up the screen
   redraw!
   " unlet the flag which controlls the reload of every vorax script.
   for filenam in split(globpath(&rtp, "autoload/voraxlib/**/*.vim"), "\n")

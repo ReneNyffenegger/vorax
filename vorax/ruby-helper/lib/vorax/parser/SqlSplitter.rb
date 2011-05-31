@@ -3,9 +3,9 @@
 # vorax/ruby-helper/grammar/SqlSplitter.ruby.g
 # --
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
-# Ruby runtime library version: 1.8.11
+# Ruby runtime library version: 1.8.5
 # Input grammar file: vorax/ruby-helper/grammar/SqlSplitter.ruby.g
-# Generated at: 2011-05-30 16:44:34
+# Generated at: 2011-05-31 23:05:33
 # 
 
 # ~~~> start load path setup
@@ -16,7 +16,7 @@ antlr_load_failed = proc do
   load_path = $LOAD_PATH.map { |dir| '  - ' << dir }.join( $/ )
   raise LoadError, <<-END.strip!
   
-Failed to load the ANTLR3 runtime library (version 1.8.11):
+Failed to load the ANTLR3 runtime library (version 1.8.5):
 
 Ensure the library has been installed on your system and is available
 on the load path. If rubygems is available on your system, this can
@@ -46,7 +46,7 @@ rescue LoadError
   
   # 3: try to activate the antlr3 gem
   begin
-    Gem.activate( 'antlr3', '~> 1.8.11' )
+    Gem.activate( 'antlr3', '~> 1.8.5' )
   rescue Gem::LoadError
     antlr_load_failed.call
   end
@@ -80,7 +80,7 @@ module SqlSplitter
 
     
     begin
-      generated_using( "vorax/ruby-helper/grammar/SqlSplitter.ruby.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
+      generated_using( "vorax/ruby-helper/grammar/SqlSplitter.ruby.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.5" )
     rescue NoMethodError => error
       # ignore
     end
@@ -121,7 +121,8 @@ module SqlSplitter
           last_pos = 0
           lexer.separators << text.length if lexer.separators == [] || lexer.separators.last < text.length
           lexer.separators.each do |pos|
-            statements << text[(last_pos ... pos)]
+            stmt = text[(last_pos ... pos)]
+            statements << stmt unless stmt =~ /\A[\r\n\t ]*\Z/
             last_pos = pos
           end
           statements
@@ -152,8 +153,8 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 45:5: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
-      # at line 45:5: ( 'n' )?
+      # at line 46:5: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
+      # at line 46:5: ( 'n' )?
       alt_1 = 2
       look_1_0 = @input.peek( 1 )
 
@@ -162,12 +163,12 @@ module SqlSplitter
       end
       case alt_1
       when 1
-        # at line 45:7: 'n'
+        # at line 46:7: 'n'
         match( 0x6e )
 
       end
       match( 0x27 )
-      # at line 45:19: ( '\\'\\'' | ~ ( '\\'' ) )*
+      # at line 46:19: ( '\\'\\'' | ~ ( '\\'' ) )*
       while true # decision 2
         alt_2 = 3
         look_2_0 = @input.peek( 1 )
@@ -185,11 +186,11 @@ module SqlSplitter
         end
         case alt_2
         when 1
-          # at line 45:21: '\\'\\''
+          # at line 46:21: '\\'\\''
           match( "''" )
 
         when 2
-          # at line 45:30: ~ ( '\\'' )
+          # at line 46:30: ~ ( '\\'' )
           if @input.peek( 1 ).between?( 0x0, 0x26 ) || @input.peek( 1 ).between?( 0x28, 0xff )
             @input.consume
           else
@@ -229,9 +230,9 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 49:5: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? ( '\\n' | EOF )
+      # at line 50:5: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? ( '\\n' | EOF )
       match( "--" )
-      # at line 49:10: (~ ( '\\n' | '\\r' ) )*
+      # at line 50:10: (~ ( '\\n' | '\\r' ) )*
       while true # decision 3
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
@@ -242,7 +243,7 @@ module SqlSplitter
         end
         case alt_3
         when 1
-          # at line 49:10: ~ ( '\\n' | '\\r' )
+          # at line 50:10: ~ ( '\\n' | '\\r' )
           if @input.peek( 1 ).between?( 0x0, 0x9 ) || @input.peek( 1 ).between?( 0xb, 0xc ) || @input.peek( 1 ).between?( 0xe, 0xff )
             @input.consume
           else
@@ -259,7 +260,7 @@ module SqlSplitter
           break # out of loop for decision 3
         end
       end # loop for decision 3
-      # at line 49:24: ( '\\r' )?
+      # at line 50:24: ( '\\r' )?
       alt_4 = 2
       look_4_0 = @input.peek( 1 )
 
@@ -268,11 +269,11 @@ module SqlSplitter
       end
       case alt_4
       when 1
-        # at line 49:24: '\\r'
+        # at line 50:24: '\\r'
         match( 0xd )
 
       end
-      # at line 49:30: ( '\\n' | EOF )
+      # at line 50:30: ( '\\n' | EOF )
       alt_5 = 2
       look_5_0 = @input.peek( 1 )
 
@@ -283,11 +284,11 @@ module SqlSplitter
       end
       case alt_5
       when 1
-        # at line 49:31: '\\n'
+        # at line 50:31: '\\n'
         match( 0xa )
 
       when 2
-        # at line 49:38: EOF
+        # at line 50:38: EOF
         match( ANTLR3::EOF )
 
 
@@ -314,9 +315,9 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 53:5: '/*' ( options {greedy=false; } : . )* '*/'
+      # at line 54:5: '/*' ( options {greedy=false; } : . )* '*/'
       match( "/*" )
-      # at line 53:10: ( options {greedy=false; } : . )*
+      # at line 54:10: ( options {greedy=false; } : . )*
       while true # decision 6
         alt_6 = 2
         look_6_0 = @input.peek( 1 )
@@ -336,7 +337,7 @@ module SqlSplitter
         end
         case alt_6
         when 1
-          # at line 53:38: .
+          # at line 54:38: .
           match_any
 
         else
@@ -370,7 +371,7 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 57:3: ( SQL_SEPARATOR_1 | SQL_SEPARATOR_2 )
+      # at line 58:3: ( SQL_SEPARATOR_1 | SQL_SEPARATOR_2 )
       alt_7 = 2
       look_7_0 = @input.peek( 1 )
 
@@ -385,7 +386,7 @@ module SqlSplitter
       end
       case alt_7
       when 1
-        # at line 57:5: SQL_SEPARATOR_1
+        # at line 58:5: SQL_SEPARATOR_1
         __SQL_SEPARATOR_11___start_150 = self.character_index
         sql_separator_1!
         __SQL_SEPARATOR_11__ = create_token do |t|
@@ -403,7 +404,7 @@ module SqlSplitter
         end
 
       when 2
-        # at line 59:5: SQL_SEPARATOR_2
+        # at line 60:5: SQL_SEPARATOR_2
         __SQL_SEPARATOR_22___start_165 = self.character_index
         sql_separator_2!
         __SQL_SEPARATOR_22__ = create_token do |t|
@@ -439,7 +440,7 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 64:5: ';'
+      # at line 65:5: ';'
       match( 0x3b )
 
     ensure
@@ -456,9 +457,9 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 69:5: CR ( SPACE )* '/' ( SPACE )* ( CR | EOF )
+      # at line 70:5: CR ( SPACE )* '/' ( SPACE )* ( CR | EOF )
       cr!
-      # at line 69:9: ( SPACE )*
+      # at line 70:9: ( SPACE )*
       while true # decision 8
         alt_8 = 2
         look_8_0 = @input.peek( 1 )
@@ -469,7 +470,7 @@ module SqlSplitter
         end
         case alt_8
         when 1
-          # at line 69:9: SPACE
+          # at line 70:9: SPACE
           space!
 
         else
@@ -477,7 +478,7 @@ module SqlSplitter
         end
       end # loop for decision 8
       match( 0x2f )
-      # at line 69:20: ( SPACE )*
+      # at line 70:20: ( SPACE )*
       while true # decision 9
         alt_9 = 2
         look_9_0 = @input.peek( 1 )
@@ -488,14 +489,14 @@ module SqlSplitter
         end
         case alt_9
         when 1
-          # at line 69:20: SPACE
+          # at line 70:20: SPACE
           space!
 
         else
           break # out of loop for decision 9
         end
       end # loop for decision 9
-      # at line 69:27: ( CR | EOF )
+      # at line 70:27: ( CR | EOF )
       alt_10 = 2
       look_10_0 = @input.peek( 1 )
 
@@ -506,11 +507,11 @@ module SqlSplitter
       end
       case alt_10
       when 1
-        # at line 69:28: CR
+        # at line 70:28: CR
         cr!
 
       when 2
-        # at line 69:33: EOF
+        # at line 70:33: EOF
         match( ANTLR3::EOF )
 
 
@@ -530,8 +531,8 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 74:5: ( '\\n' )+
-      # at file 74:5: ( '\\n' )+
+      # at line 75:5: ( '\\n' )+
+      # at file 75:5: ( '\\n' )+
       match_count_11 = 0
       while true
         alt_11 = 2
@@ -543,7 +544,7 @@ module SqlSplitter
         end
         case alt_11
         when 1
-          # at line 74:5: '\\n'
+          # at line 75:5: '\\n'
           match( 0xa )
 
         else
@@ -573,8 +574,8 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 79:5: ( ' ' | '\\t' )+
-      # at file 79:5: ( ' ' | '\\t' )+
+      # at line 80:5: ( ' ' | '\\t' )+
+      # at file 80:5: ( ' ' | '\\t' )+
       match_count_12 = 0
       while true
         alt_12 = 2
@@ -626,8 +627,8 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 84:5: ( ' ' | '\\t' | '\\n' )+
-      # at file 84:5: ( ' ' | '\\t' | '\\n' )+
+      # at line 85:5: ( ' ' | '\\t' | '\\n' )+
+      # at file 85:5: ( ' ' | '\\t' | '\\n' )+
       match_count_13 = 0
       while true
         alt_13 = 2

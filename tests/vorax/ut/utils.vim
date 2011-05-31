@@ -53,6 +53,9 @@ function! TestVoraxUtilsRTrimSqlComments()
   call VUAssertEquals(cmd, 
                     \ voraxlib#utils#RTrimSqlComments(cmd.'/* test */'),
                     \ 'voraxlib#utils#RTrimSqlComments() test 4')
+  call VUAssertEquals(cmd, 
+                    \ voraxlib#utils#RTrimSqlComments(cmd.' --comment'),
+                    \ 'voraxlib#utils#RTrimSqlComments() test 5')
 endfunction
 
 function! TestVoraxUtilsTrimSqlComments()
@@ -187,11 +190,30 @@ function! TestVoraxUtilsRemoveSqlDelimitator()
   call VUAssertEquals(voraxlib#utils#RemoveSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;\n/"), "begin\ndbms_output.put_line('muci');\nend\n;", 'Complete plsql block 1.')
 endfunction
 
-function! TestVoraxUtilsHasSqlDelimitator()
+function! TestVoraxUtilsAddSqlDelimitator()
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator('select * from cat;'), 'select * from cat;', 'Simple stmt with ; at the end')
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator('select * from cat'), 'select * from cat;', 'Simple stmt without delim at the end')
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin dbms_output.put_line('muci'); end;"), "begin dbms_output.put_line('muci'); end;\n/\n", 'Incomplete plsql block.')
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin dbms_output.put_line('muci'); end/*muci*/muci;"), "begin dbms_output.put_line('muci'); end/*muci*/muci;\n/\n", 'Incomplete plsql block 2.')
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;"), "begin\ndbms_output.put_line('muci');\nend\n;\n/\n", 'Incomplete plsql block 3.')
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin\ndbms_output.put_line('muci');\nend \"muci\"\n;"), "begin\ndbms_output.put_line('muci');\nend \"muci\"\n;\n/\n", 'InComplete plsql block 3.')
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator('select * from cat --my comment'), 'select * from cat;', 'Statement with comment at the end.')
+endfunction
+
+function! TestVoraxUtilsIsQuery()
+  call VUAssertEquals(voraxlib#utils#IsQuery('/*muci*/select * from cat;'), 1, 'test 1')
+  call VUAssertEquals(voraxlib#utils#IsQuery('with x as (select * from cat) select * from x;'), 1, 'test 2')
+  call VUAssertEquals(voraxlib#utils#IsQuery("--comment\nwith x as (select * from cat) select * from x;"), 1, 'test 3')
+  call VUAssertEquals(voraxlib#utils#IsQuery("selects * from dual;"), 0, 'test 4')
+  call VUAssertEquals(voraxlib#utils#IsQuery("update tbl set x='abc';"), 0, 'test 5')
+endfunction
+
+function! TestVoraxUtilsAddRownumFilter()
+  "call VoraxReloadEnvironment()
+  let bwrap = "select * from (\n/* original query starts here */\n"
+  let ewrap = "\n/* original query ends here */\n) where rownum <= 10;\n"
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;', 10), bwrap . 'select * from cat' . ewrap, 'test 1')
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;', 10), bwrap . 'select * from cat' . ewrap.'set autotrace on;', 'test 2')
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;width x as (select * from dual) select * from x', 10), 
+        \ bwrap . 'select * from cat' . ewrap.'set autotrace on;' . bwrap . 'width x as (select * from dual) select * from x' . ewrap, 'test 3')
 endfunction

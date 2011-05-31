@@ -4,7 +4,7 @@ module Vorax
   class TextTagHandler < AbstractTagHandler
 
     def visit(node)
-      node.text if node.name == 'text'
+      CGI.unescape(node.text.chomp) if node.name == 'text'
     end
 
   end

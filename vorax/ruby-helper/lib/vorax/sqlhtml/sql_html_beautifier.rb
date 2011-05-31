@@ -21,7 +21,7 @@ module Vorax
 
     def beautify(html)
       body = Nokogiri::HTML(html, nil, 'utf-8').xpath('/html/body')
-      return walk(body)
+      return CGI.unescape(walk(body))
     end
 
     private

@@ -6,7 +6,7 @@ module Vorax
     def visit(node)
       buffer = ''
       if node.name == 'p'
-        node.children.each { |n| buffer << n.to_s if n.text? }
+        node.children.each { |n| buffer << CGI.unescape(n.to_s) if n.text? }
       end
       buffer
     end

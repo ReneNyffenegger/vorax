@@ -24,7 +24,8 @@ options {
       last_pos = 0
       lexer.separators << text.length if lexer.separators == [] || lexer.separators.last < text.length
       lexer.separators.each do |pos|
-        statements << text[(last_pos ... pos)]
+        stmt = text[(last_pos ... pos)]
+        statements << stmt unless stmt =~ /\A[\r\n\t ]*\Z/
         last_pos = pos
       end
       statements

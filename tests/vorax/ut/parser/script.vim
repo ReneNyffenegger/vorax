@@ -1,4 +1,5 @@
 function! TestVoraxParserScriptSplit()
+  call VoraxReloadEnvironment()
   let stmt1 = "select * from dual;"
   let stmt2 = "select * from cat\n/\n"
   let stmt3 = "select /*+ hint with ; */, ';', '/' from dual /* comment */;"
@@ -10,5 +11,7 @@ function! TestVoraxParserScriptSplit()
   call VUAssertEquals(voraxlib#parser#script#Split(stmt3 . stmt4), [stmt3, stmt4], 'Test with last statement without separator')
 
   call VUAssertEquals(voraxlib#parser#script#Split(stmt4), [stmt4], 'Test with one statement without separator')
+
+  call VUAssertEquals(voraxlib#parser#script#Split("select * from cat;\n"), ['select * from cat;'], 'Test with empty lines at the end.')
   
 endfunction

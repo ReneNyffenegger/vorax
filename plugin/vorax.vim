@@ -123,18 +123,20 @@ if !exists('g:vorax_session_owner_monitor')
   "                  penalty. Likewise, there are some issues with DBMS_XPLAN.
   let g:vorax_session_owner_monitor = 1
 endif " }}}
+" g:vorax_limit_rows"{{{
+if !exists('g:vorax_limit_rows')
+	" Limit the rows returned by interactive executed queries. This setting
+	" doesn't affect queries contained in sqlplus scripts. If this variable is
+	" greater than 0 then every query will be wrapped in a:
+	" select * from (<actual_query>) where rownum <= g:vorax_limit_rows.
+	let g:vorax_limit_rows = 0
+endif"}}}
 " g:vorax_sqlplus_default_options"{{{
 if !exists('g:vorax_sqlplus_default_options')
   let g:vorax_sqlplus_default_options = ['set linesize 10000',
                                        \ 'set tab off',
-                                       \ 'set flush on',]
-endif"}}}
-" g:vorax_statement_highlight_group"{{{
-if !exists('g:vorax_statement_highlight_group')
-	" The highlight group to be used when the currently executing statement is
-	" highlighted. If you want to disable this feature then set this global
-	" variable on an empty string.
-	let g:vorax_statement_highlight_group = 'TODO'
+                                       \ 'set flush on',
+                                       \ 'set sqlblanklines on',]
 endif"}}}
 " g:vorax_sqlplus_pause_warning"{{{
 if !exists('g:vorax_sqlplus_pause_warning')
@@ -143,6 +145,13 @@ if !exists('g:vorax_sqlplus_pause_warning')
 	" displayed in case this option is enabled. If you don't care and you rely
 	" to the sqlplus SET PAUSE ON you can disable this warning.
 	let g:vorax_sqlplus_pause_warning = 1
+endif"}}}
+" g:vorax_statement_highlight_group"{{{
+if !exists('g:vorax_statement_highlight_group')
+	" The highlight group to be used when the currently executing statement is
+	" highlighted. If you want to disable this feature then set this global
+	" variable on an empty string.
+	let g:vorax_statement_highlight_group = 'TODO'
 endif"}}}
 " g:vorax_output_window_anchor"{{{
 if !exists('g:vorax_output_window_anchor')
@@ -259,6 +268,11 @@ if !exists(':VoraxCompressedOutputToggle')
   command! -nargs=0 -bar VoraxCompressedOutputToggle :call vorax#ToggleCompressedOutput()
   nmap <unique> <script> <Plug>VoraxCompressedOutputToggle :VoraxCompressedOutputToggle<CR>
 endif"}}}
+" :VoraxLimitRowsToggle"{{{
+if !exists(':VoraxLimitRowsToggle')
+  command! -nargs=0 VoraxLimitRowsToggle :call vorax#ToggleLimitRows()
+  nmap <unique> <script> <Plug>VoraxLimitRowsToggle :VoraxLimitRowsToggle<CR>
+endif"}}}
 " ==============================================================================
 
 " *** KEY MAPPINGS SECTION 
@@ -278,6 +292,12 @@ if !exists('g:vorax_compressed_output_toggle_key')
   let g:vorax_compressed_output_toggle_key = "<Leader>co"
 endif
 exe "nmap <silent> <unique> " . g:vorax_compressed_output_toggle_key . " <Plug>VoraxCompressedOutputToggle"
+"}}}
+" g:vorax_limit_rows_toggle_key"{{{
+if !exists('g:vorax_limit_rows_toggle_key')
+  let g:vorax_limit_rows_toggle_key = "<Leader>lr"
+endif
+exe "nmap <silent> <unique> " . g:vorax_limit_rows_toggle_key . " <Plug>VoraxLimitRowsToggle"
 "}}}
 " g:vorax_output_window_clear_key"{{{
 if !exists('g:vorax_output_window_clear_key')

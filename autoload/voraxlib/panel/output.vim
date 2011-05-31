@@ -45,6 +45,7 @@ endfunction"}}}
 function! voraxlib#panel#output#StatusLine()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
   return ' %l/%L - %P%= '.
+        \ (exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0 ? 'limit=' . string(g:vorax_limit_rows) . ' ' : '') .
         \ (s:IsPaginatingEnabled() ? 'pause=' . (g:vorax_output_window_page_size == 0 ? 'auto' : string(g:vorax_output_window_page_size)) . ' ' : '') .
         \ (sqlplus.html ? 'compressed ' : '') . 
         \ (s:output_window.spooling ? '[spool to: ' . simplify(s:output_window.spool_file) . '] ' : '') . 
@@ -134,7 +135,9 @@ function! s:ExtendWindow()"{{{
     if self.buffer.html
       redraw
       echo 'Compressing output...'
+      if s:log.isDebugEnabled() | call s:log.debug('html buffer: '.string(self.buffer.text)) | endif
       let self.buffer.text = voraxlib#parser#output#Compress(self.buffer.text)
+      if s:log.isDebugEnabled() | call s:log.debug('after convert: '.string(self.buffer.text)) | endif
       let self.buffer.html = 0
     endif
   endfunction"}}}

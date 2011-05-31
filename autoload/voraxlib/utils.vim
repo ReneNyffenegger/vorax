@@ -13,7 +13,7 @@ set cpo&vim
 " How statements are sepparated
 let s:sql_delimitator_pattern = ';\|^\s*\/\s*$'
 let s:plsql_end_marker = '\v\_s+end\_s*"?[^"]*"?\_s*;\_s*\_$'
-let s:sql_strip_comments_pattern = '((\s*\/\*[^*\/]*\*\/\s*)|(\s*--[^\n]*\n\s*))+'
+let s:sql_strip_comments_pattern = '((\s*\/\*[^*\/]*\*\/\s*)|(\s*--[^\n]*((\n\s*)|\Z)))+'
 
 " Display a warning message.
 function! voraxlib#utils#Warn(text)"{{{
@@ -61,12 +61,13 @@ endfunction"}}}
 " dictionary with the following structure:
 " { 'prompt' : '<your_msg>',
 "   'check'  : [{'regexp' : '<your regexp check>', 'errmsg' : '<your error message in case the check failed>'} ... ]
+"   'default': '<your_default_value>'
 " }
 function! voraxlib#utils#Ask(askobj)"{{{
   let valid = 0
   let retval = ''
   while !valid
-    let retval = input(a:askobj.prompt)
+    let retval = input(a:askobj.prompt, (exists('a:askobj.default') ? a:askobj.default : ''))
     for checkobj in a:askobj.check
       if retval !~ checkobj.regexp
         let valid = 0
@@ -370,17 +371,50 @@ function! voraxlib#utils#RemoveSqlDelimitator(statement)"{{{
 endfunction"}}}
 
 " Adds a sql delimitator at the end of the statement.
-function! voraxlib#utils#AddSqlDelimitator(statement)
+function! voraxlib#utils#AddSqlDelimitator(statement)"{{{
   if !voraxlib#utils#HasSqlDelimitator(a:statement)
     if a:statement =~ s:plsql_end_marker
       " that's a plsql end marker add a /
       return a:statement . "\n/\n"
     else
-    	return a:statement . ";"
+    	" add the delimitator on the same line. This is needed because VoraX
+    	" doesn't know if it's an sqlplus command or an SQL command. For
+    	" example: 'SET AUTOTRACE ON;' is not the same as 'SET AUTOTRACE ON\n;'.
+    	" The second is dangerous because it excutes also the previous SQL
+    	" command. Likewise, take care about the trailing comment. Something
+    	" like 'SELECT * FROM CAT -- my comment;' is useless.
+    	return voraxlib#utils#RTrimSqlComments(a:statement) . ";"
     endif
   else
   	return a:statement
   endif
+endfunction"}}}
+
+" Whenever or not the provided statement is an oracle query.
+function! voraxlib#utils#IsQuery(statement)"{{{
+  if voraxlib#utils#LTrimSqlComments(a:statement) =~? '\v(^<select>)|(^<with>)'
+    return 1
+  else
+  	return 0
+  endif
+endfunction"}}}
+
+" For the identified queries identified in the a:text apply the a:limit rownum
+" filter.
+function! voraxlib#utils#AddRownumFilter(text, limit)
+  let result = ''
+  let statements = voraxlib#parser#script#Split(a:text)
+  for statement in statements
+    echom statement
+    if voraxlib#utils#IsQuery(statement)
+      let result .= "select * from (\n/* original query starts here */\n" . 
+            \ substitute(voraxlib#utils#RemoveSqlDelimitator(statement), '\v(\_^\_s*)|(\_s*\_$)', '', 'g') . 
+            \ "\n/* original query ends here */\n) where rownum <= " . string(a:limit) . ";\n"
+    else
+    	let result .= voraxlib#utils#AddSqlDelimitator(statement)."\n"
+    endif
+  endfor
+  return result
 endfunction
 
 let &cpo = s:cpo_save

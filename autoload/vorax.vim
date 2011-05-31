@@ -71,10 +71,16 @@ function! vorax#Exec(command)"{{{
   if s:ShouldGoOnWithPauseOn()
     if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
     " save the last command. this is require in order to be able to replay it.
-    let sqlplus.last_stmt = a:command
-    " exec the command in bg, prefixed with a CR. this is important especially
-    " in connection with set echo on.
-    call sqlplus.NonblockExec(sqlplus.Pack(sqlplus.last_stmt, {'include_eor' : 1}), 0)
+    let sqlplus.last_stmt = voraxlib#utils#AddSqlDelimitator(a:command)
+    if s:log.isDebugEnabled() | call s:log.debug('with delimitator added: '.string(sqlplus.last_stmt)) | endif
+    if exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0
+      let sqlplus.last_stmt = voraxlib#utils#AddRownumFilter(sqlplus.last_stmt, g:vorax_limit_rows)
+      if s:log.isDebugEnabled() | call s:log.debug('limit rows enabled. statements coverted to: '.string(sqlplus.last_stmt)) | endif
+    endif
+    " exec the command in bg. All trailing CR/spaces are removed before exec.
+    " This is important especially in connection with set echo on. With CRs
+    " the sqlprompt will be echoed
+    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt, '\_s*\_$', '', 'g'), {'include_eor' : 1}), 0)
     call s:output.StartMonitor()
   else
     if s:log.isDebugEnabled() | call s:log.debug('User decided to cancel the exec because of the pause on.') | endif
@@ -172,6 +178,30 @@ function! vorax#ToggleCompressedOutput()"{{{
     " refreshed after enabling.
     redraw!
     echo 'Compressed output enabled!'
+  endif
+endfunction"}}}
+
+" Toggle the ROWNUM limit filter
+function! vorax#ToggleLimitRows()"{{{
+  if exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0
+  	let s:last_vorax_limit_rows = g:vorax_limit_rows
+  	let g:vorax_limit_rows = 0
+    redraw!
+    echo 'ROWNUM limit filter has been removed!'
+  else
+    let s:filter_checker = { 'prompt' : 'Maximum number of records: ', 
+                           \ 'check'  : [
+                                          \ {'regexp' : '[0-9]\+',
+                                          \  'errmsg' : 'Please specify a valid number.'},
+                                          \ ],
+                           \ 'default': (exists('s:last_vorax_limit_rows') ? s:last_vorax_limit_rows : '')
+                           \ }
+    let limit = voraxlib#utils#Ask(s:filter_checker)
+    if limit != ''
+      let g:vorax_limit_rows = str2nr(limit)
+      redraw!
+      echo 'ROWNUM limit filter has been activated!'
+    endif
   endif
 endfunction"}}}
 
