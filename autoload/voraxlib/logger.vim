@@ -2,8 +2,13 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
-let s:cpo=&cpo
-set cpo-=C
+if &cp || exists("g:_loaded_voraxlib_logger")
+ finish
+endif
+
+let g:_loaded_voraxlib_logger = 1
+let s:cpo_save = &cpo
+set cpo&vim
 
 " A dummy logger object. It is used only if the log.vim script was not 
 " installed.
@@ -68,6 +73,6 @@ function! voraxlib#logger#New(script_name)
   return log
 endfunction
 
-let &cpo=s:cpo
-unlet s:cpo
+let &cpo = s:cpo_save
+unlet s:cpo_save
 

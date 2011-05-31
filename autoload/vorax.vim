@@ -2,6 +2,14 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
+if &cp || exists("g:_loaded_vorax") 
+ finish
+endif
+
+let g:_loaded_vorax = 1
+let s:cpo_save = &cpo
+set cpo&vim
+
 " Initialize logger
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
@@ -223,3 +231,7 @@ function! s:ShouldGoOnWithPauseOn()"{{{
 endfunction"}}}
 
 "}}}
+
+let &cpo=s:cpo_save
+unlet s:cpo_save
+

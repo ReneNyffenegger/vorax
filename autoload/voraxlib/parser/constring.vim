@@ -1,7 +1,15 @@
 " Description: Parsing utilities for connection strings.
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
-"
+
+if &cp || exists("g:_loaded_voraxlib_parser_constring") 
+ finish
+endif
+
+let g:_loaded_voraxlib_parser_constring = 1
+let s:cpo_save = &cpo
+set cpo&vim
+
 " This function is used to parse a connect string. It receives
 " a string like 'user/pwd@db' and it breaks it down into the
 " corresponding user,pwd,db parts. It returns these components
@@ -43,3 +51,5 @@ function! voraxlib#parser#constring#Split(cstr)
   return cdata
 endfunction
 
+let &cpo = s:cpo_save
+unlet s:cpo_save

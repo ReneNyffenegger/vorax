@@ -21,26 +21,52 @@
 " that a new VIM process will be created by this test suite. The GUI testing
 " part is controlled by the following global variables:
 "
-" g:vorax_test_gui: enable or disable GUI testing (by default 1)
+" g:vorax_test_gui:            enable or disable GUI testing (by default 1)
 " g:vorax_test_gui_servername: the name of the vim server
-" g:vorax_test_gui_timeout: how long to wait for a response from the server
-" (in miliseconds). For slow computers increase this value. (by default 3000)
-" g:vorax_test_gui_vim_exe: the vim executable to use when launching the
-" remote vim server.
+" g:vorax_test_gui_timeout:    how long to wait for a response from the server
+" (in miliseconds).            For slow computers increase this value. 
+"                              (by default 3000)
+" g:vorax_test_gui_vim_exe:    the vim executable to use when launching the
+"                              remote vim server.
 "
 " To run the regression test use:
 "   :so %
 " and look at the displayed statistics.
 
-let g:vorax_test_gui = 1
+let g:vorax_test_gui = 0
 
 if !exists('g:vorax_test_gui') | let g:vorax_test_gui = 1 | endif
+
+" Reload all VIM and ruby support functions.
+function! VoraxReloadEnvironment()
+  " signal to ruby that testing is in place. It'll use load instead of
+  " require.
+  ruby $vorax_testing=true
+  ruby load "vorax.rb"
+  ruby $vorax_testing=false
+  " because some ruby warnings messup the screen
+  redraw!
+  " unlet the flag which controlls the reload of every vorax script.
+  for filenam in split(globpath(&rtp, "autoload/voraxlib/**/*.vim"), "\n")
+    silent! exe 'unlet g:_loaded_' . substitute(filenam, 
+          \ '^.\{-\}\(voraxlib.\{-\}\)\.vim$', 
+          \ '\=substitute(submatch(1), "/", "_", "g")', 
+          \ '') 
+  endfor
+  runtime! autoload/voraxlib/**/*.vim
+  " the same for main vorax autoload file
+  silent! unlet g:_loaded_vorax
+  runtime! autoload/vorax.vim
+endfunction
 
 " Create the suite.
 function! TestSuiteForVorax()
   " don't mess up the current vorax home dir. Create a new vorax home dir just
   " for tests.
   let save_vorax_home_dir = g:vorax_home_dir
+  " save the current title
+  let save_titlestring = &titlestring
+  " ~/vorax_test is the temporary location used for tests.
   let g:vorax_home_dir = fnamemodify(expand('$HOME'). '/vorax_test', ':8')
   if !isdirectory(g:vorax_home_dir)
     call mkdir(g:vorax_home_dir, '')
@@ -56,6 +82,8 @@ function! TestSuiteForVorax()
   endfor
   " restore the old value
   let g:vorax_home_dir = save_vorax_home_dir
+  " restore title
+  let &titlestring = save_titlestring
 endfunction
 
 " Get all vorax unit test functions.
@@ -78,5 +106,6 @@ endfunction
 if g:vorax_test_gui | runtime! tests/vorax/gui_setup.vim | endif
 
 " Run suite.
+call VoraxReloadEnvironment()
 call VURunnerRunTest('TestSuiteForVorax')
 

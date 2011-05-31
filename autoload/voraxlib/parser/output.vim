@@ -2,8 +2,16 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
+if &cp || exists("g:_loaded_voraxlib_parser_output") 
+ finish
+endif
+
+let g:_loaded_voraxlib_parser_output = 1
+let s:cpo_save = &cpo
+set cpo&vim
+
 " Convert the provided html output to text.
-function voraxlib#parser#output#Compress(html)
+function! voraxlib#parser#output#Compress(html)
   let sqlplus = vorax#GetSqlplusHandler()
   if !sqlplus.IsBusy()
     let params = sqlplus.GetConfigFor(['colsep', 'recsep', 'recsepchar', 'underline'])
@@ -37,3 +45,6 @@ function voraxlib#parser#output#Compress(html)
     VIM::command("return #{vorax_html.beautify(VIM::evaluate('a:html')).inspect}")
 EORC
 endfunction
+
+let &cpo = s:cpo_save
+unlet s:cpo_save

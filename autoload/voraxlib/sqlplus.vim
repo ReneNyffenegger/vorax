@@ -2,8 +2,13 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
-let s:cpo=&cpo
-set cpo-=C
+if &cp || exists("g:_loaded_voraxlib_sqlplus") 
+ finish
+endif
+
+let g:_loaded_voraxlib_sqlplus = 1
+let s:cpo_save = &cpo
+set cpo&vim
 
 " the sqlplus object
 let s:sqlplus = {'ruby_key' : '', 'last_stmt' : '', 'html' : 0}
@@ -336,5 +341,5 @@ function! s:sqlplus.Destroy() dict "{{{
   ruby $sqlplus_factory.delete(VIM::evaluate('self.ruby_key'))
 endfunction "}}}
 
-let &cpo=s:cpo
-
+let &cpo = s:cpo_save
+unlet s:cpo_save

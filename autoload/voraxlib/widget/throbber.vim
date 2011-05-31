@@ -2,8 +2,13 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
-let s:cpo = &cpo
-set cpo-=C
+if &cp || exists("g:_loaded_voraxlib_widget_throbber") 
+ finish
+endif
+
+let g:_loaded_voraxlib_widget_throbber = 1
+let s:cpo_save = &cpo
+set cpo&vim
 
 let s:throbber = {
       \ 'chars' : ['|', '/', '-', '*', '\'],
@@ -32,5 +37,5 @@ function! s:throbber.Spin()
   endif
 endfunction
 
-let &cpo=s:cpo
-unlet s:cpo
+let &cpo = s:cpo_save
+unlet s:cpo_save

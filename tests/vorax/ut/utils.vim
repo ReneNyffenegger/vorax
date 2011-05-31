@@ -63,6 +63,13 @@ function! TestVoraxUtilsTrimSqlComments()
                     \ 'voraxlib#utils#TrimSqlComments() test 1')
 endfunction
 
+function! TestVoraxUtilsRemoveAllSqlComments()
+  let cmd = "\n--muci\n/* ab\n c */\nselect /*+ hint */ * from cat;--test\n/*comment 2*/"
+  call VUAssertEquals(' select * from cat; ', 
+                    \ voraxlib#utils#RemoveAllSqlComments(cmd),
+                    \ 'test 1')
+endfunction
+
 function! TestVoraxUtilsGetStartOfCurrentSql()
   silent exe 'split ' . s:ut_dir . '/../sql/under_cursor.sql'
 
@@ -159,4 +166,32 @@ endfunction
 function! TestVoraxUtilsCountMatch()
   call VUAssertEquals(voraxlib#utils#CountMatch("line1\nline2\nline3\nline4", '\n'), 3, "Test 1")
   call VUAssertEquals(voraxlib#utils#CountMatch("line1\nline2\nline3\nline4", 'l'), 4, "Test 2")
+endfunction
+
+function! TestVoraxUtilsHasSqlDelimitator()
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator('select * from cat;'), 1, 'Simple stmt with ; at the end')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("select ';' from cat\n\n;"), 1, 'Delim on a new line')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator('select * from cat'), 0, 'Simple stmt without delim at the end')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin dbms_output.put_line('muci'); end;"), 0, 'Incomplete plsql block.')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin dbms_output.put_line('muci'); end/*muci*/muci;"), 0, 'Incomplete plsql block 2.')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;"), 0, 'Incomplete plsql block 3.')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;\n/"), 1, 'Complete plsql block 1.')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend \"muci\"\n;"), 0, 'InComplete plsql block 3.')
+endfunction
+
+function! TestVoraxUtilsRemoveSqlDelimitator()
+  call VUAssertEquals(voraxlib#utils#RemoveSqlDelimitator('select * from cat;'), 'select * from cat', 'Simple stmt with ; at the end')
+  call VUAssertEquals(voraxlib#utils#RemoveSqlDelimitator("select ';' from cat\n\n;"), "select ';' from cat", 'Delim on a new line')
+  call VUAssertEquals(voraxlib#utils#RemoveSqlDelimitator('select * from cat'), 'select * from cat', 'Simple stmt without delim at the end')
+  call VUAssertEquals(voraxlib#utils#RemoveSqlDelimitator("begin dbms_output.put_line('muci'); end;"), "begin dbms_output.put_line('muci'); end;", 'Incomplete plsql block.')
+  call VUAssertEquals(voraxlib#utils#RemoveSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;\n/"), "begin\ndbms_output.put_line('muci');\nend\n;", 'Complete plsql block 1.')
+endfunction
+
+function! TestVoraxUtilsHasSqlDelimitator()
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator('select * from cat;'), 'select * from cat;', 'Simple stmt with ; at the end')
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator('select * from cat'), 'select * from cat;', 'Simple stmt without delim at the end')
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin dbms_output.put_line('muci'); end;"), "begin dbms_output.put_line('muci'); end;\n/\n", 'Incomplete plsql block.')
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin dbms_output.put_line('muci'); end/*muci*/muci;"), "begin dbms_output.put_line('muci'); end/*muci*/muci;\n/\n", 'Incomplete plsql block 2.')
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;"), "begin\ndbms_output.put_line('muci');\nend\n;\n/\n", 'Incomplete plsql block 3.')
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin\ndbms_output.put_line('muci');\nend \"muci\"\n;"), "begin\ndbms_output.put_line('muci');\nend \"muci\"\n;\n/\n", 'InComplete plsql block 3.')
 endfunction

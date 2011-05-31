@@ -2,9 +2,14 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
-let s:cpo = &cpo
-set cpo-=C
+if &cp || exists("g:_loaded_voraxlib_panel_output") 
+ finish
+endif
 
+let g:_loaded_voraxlib_panel_output = 1
+let s:cpo_save = &cpo
+set cpo&vim
+  
 " Initialize logger
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
@@ -40,6 +45,7 @@ endfunction"}}}
 function! voraxlib#panel#output#StatusLine()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
   return ' %l/%L - %P%= '.
+        \ (s:IsPaginatingEnabled() ? 'pause=' . (g:vorax_output_window_page_size == 0 ? 'auto' : string(g:vorax_output_window_page_size)) . ' ' : '') .
         \ (sqlplus.html ? 'compressed ' : '') . 
         \ (s:output_window.spooling ? '[spool to: ' . simplify(s:output_window.spool_file) . '] ' : '') . 
         \ (exists('g:vorax_monitor_end_exec') && g:vorax_monitor_end_exec ? 'bell ' : '' ) . 
@@ -244,7 +250,7 @@ EORC
 endfunction"}}}
 
 " Compute the status feedback based on the provided chunk.
-function s:SetStatusFeedback(chunk)"{{{
+function! s:SetStatusFeedback(chunk)"{{{
   if a:chunk != ''
     let s:last_set = localtime()
     let last_line = voraxlib#utils#CountMatch(a:chunk, '\n')
@@ -393,7 +399,7 @@ function! s:RemoveInteractivity()"{{{
 endfunction"}}}
 
 " Toggle PAUSE for the output window.
-function s:TogglePause()"{{{
+function! s:TogglePause()"{{{
   let s:pause = !s:pause
 endfunction"}}}
 
@@ -487,5 +493,6 @@ function! s:ClearOutputWindow()"{{{
   call s:output_window.Clear()
 endfunction"}}}
 
-let &cpo=s:cpo
-unlet s:cpo
+let &cpo = s:cpo_save
+unlet s:cpo_save
+

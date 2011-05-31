@@ -2,12 +2,18 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
-let s:cpo=&cpo
-set cpo-=C
+if &cp || exists("g:_loaded_voraxlib_utils") 
+ finish
+endif
+
+let g:_loaded_voraxlib_utils = 1
+let s:cpo_save = &cpo
+set cpo&vim
 
 " How statements are sepparated
 let s:sql_delimitator_pattern = ';\|^\s*\/\s*$'
-let s:sql_strip_comments_pattern = '((\s*\/\*[^*\/]*\*\/\s*)|(\s*--[^\n]*\n\s*)|(\s*\r?\n))*'
+let s:plsql_end_marker = '\v\_s+end\_s*"?[^"]*"?\_s*;\_s*\_$'
+let s:sql_strip_comments_pattern = '((\s*\/\*[^*\/]*\*\/\s*)|(\s*--[^\n]*\n\s*))+'
 
 " Display a warning message.
 function! voraxlib#utils#Warn(text)"{{{
@@ -241,7 +247,7 @@ endfunction"}}}
 " Get rid of all SQL comments along with the empty lines from the beginning of the provided command.
 function! voraxlib#utils#LTrimSqlComments(command)"{{{
   ruby <<EORC
-  result = VIM::evaluate("a:command").gsub(/\A#{VIM::evaluate('s:sql_strip_comments_pattern')}/, '')
+  result = VIM::evaluate("a:command").gsub(/\A#{VIM::evaluate('s:sql_strip_comments_pattern')}/, '').gsub(/\A(\s*\r?\n)*/, '')
   VIM::command("return #{result.inspect}")
 EORC
 endfunction"}}}
@@ -249,7 +255,7 @@ endfunction"}}}
 " Get rid of all SQL comments along with the empty lines from the end of the provided command.
 function! voraxlib#utils#RTrimSqlComments(command)"{{{
   ruby <<EORC
-  result = VIM::evaluate("a:command").gsub(/#{VIM::evaluate('s:sql_strip_comments_pattern')}\Z/, '')
+  result = VIM::evaluate("a:command").gsub(/#{VIM::evaluate('s:sql_strip_comments_pattern')}\Z/, '').gsub(/(\s*\r?\n)*\Z/, '')
   VIM::command("return #{result.inspect}")
 EORC
 endfunction"}}}
@@ -257,6 +263,16 @@ endfunction"}}}
 " Get rid of sourrounding comments for the provided sql command.
 function! voraxlib#utils#TrimSqlComments(command)"{{{
   return voraxlib#utils#RTrimSqlComments(voraxlib#utils#LTrimSqlComments(a:command))
+endfunction"}}}
+
+" Get rid of all SQL comments which are replaced with whitespace in order to
+" keep the meaning of the statement (e.g. select/*comment*/'abc' from dual; would
+" be invalid if the comment is removed completelly)
+function! voraxlib#utils#RemoveAllSqlComments(command)"{{{
+  ruby <<EORC
+  result = VIM::evaluate("a:command").gsub(/#{VIM::evaluate('s:sql_strip_comments_pattern')}/, ' ')
+  VIM::command("return #{result.inspect}")
+EORC
 endfunction"}}}
 
 " whenever or not the provided output contains oracle error messages
@@ -327,6 +343,46 @@ function! voraxlib#utils#CountMatch(text, pattern)"{{{
   return c
 endfunction"}}}
 
-let &cpo=s:cpo
-unlet s:cpo
+" Whenever or not the provided statement has the sql delimitator at the end.
+function! voraxlib#utils#HasSqlDelimitator(statement)"{{{
+  let statement = voraxlib#utils#RemoveAllSqlComments(a:statement)
+  if statement =~ '\v\n+\s*/\s*\n*$'
+    " the statement has an ending /
+  	return 1
+  elseif statement =~ s:plsql_end_marker
+    " the statement is a PL/SQL block but it doesn't have the ending /
+    return 0
+  elseif statement =~ '\v\_s*;\_s*\_$'
+    " a regular statement with ; at the end
+    return 1
+  else
+  	return 0
+  endif
+endfunction"}}}
+
+" Remove the end delimitator, if any
+function! voraxlib#utils#RemoveSqlDelimitator(statement)"{{{
+  if voraxlib#utils#HasSqlDelimitator(a:statement)
+  	return substitute(a:statement, '\v(\n+\s*/\s*\n*$)|(\_s*;\_s*\_$)', '', '')
+  else
+  	return a:statement
+  endif
+endfunction"}}}
+
+" Adds a sql delimitator at the end of the statement.
+function! voraxlib#utils#AddSqlDelimitator(statement)
+  if !voraxlib#utils#HasSqlDelimitator(a:statement)
+    if a:statement =~ s:plsql_end_marker
+      " that's a plsql end marker add a /
+      return a:statement . "\n/\n"
+    else
+    	return a:statement . ";"
+    endif
+  else
+  	return a:statement
+  endif
+endfunction
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
 

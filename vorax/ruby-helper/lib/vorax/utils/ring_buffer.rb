@@ -3,8 +3,8 @@ module Vorax
   # A circular buffer implementation.
   class RingBuffer < Array
 
-    alias_method :array_push, :push
-    alias_method :array_element, :[]
+    alias_method :array_push, :push unless public_method_defined?(:array_push)
+    alias_method :array_element, :[] unless public_method_defined?(:array_element)
 
     def initialize( size )
       @ring_size = size
@@ -12,6 +12,7 @@ module Vorax
     end
 
     def push( element )
+      #p Kernel::caller
       if length == @ring_size
         shift # loose element
       end

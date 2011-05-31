@@ -19,11 +19,11 @@ module Vorax
   class ProfilesManager
 
     # The file name for the private key
-    PRIVATE_KEY = 'id_rsa'
+    PRIVATE_KEY = 'id_rsa' unless defined?(PRIVATE_KEY)
     # The file name for the public key
-    PUBLIC_KEY = 'id_rsa.pub'
+    PUBLIC_KEY = 'id_rsa.pub' unless defined?(PUBLIC_KEY)
     # The file name for the repository file.
-    REPOSITORY_FILE = 'profiles.xml'
+    REPOSITORY_FILE = 'profiles.xml' unless defined?(REPOSITORY_FILE)
 
     attr_reader :repository_xml, :unlocked
 

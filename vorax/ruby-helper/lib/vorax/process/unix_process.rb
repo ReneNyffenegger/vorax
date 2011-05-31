@@ -10,7 +10,7 @@ module Vorax
     
     # How many seconds to wait for a process to vanish after
     # a destroy request
-    DESTROY_TIMEOUT = 10
+    DESTROY_TIMEOUT = 10 unless defined?(DESTROY_TIMEOUT)
 
     # create a new process. 
     def create(command)

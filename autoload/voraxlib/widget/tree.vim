@@ -4,8 +4,13 @@
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
-let s:cpo = &cpo
-set cpo-=C
+if &cp || exists("g:_loaded_voraxlib_widget_tree") 
+ finish
+endif
+
+let g:_loaded_voraxlib_widget_tree = 1
+let s:cpo_save = &cpo
+set cpo&vim
 
 let s:tree = {
       \ 'window' : {},
@@ -25,7 +30,7 @@ function! voraxlib#widget#tree#New(window)"{{{
 endfunction"}}}
 
 " Comparator function to sort taking into account the depth of the tree.
-function voraxlib#widget#tree#DepthSort(i1, i2)"{{{
+function! voraxlib#widget#tree#DepthSort(i1, i2)"{{{
   let d1 = len(split(a:i1, voraxlib#utils#LiteralRegexp(s:tree.path_separator)))
   let d2 = len(split(a:i2, voraxlib#utils#LiteralRegexp(s:tree.path_separator)))
   return d1 == d2 ? 0 : d1 > d2 ? 1 : -1
@@ -305,6 +310,5 @@ function! s:GetPathName(xpos, ypos, tree) "{{{
 endfunction "}}}
 "}}}
 
-let &cpo=s:cpo
-unlet s:cpo
-
+let &cpo = s:cpo_save
+unlet s:cpo_save

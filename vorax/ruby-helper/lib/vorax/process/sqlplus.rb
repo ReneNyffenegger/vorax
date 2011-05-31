@@ -313,17 +313,17 @@ module Vorax
     # This is the end marker till the output from
     # the sqlplus process must be read after executing
     # a statement.
-    END_OF_REQUEST = '~~~ VORAX_END_OF_REQUEST ~~~'
+    END_OF_REQUEST = '~~~ VORAX_END_OF_REQUEST ~~~' unless defined?(END_OF_REQUEST)
 
     # This marker is used to mark a cancel request.
-    CANCEL_MARKER = '~~~ VORAX_CANCEL_REQUEST ~~~'
+    CANCEL_MARKER = '~~~ VORAX_CANCEL_REQUEST ~~~' unless defined?(CANCEL_MARKER)
 
     # Where to pack the sql commands by default.
-    DEFAULT_PACK_FILE = "run_this.sql"
+    DEFAULT_PACK_FILE = "run_this.sql" unless defined?(DEFAULT_PACK_FILE)
 
     # If there's no data to read from the sqlplus output how long
     # (in seconds) to wait till the next read.
-    READ_SLEEP_TICK = 0.03
+    READ_SLEEP_TICK = 0.03 unless defined?(READ_SLEEP_TICK)
 
     # Check if the process with the provided PID still exists.
     def pid_exists?(proc_pid)
