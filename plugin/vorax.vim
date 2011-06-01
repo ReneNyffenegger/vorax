@@ -268,6 +268,11 @@ if !exists(':VoraxCompressedOutputToggle')
   command! -nargs=0 -bar VoraxCompressedOutputToggle :call vorax#ToggleCompressedOutput()
   nmap <unique> <script> <Plug>VoraxCompressedOutputToggle :VoraxCompressedOutputToggle<CR>
 endif"}}}
+" :VoraxVerticalOutputToggle"{{{
+if !exists(':VoraxVerticalOutputToggle')
+  command! -nargs=0 -bar VoraxVerticalOutputToggle :call vorax#ToggleVerticalOutput()
+  nmap <unique> <script> <Plug>VoraxVerticalOutputToggle :VoraxVerticalOutputToggle<CR>
+endif"}}}
 " :VoraxLimitRowsToggle"{{{
 if !exists(':VoraxLimitRowsToggle')
   command! -nargs=0 VoraxLimitRowsToggle :call vorax#ToggleLimitRows()
@@ -292,6 +297,12 @@ if !exists('g:vorax_compressed_output_toggle_key')
   let g:vorax_compressed_output_toggle_key = "<Leader>co"
 endif
 exe "nmap <silent> <unique> " . g:vorax_compressed_output_toggle_key . " <Plug>VoraxCompressedOutputToggle"
+"}}}
+" g:vorax_vertical_output_toggle_key"{{{
+if !exists('g:vorax_vertical_output_toggle_key')
+  let g:vorax_vertical_output_toggle_key = "<Leader>vo"
+endif
+exe "nmap <silent> <unique> " . g:vorax_vertical_output_toggle_key . " <Plug>VoraxVerticalOutputToggle"
 "}}}
 " g:vorax_limit_rows_toggle_key"{{{
 if !exists('g:vorax_limit_rows_toggle_key')

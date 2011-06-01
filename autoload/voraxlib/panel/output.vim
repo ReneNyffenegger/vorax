@@ -30,7 +30,7 @@ function! voraxlib#panel#output#New()"{{{
     " Status info
     let s:output_window['status'] = ''
     " The output buffer.
-    let s:output_window['buffer'] = { 'text' : '', 'html' : 0 } 
+    let s:output_window['buffer'] = { 'text' : '', 'html' : 0, 'vertical' : 0 } 
     " Spooling flag.
     let s:output_window['spooling'] = 0
     " Log destination.
@@ -47,7 +47,8 @@ function! voraxlib#panel#output#StatusLine()"{{{
   return ' %l/%L - %P%= '.
         \ (exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0 ? 'limit=' . string(g:vorax_limit_rows) . ' ' : '') .
         \ (s:IsPaginatingEnabled() ? 'pause=' . (g:vorax_output_window_page_size == 0 ? 'auto' : string(g:vorax_output_window_page_size)) . ' ' : '') .
-        \ (sqlplus.html ? 'compressed ' : '') . 
+        \ (sqlplus.html && !s:output_window.buffer.vertical ? 'compressed ' : '') . 
+        \ (sqlplus.html && s:output_window.buffer.vertical ? 'vertical ' : '') . 
         \ (s:output_window.spooling ? '[spool to: ' . simplify(s:output_window.spool_file) . '] ' : '') . 
         \ (exists('g:vorax_monitor_end_exec') && g:vorax_monitor_end_exec ? 'bell ' : '' ) . 
         \ sqlplus.GetConnectedTo() . ' '
@@ -136,7 +137,7 @@ function! s:ExtendWindow()"{{{
       redraw
       echo 'Compressing output...'
       if s:log.isDebugEnabled() | call s:log.debug('html buffer: '.string(self.buffer.text)) | endif
-      let self.buffer.text = voraxlib#parser#output#Compress(self.buffer.text)
+      let self.buffer.text = voraxlib#parser#output#Compress(self.buffer.text, self.buffer.vertical)
       if s:log.isDebugEnabled() | call s:log.debug('after convert: '.string(self.buffer.text)) | endif
       let self.buffer.html = 0
     endif
@@ -260,7 +261,7 @@ function! s:SetStatusFeedback(chunk)"{{{
     let s:output_window['status'] .= voraxlib#utils#ExtractLines(a:chunk, last_line + 1)
     let s:output_window['status'] = strpart(substitute(s:output_window['status'], '\(\r\n\)\|\r\|\n', " ... ", "g"), len(s:output_window['status'])-20)
     if s:output_window.buffer.html
-      let s:output_window.status = voraxlib#parser#output#Compress(s:output_window.status)
+      let s:output_window.status = voraxlib#parser#output#Compress(s:output_window.status, 0)
     endif
   endif
   if s:pause

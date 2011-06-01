@@ -166,18 +166,42 @@ endfunction"}}}
 " Toggle pretty print for the sqlplus output.
 function! vorax#ToggleCompressedOutput()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
-  if sqlplus.html
+  let output_win = vorax#GetOutputWindowHandler()
+  if sqlplus.html && !output_win.buffer.vertical
     call sqlplus.DisableHtml()
+    let output_win.buffer.vertical = 0
     " redraw here because the statusline of the output window must also be
     " refreshed after disabling.
     redraw!
     echo 'Compressed output disabled!'
   else
     call sqlplus.EnableHtml()
+    let output_win.buffer.vertical = 0
     " redraw here because the statusline of the output window must also be
     " refreshed after enabling.
     redraw!
     echo 'Compressed output enabled!'
+  endif
+endfunction"}}}
+
+" Toggle vertical layout output.
+function! vorax#ToggleVerticalOutput()"{{{
+  let sqlplus = vorax#GetSqlplusHandler()
+  let output_win = vorax#GetOutputWindowHandler()
+  if sqlplus.html && output_win.buffer.vertical
+    call sqlplus.DisableHtml()
+    let output_win.buffer.vertical = 1
+    " redraw here because the statusline of the output window must also be
+    " refreshed after disabling.
+    redraw!
+    echo 'Vertical layout output disabled!'
+  else
+    call sqlplus.EnableHtml()
+    let output_win.buffer.vertical = 1
+    " redraw here because the statusline of the output window must also be
+    " refreshed after enabling.
+    redraw!
+    echo 'Vertical layout output enabled!'
   endif
 endfunction"}}}
 
