@@ -229,6 +229,21 @@ function! vorax#ToggleLimitRows()"{{{
   endif
 endfunction"}}}
 
+" Toggle paginating
+function! vorax#TogglePaginating()
+  if exists('g:vorax_output_window_pause') && g:vorax_output_window_pause
+  	" disable paginating
+    let g:vorax_output_window_pause = 0
+    redraw!
+    echo 'Output paginating disabled!'
+  else
+  	" enable paginating
+    let g:vorax_output_window_pause = 1
+    redraw!
+    echo 'Output paginating enabled!'
+  endif
+endfunction
+
 " Get the profiles manager object.
 function! vorax#GetProfilesHandler()"{{{
   return s:profiles

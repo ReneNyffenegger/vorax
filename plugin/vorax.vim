@@ -278,6 +278,11 @@ if !exists(':VoraxLimitRowsToggle')
   command! -nargs=0 VoraxLimitRowsToggle :call vorax#ToggleLimitRows()
   nmap <unique> <script> <Plug>VoraxLimitRowsToggle :VoraxLimitRowsToggle<CR>
 endif"}}}
+" :VoraxPaginatingToggle"{{{
+if !exists(':VoraxPaginatingToggle')
+  command! -nargs=0 VoraxPaginatingToggle :call vorax#TogglePaginating()
+  nmap <unique> <script> <Plug>VoraxPaginatingToggle :VoraxPaginatingToggle<CR>
+endif"}}}
 " ==============================================================================
 
 " *** KEY MAPPINGS SECTION 
@@ -309,6 +314,12 @@ if !exists('g:vorax_limit_rows_toggle_key')
   let g:vorax_limit_rows_toggle_key = "<Leader>lr"
 endif
 exe "nmap <silent> <unique> " . g:vorax_limit_rows_toggle_key . " <Plug>VoraxLimitRowsToggle"
+"}}}
+" g:vorax_paginating_toggle_key"{{{
+if !exists('g:vorax_paginating_toggle_key')
+  let g:vorax_paginating_toggle_key = "<Leader>pa"
+endif
+exe "nmap <silent> <unique> " . g:vorax_paginating_toggle_key . " <Plug>VoraxPaginatingToggle"
 "}}}
 " g:vorax_output_window_clear_key"{{{
 if !exists('g:vorax_output_window_clear_key')

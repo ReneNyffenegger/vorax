@@ -31,13 +31,13 @@ module Vorax
     def vertical(node)
       buffer = ''
       columns = []
-      node.xpath("tr[1]/th").each { |col| columns << u(col.text.strip) }
+      node.xpath("tr[1]/th").each { |col| columns << u(CGI.unescapeHTML(col.text).strip) }
       max_col_length = columns.inject(0) { |result, col| [result, col.length].max }
       columns.map! { |col| col.ljust(max_col_length) }
       idx = 0
       node.xpath('tr/*').each do |tr|
         if tr.name == 'td'
-          value = u(tr.text.gsub(/\n/, ' ')).strip
+          value = u(CGI.unescapeHTML(tr.text.gsub(/\n/, ' '))).strip
           buffer << columns[idx] << ': ' << u(value) << "\n"
           idx += 1
           if idx == columns.count
@@ -57,7 +57,7 @@ module Vorax
       structure = []
       (0..cols-1).each do |rn|
         structure << node.xpath("tr/th[#{rn+1}]|tr/td[#{rn+1}]").inject([0, false]) do |result, element| 
-          [ [result[0], u(CGI.unescape(element.text.gsub(/\r?\n/, ' '))).strip.length].max, (result[1] || element.attribute('align'))] 
+          [ [result[0], u(CGI.unescapeHTML(element.text.gsub(/\r?\n/, ' '))).strip.length].max, (result[1] || element.attribute('align'))] 
         end
       end
       line = []
@@ -65,7 +65,7 @@ module Vorax
       i = 1
       node.xpath('tr/*').each do |tr|
         # walk through all columns of every record
-        value = u(CGI.unescape(tr.text).gsub(/\r?\n/, ' ')).strip
+        value = u(CGI.unescapeHTML(tr.text).gsub(/\r?\n/, ' ')).strip
         if structure[idx][1]
           # it's a number so it must be right justified
           line << value.rjust(structure[idx][0])
