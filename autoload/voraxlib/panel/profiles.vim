@@ -569,7 +569,7 @@ function! s:InvokeMenu()"{{{
       call s:profiles.Add('', {'category' : s:profiles.GetCategory(crr_node)})
     elseif response == 'R'
       call s:profiles.RemoveProfile(s:profiles.BuildProfileFromPath(crr_node))
-      echo crr_node . ' deleted.'
+      echo s:profiles.GetProfileNameFromPath(crr_node) . ' deleted.'
     elseif response == 'i'
       call s:ToggleImportantCurrentNode()
     endif

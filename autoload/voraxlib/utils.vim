@@ -405,7 +405,6 @@ function! voraxlib#utils#AddRownumFilter(text, limit)
   let result = ''
   let statements = voraxlib#parser#script#Split(a:text)
   for statement in statements
-    echom statement
     if voraxlib#utils#IsQuery(statement)
       let result .= "select * from (\n/* original query starts here */\n" . 
             \ substitute(voraxlib#utils#RemoveSqlDelimitator(statement), '\v(\_^\_s*)|(\_s*\_$)', '', 'g') . 

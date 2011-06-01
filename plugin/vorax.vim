@@ -232,8 +232,8 @@ endif"}}}
 " ==============================================================================
 " :VoraxConnect"{{{
 if !exists(':VoraxConnect')
-  command! -nargs=? -bar -complete=customlist,vorax#ProfilesForCompletion 
-        \ -bang VoraxConnect :call vorax#Connect(<q-args>, '<bang>')
+  command! -nargs=? -count=0 -complete=customlist,vorax#ProfilesForCompletion 
+        \ -bang VoraxConnect :call vorax#Connect(escape(<q-args>, '"\'), '<bang>')
   nmap <unique> <script> <Plug>VoraxConnect :VoraxConnect<CR>
 endif"}}}
 " :VoraxExec"{{{

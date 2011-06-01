@@ -209,11 +209,10 @@ function! TestVoraxUtilsIsQuery()
 endfunction
 
 function! TestVoraxUtilsAddRownumFilter()
-  "call VoraxReloadEnvironment()
   let bwrap = "select * from (\n/* original query starts here */\n"
   let ewrap = "\n/* original query ends here */\n) where rownum <= 10;\n"
   call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;', 10), bwrap . 'select * from cat' . ewrap, 'test 1')
-  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;', 10), bwrap . 'select * from cat' . ewrap.'set autotrace on;', 'test 2')
-  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;width x as (select * from dual) select * from x', 10), 
-        \ bwrap . 'select * from cat' . ewrap.'set autotrace on;' . bwrap . 'width x as (select * from dual) select * from x' . ewrap, 'test 3')
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;', 10), bwrap . 'select * from cat' . ewrap."set autotrace on;\n", 'test 2')
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;with x as (select * from dual) select * from x', 10), 
+        \ bwrap . 'select * from cat' . ewrap."set autotrace on;\n" . bwrap . 'with x as (select * from dual) select * from x' . ewrap, 'test 3')
 endfunction
