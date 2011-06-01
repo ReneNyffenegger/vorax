@@ -1,12 +1,19 @@
 #!/usr/bin/ruby
 
-$KCODE = 'UTF-8' 
+$KCODE = 'u' 
 
 require 'rubygems'
+require 'active_support/multibyte'
 require 'nokogiri'
-require 'encoding/character/utf-8'
 require 'antlr3'
 require 'cgi'
+
+# Unicode proxy
+class String
+  def mb_chars
+    ActiveSupport::Multibyte::Chars.new(self)
+  end
+end
 
 module Vorax
 
