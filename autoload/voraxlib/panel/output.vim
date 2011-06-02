@@ -164,6 +164,8 @@ function! s:ExtendWindow()"{{{
     call self.Focus()
     au VoraX CursorHold <buffer> call s:FetchResults()
     call s:SetupInteractivity()
+    let s:old_showcmd = &showcmd
+    let &showcmd = 0
   endfunction"}}}
 
   " Whenever or not the monitor is running
@@ -184,6 +186,7 @@ function! s:ExtendWindow()"{{{
       " register the clear highlight action.
       call s:RegisterClearHighlight()
     endif
+    let &showcmd = s:old_showcmd
   endfunction"}}}
 
   " Whenever or not the monitor is paused.
