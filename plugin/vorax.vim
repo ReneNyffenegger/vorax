@@ -220,6 +220,23 @@ if !exists('g:vorax_profiles_window_size')
   " The size of the profile window. 
   let g:vorax_profiles_window_size = 30
 endif"}}}
+" g:vorax_explorer_window_anchor"{{{
+if !exists('g:vorax_explorer_window_anchor')
+	" The anchor of the explorer window. The allowed values are: topleft or
+	" botright.
+	let g:vorax_explorer_window_anchor = 'topleft'
+endif"}}}
+" g:vorax_explorer_window_orientation"{{{
+if !exists('g:vorax_explorer_window_orientation')
+  " The orientation of the explorer window. The allowed values are: 'v' for
+  " vertical and 'h' for horizontal.
+  let g:vorax_explorer_window_orientation = 'v'
+endif"}}}
+" g:vorax_explorer_window_size"{{{
+if !exists('g:vorax_explorer_window_size')
+  " The size of the explorer window. 
+  let g:vorax_explorer_window_size = 30
+endif"}}}
 " g:vorax_test_constr"{{{
 if !exists('g:vorax_test_constr')
 	" This global variable is used by vorax unit tests. Ignore it if you do not
@@ -257,6 +274,13 @@ if !exists(':VoraxProfilesWindowToggle')
         \:call vorax#GetProfilesHandler().Toggle()
   nmap <unique> <script> <Plug>VoraxProfilesWindowToggle 
         \:VoraxProfilesWindowToggle<CR>
+endif"}}}
+" :VoraxExplorerWindowToggle"{{{
+if !exists(':VoraxExplorerWindowToggle')
+  command! -nargs=0 -bar VoraxExplorerWindowToggle 
+        \:call vorax#GetExplorerHandler().Toggle()
+  nmap <unique> <script> <Plug>VoraxExplorerWindowToggle 
+        \:VoraxExplorerWindowToggle<CR>
 endif"}}}
 " :VoraxSpoolingToggle"{{{
 if !exists(':VoraxSpoolingToggle')
@@ -342,6 +366,16 @@ endif"}}}
 " g:vorax_profiles_window_menu_key"{{{
 if !exists('g:vorax_profiles_window_menu_key')
   let g:vorax_profiles_window_menu_key = "m"
+endif"}}}
+" g:vorax_explorer_window_toggle_key"{{{
+if !exists('g:vorax_explorer_window_toggle_key')
+  let g:vorax_explorer_window_toggle_key = "<Leader>ex"
+endif
+if g:vorax_explorer_window_toggle_key != '' 
+      \ && !hasmapto('<Plug>VoraxExplorerWindowToggle') 
+      \ && !hasmapto(g:vorax_explorer_window_toggle_key, 'n')
+  exe "nmap <unique> " . g:vorax_explorer_window_toggle_key . 
+        \ " <Plug>VoraxExplorerWindowToggle"
 endif"}}}
 " ==============================================================================
 

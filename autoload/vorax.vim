@@ -13,17 +13,12 @@ set cpo&vim
 " Initialize logger
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
-" Create the sqlplus instance
-let s:sqlplus = voraxlib#sqlplus#New()
-
-" Create the output window instance
-let s:output = voraxlib#panel#output#New()
-
-" Create the profiles manager
-let s:profiles = voraxlib#panel#profiles#New()
-
-" The default throbber
-let s:default_throbber = voraxlib#widget#throbber#New(g:vorax_throbber_chars)
+" In case it's a script reload (see testing) then ensure the following vars
+" are cleaned up
+if exists('s:profiles') | unlet s:profiles | endif
+if exists('s:sqlplus') | unlet s:sqlplus | endif
+if exists('s:output') | unlet s:output | endif
+if exists('s:default_throbber') | unlet s:default_throbber | endif
 
 " Connects to the provided database using the cstr
 " connection string. The cstr has the common sqlplus
@@ -32,31 +27,35 @@ let s:default_throbber = voraxlib#widget#throbber#New(g:vorax_throbber_chars)
 " user being prompted afterwards for the missing parts.
 function! vorax#Connect(cstr, bang)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Connect(' . string(a:cstr) . ')') | endif
+  let sqlplus = vorax#GetSqlplusHandler()
+  let outputwin = vorax#GetOutputWindowHandler()
   " reset the last executed statement
-  let s:sqlplus.last_stmt = ''
-  if s:sqlplus.GetPid() && a:bang == '!'
+  let sqlplus.last_stmt = ''
+  if sqlplus.GetPid() && a:bang == '!'
     " destroy the sqlplus process if any attached
     if s:log.isDebugEnabled() | call s:log.debug('Connect with bang. Destroy the old attached sqlplus process.') | endif
     call vorax#ResetSqlplusHandler()
+    " The old handler becomes invalid, reassign
+    let sqlplus = vorax#GetSqlplusHandler()
   endif
-  if s:sqlplus.GetPid()
+  if sqlplus.GetPid()
     " set the session owner monitor policy
-    call s:sqlplus.SetSessionOwnerMonitor(g:vorax_session_owner_monitor)
+    call sqlplus.SetSessionOwnerMonitor(g:vorax_session_owner_monitor)
     let cstr = voraxlib#connection#Ask(a:cstr)
     if cstr != ''
-      let output = s:sqlplus.Exec("connect " . cstr, 
+      let output = sqlplus.Exec("connect " . cstr, 
             \ {'executing_msg' : 'Connecting...' , 
-            \  'throbber' : s:default_throbber,
+            \  'throbber' : vorax#GetDefaultThrobber(),
             \  'done_msg' : 'Done.',
             \  'sqlplus_options' : [{'option' : 'sqlprompt', 'value' : "''"}]})
-      if s:sqlplus.GetPid()
+      if sqlplus.GetPid()
         " only if sqlplus process is still alive
-        call s:output.AppendText(s:sqlplus.GetBanner() . "\n\n")
+        call outputwin.AppendText(sqlplus.GetBanner() . "\n\n")
         if !voraxlib#utils#HasErrors(output)
-          call s:output.AppendText(s:sqlplus.Exec("prompt &_O_VERSION", 
+          call outputwin.AppendText(sqlplus.Exec("prompt &_O_VERSION", 
                 \ {'sqlplus_options' : [{'option' : 'define', 'value' : '"&"'}]}))
         endif
-        call s:output.AppendText("\n" . output)
+        call outputwin.AppendText("\n" . output)
       endif
     else
       echo 'Aborted!'
@@ -68,6 +67,7 @@ endfunction"}}}
 " Execute the provided command and spit the result into the output window.
 function! vorax#Exec(command)"{{{
   let sqlplus = vorax#GetSqlplusHandler()
+  let outputwin = vorax#GetOutputWindowHandler()
   if s:ShouldGoOnWithPauseOn()
     if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
     " save the last command. this is require in order to be able to replay it.
@@ -81,7 +81,7 @@ function! vorax#Exec(command)"{{{
     " This is important especially in connection with set echo on. With CRs
     " the sqlprompt will be echoed
     call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt, '\_s*\_$', '', 'g'), {'include_eor' : 1}), 0)
-    call s:output.StartMonitor()
+    call outputwin.StartMonitor()
   else
     if s:log.isDebugEnabled() | call s:log.debug('User decided to cancel the exec because of the pause on.') | endif
   endif
@@ -230,7 +230,7 @@ function! vorax#ToggleLimitRows()"{{{
 endfunction"}}}
 
 " Toggle paginating
-function! vorax#TogglePaginating()
+function! vorax#TogglePaginating()"{{{
   if exists('g:vorax_output_window_pause') && g:vorax_output_window_pause
   	" disable paginating
     let g:vorax_output_window_pause = 0
@@ -242,16 +242,29 @@ function! vorax#TogglePaginating()
     redraw!
     echo 'Output paginating enabled!'
   endif
-endfunction
+endfunction"}}}
 
 " Get the profiles manager object.
 function! vorax#GetProfilesHandler()"{{{
+  if !exists('s:profiles')
+    " Create the profiles manager
+    let s:profiles = voraxlib#panel#profiles#New()
+  endif
   return s:profiles
+endfunction"}}}
+
+" Get the vorax explorer object.
+function! vorax#GetExplorerHandler()"{{{
+  if !exists('s:explorer')
+    " Create the db explorer
+    let s:explorer = voraxlib#panel#explorer#New()
+  endif
+  return s:explorer
 endfunction"}}}
 
 " Get the sqlplus wrapper object.
 function! vorax#GetSqlplusHandler()"{{{
-  if !s:sqlplus.GetPid()
+  if !exists('s:sqlplus') || !s:sqlplus.GetPid()
     let s:sqlplus = voraxlib#sqlplus#New()
   endif
   return s:sqlplus
@@ -259,17 +272,27 @@ endfunction"}}}
 
 " Destroys the current sqlplus handler and creates a new one.
 function! vorax#ResetSqlplusHandler()"{{{
-  call s:sqlplus.Destroy()
+  if exists('s:sqlplus')
+    call s:sqlplus.Destroy()
+  endif
   let s:sqlplus = voraxlib#sqlplus#New()
 endfunction"}}}
 
 " Get the default throbber
 function! vorax#GetDefaultThrobber()"{{{
+  if !exists('s:default_throbber')
+    " The default throbber
+    let s:default_throbber = voraxlib#widget#throbber#New(g:vorax_throbber_chars)
+  endif
   return s:default_throbber
 endfunction"}}}
 
 " Get the output window object.
 function! vorax#GetOutputWindowHandler()"{{{
+  if !exists('s:output')
+    " Create the output window instance
+    let s:output = voraxlib#panel#output#New()
+  endif
   return s:output
 endfunction"}}}
 
