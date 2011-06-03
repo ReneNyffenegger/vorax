@@ -34,7 +34,7 @@ function! voraxlib#widget#window#New(name, orientation, anchor, size, multi_tab)
   	throw 'Invalid window name'
   endif
   " create a new object
-  let window = copy(s:window)
+  let window = deepcopy(s:window)
   let window.name = a:name
   " check and init the split type
   if a:orientation == 'h'

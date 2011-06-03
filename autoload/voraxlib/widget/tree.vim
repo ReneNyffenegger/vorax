@@ -24,7 +24,7 @@ let s:tree = {
 " Creates a new tree widget. It expects a voraxlib#widget#window as a
 " container and the root path of the tree.
 function! voraxlib#widget#tree#New(window)"{{{
-  let tree = copy(s:tree)
+  let tree = deepcopy(s:tree)
   let tree.window = a:window
   return tree
 endfunction"}}}
@@ -42,7 +42,7 @@ function! s:tree.SetRoot(root) dict"{{{
   let self.root = a:root
   call self.window.Focus()
   setlocal nowrap
-  call s:BuildTree(self)
+  call self._BuildTree()
   normal gg
 endfunction"}}}
 
@@ -69,15 +69,15 @@ function! s:tree.ClickNode(path)"{{{
   normal ^
   let xpos = col('.') - 1
   let ypos = line('.')
-  let path = s:GetPathName(xpos, ypos, self)
+  let path = self._GetPathName(xpos, ypos)
   if self.IsLeaf(path)
   	call self.OnLeafClick(path)
   else
     " expand/colapse the node
     if getline(ypos) =~ '\m^\s*+'
-      call s:TreeExpand(xpos, ypos, self)
+      call self._TreeExpand(xpos, ypos)
     elseif getline(ypos) =~ '\m^\s*-'
-      call s:TreeCollapse(xpos, ypos, self)
+      call self._TreeCollapse(xpos, ypos)
     endif
   endif
 endfunction"}}}
@@ -88,7 +88,7 @@ function! s:tree.GetCurrentNode() dict"{{{
   normal ^
   let xpos = col('.') - 1
   let ypos = line('.')
-  let path = s:GetPathName(xpos, ypos, self)
+  let path = self._GetPathName(xpos, ypos)
   call setpos('.', crr_pos) 
   return path
 endfunction"}}}
@@ -99,7 +99,7 @@ function! s:tree.ExpandCurrentNode() dict "{{{
   normal ^
   let xpos = col('.') - 1
   let ypos = line('.')
-  call s:TreeExpand(xpos, ypos, self)
+  call self._TreeExpand(xpos, ypos)
   call setpos('.', crr_pos) 
 endfunction"}}}
 
@@ -109,7 +109,7 @@ function! s:tree.CollapseCurrentNode() dict "{{{
   normal ^
   let xpos = col('.') - 1
   let ypos = line('.')
-  call s:TreeCollapse(xpos, ypos, self)
+  call self._TreeCollapse(xpos, ypos)
   call setpos('.', crr_pos) 
 endfunction"}}}
 
@@ -160,77 +160,77 @@ endfunction!"}}}
 " *** INTERNAL FUNCTONS ***"{{{
 
 " build the provided tree
-function! s:BuildTree(tree) "{{{
-	let path = a:tree.root
+function! s:tree._BuildTree() "{{{
+	let path = self.root
 	" unlock bufer
-	call a:tree.window.UnlockBuffer()
+	call self.window.UnlockBuffer()
 	" clean up
 	normal ggdGd
 	call setline(1,path)
-	call a:tree.window.LockBuffer()
-	call s:TreeExpand(-1, 1, a:tree)
+	call self.window.LockBuffer()
+	call self._TreeExpand(-1, 1)
 	" move to first entry
 	norm ggj1|g^
-  if len(a:tree.expanded_nodes) > 0
-  	call s:RestoreState(a:tree)
+  if len(self.expanded_nodes) > 0
+    call self._RestoreState()
   endif
 endfunction "}}}
 
 " restore the previous tree open folders state.
-function! s:RestoreState(tree)"{{{
+function! s:tree._RestoreState()"{{{
   " check if the nodes from the expanded_nodes are still valid
   let to_be_deleted = []
-  for node in a:tree.expanded_nodes
-    if len(a:tree.GetSubNodes(node)) == 0
+  for node in self.expanded_nodes
+    if len(self.GetSubNodes(node)) == 0
       call add(to_be_deleted, node)
     endif
   endfor
   for node in to_be_deleted
-    call remove(a:tree.expanded_nodes, index(a:tree.expanded_nodes, node))
+    call remove(self.expanded_nodes, index(self.expanded_nodes, node))
   endfor
   " sort expanded list by depth
-  let expanded_list = sort(a:tree.expanded_nodes, "voraxlib#widget#tree#DepthSort")
+  let expanded_list = sort(self.expanded_nodes, "voraxlib#widget#tree#DepthSort")
   for node in expanded_list
-    call a:tree.RevealNode(node)
-    call a:tree.ExpandCurrentNode()
+    call self.RevealNode(node)
+    call self.ExpandCurrentNode()
   endfor
 endfunction"}}}
 
 " expand a node from the provided tree at the xpos/ypos position. The node is
 " the actual path to it.
-function! s:TreeExpand (xpos, ypos, tree) "{{{
-	let node = s:GetPathName(a:xpos, a:ypos, a:tree)
+function! s:tree._TreeExpand(xpos, ypos) "{{{
+	let node = self._GetPathName(a:xpos, a:ypos)
 	" first get all subdirectories
-	let nodelist = a:tree.GetSubNodes(node)
-	call s:AppendSubNodes(a:xpos, a:ypos, a:tree, nodelist)
-  if node != a:tree.root
-    call voraxlib#utils#AddUnique(a:tree.expanded_nodes, node)
+	let nodelist = self.GetSubNodes(node)
+	call self._AppendSubNodes(a:xpos, a:ypos, nodelist)
+  if node != self.root
+    call voraxlib#utils#AddUnique(self.expanded_nodes, node)
   endif
 endfunction "}}}
 
 " collapse the node on the xpos/ypos position from the provided tree.
-function! s:TreeCollapse (xpos, ypos, tree) "{{{
-	call a:tree.window.UnlockBuffer()
+function! s:tree._TreeCollapse(xpos, ypos) "{{{
+	call self.window.UnlockBuffer()
+	let save_cursor = getpos(".")
 	" turn - into +, go to next line
-	let path = s:GetPathName(a:xpos, a:ypos, a:tree) 
-	if a:tree.IsLeaf(path)
+	let path = self._GetPathName(a:xpos, a:ypos) 
+	if self.IsLeaf(path)
 		normal ^r j
 	else
 		normal ^r+j
 	end
 	" delete lines til next line with same indent
-	while (getline ('.')[a:xpos+1] =~ '[ +-]') && (line ('$') != line ('.')) 
+	while getline ('.')[a:xpos+1] =~ '[ +-]'
 		norm dd
 	endwhile 
-	" go up again
-	normal k
-	call a:tree.window.LockBuffer()
-  call remove(a:tree.expanded_nodes, index(a:tree.expanded_nodes, path))
+	call setpos('.', save_cursor)
+	call self.window.LockBuffer()
+  call remove(self.expanded_nodes, index(self.expanded_nodes, path))
 endfunction "}}}
 
 " add the provided nodeList within the given tree at the xpos/ypos location.
-function! s:AppendSubNodes(xpos, ypos, tree, nodeList) "{{{
-	call a:tree.window.UnlockBuffer()
+function! s:tree._AppendSubNodes(xpos, ypos, nodeList) "{{{
+	call self.window.UnlockBuffer()
 	" turn + into -
 	if a:ypos != 1 
 		if getline(a:ypos)[a:xpos] == '+'  
@@ -241,12 +241,12 @@ function! s:AppendSubNodes(xpos, ypos, tree, nodeList) "{{{
 	endif 
 	let nodeList = a:nodeList
 	let row = a:ypos
-	let prefix = s:GetPathName(a:xpos, a:ypos, a:tree)
+	let prefix = self._GetPathName(a:xpos, a:ypos)
 	for node in nodeList
 		" add to tree 
 		if node != "" 
-			let path = prefix . a:tree.path_separator . node
-			if a:tree.IsLeaf(path)
+			let path = prefix . self.path_separator . node
+			if self.IsLeaf(path)
 				let node = s:SpaceString(a:xpos + 2) . node
 			else
 				let node = s:SpaceString(a:xpos + 1) . "+" . node
@@ -255,7 +255,7 @@ function! s:AppendSubNodes(xpos, ypos, tree, nodeList) "{{{
 			let row = row + 1
 		endif 
 	endfor
-	call a:tree.window.LockBuffer()
+	call self.window.LockBuffer()
 endfunction "}}}
 
 " return a string with a number of blanks given by the width argument.
@@ -271,15 +271,15 @@ endfunction "}}}
 
 " given the xpos/ypos location within the provided tree computes and return
 " the corresponding path to that node.
-function! s:GetPathName(xpos, ypos, tree) "{{{
+function! s:tree._GetPathName(xpos, ypos) "{{{
 	let xpos = a:xpos
 	let ypos = a:ypos
 	" check for expandable node
 	if getline(ypos)[xpos] =~ "[+-]" 
-		let path = (a:tree.path_separator) . strpart(getline(ypos), xpos + 1, col('$'))
+		let path = (self.path_separator) . strpart(getline(ypos), xpos + 1, col('$'))
 	else
 		" otherwise filename
-		let path = (a:tree.path_separator) . strpart(getline(ypos), xpos, col('$'))
+		let path = (self.path_separator) . strpart(getline(ypos), xpos, col('$'))
 		let xpos = xpos - 1
 	end 
 	" walk up tree and append subpaths
@@ -295,7 +295,7 @@ function! s:GetPathName(xpos, ypos, tree) "{{{
 			end 
 		endwhile 
 		" subpath found, append
-		let path = (a:tree.path_separator) . strpart(getline(row), indent + 1, strlen(getline(row))) . path
+		let path = (self.path_separator) . strpart(getline(row), indent + 1, strlen(getline(row))) . path
 	endwhile  
 	" finally add base path
 	" not needed, if in root
@@ -303,8 +303,8 @@ function! s:GetPathName(xpos, ypos, tree) "{{{
 		let path = getline(1) . path
 	end 
 	" remove the first separator, if any
-	if strpart(path, 0, strlen(a:tree.path_separator)) == a:tree.path_separator
-    let path = strpart(path, strlen(a:tree.path_separator), len(path))
+	if strpart(path, 0, strlen(self.path_separator)) == self.path_separator
+    let path = strpart(path, strlen(self.path_separator), len(path))
   endif
 	return path
 endfunction "}}}

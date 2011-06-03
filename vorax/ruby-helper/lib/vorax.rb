@@ -35,6 +35,7 @@ Vorax::source('vorax/process/windows_process.rb')
 Vorax::source('vorax/process/sqlplus.rb')
 Vorax::source('vorax/profile/profiles_manager.rb')
 Vorax::source('vorax/sqlhtml/sql_html_beautifier.rb')
+Vorax::source('vorax/sqlhtml/table_reader.rb')
 
 # load grammars
 Vorax::source('vorax/parser/SqlSplitter.rb')

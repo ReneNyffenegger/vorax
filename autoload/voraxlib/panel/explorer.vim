@@ -28,6 +28,8 @@ function! voraxlib#panel#explorer#New()"{{{
           \ 0)
     " No profile tree has been initialized. Create it now.
     let s:explorer = voraxlib#widget#tree#New(win) 
+    " Choose a path separator so that no clashes will occur
+    let s:explorer.path_separator = '"'
     " Add additional methods to the s:profiles object.
     call s:ExtendExplorer()
     let s:initialized = 1
@@ -39,14 +41,16 @@ endfunction"}}}
 function! s:ExtendExplorer()"{{{
 
   " Get children profiles for the provided path.
-  function! s:explorer.GetSubNodes(path) dict"{{{
+  function! s:explorer.GetSubNodes(path)"{{{
     if a:path == self.root
       return s:GetExplorerCategories(1)
+    elseif s:IsUsersNode(a:path)
+      return s:GetUsers()
     endif
   endfunction}}}
   
   " Initialize the tree window.
-  function! s:explorer.window.Configure() dict"{{{
+  function! s:explorer.window.Configure()"{{{
     " set options
     setlocal foldcolumn=0
     setlocal winfixwidth
@@ -68,7 +72,7 @@ function! s:ExtendExplorer()"{{{
   endfunction"}}}
   
   " Whenever or not the node is a leaf one.
-  function! s:explorer.IsLeaf(path) dict"{{{
+  function! s:explorer.IsLeaf(path)"{{{
     if self.IsCategory(a:path)
       " if ends with a ']' then it's a category.
       return 0
@@ -92,11 +96,69 @@ function! s:ExtendExplorer()"{{{
    return a:node =~ ']$'
   endfunction"}}}
 
+  " Describes the provided path. The following attributes are returned via a
+  " dictionary:
+  " {'owner'  : '<owner of the object> as an oracle expression: user for
+  "              current user or 'owner' (as literal) for the owner under the 
+  "              [Users] category', 
+  "  'type'   : '<the type of the object> as expected by Oracle: TABLE, TYPE
+  "              etc.', 
+  "  'object'  : '<the name of the object>'
+  "  }
+  function! s:explorer.DescribePath(path)
+    let desc = {'owner' : '', 'type' : '', 'object' : ''}
+    let parts = split(a:path, voraxlib#utils#LiteralRegexp(self.path_separator))
+    let index = 1
+    let desc.owner = 'user'
+    if parts[1] == '[Users]'
+      let index = 3
+      if exists('parts[2]')
+        let desc.owner = "'" . parts[2] . "'"
+      endif
+    endif
+    if len(parts) > index
+      " fill the desc dictionary only if the path is long enough
+      let desc.type = s:ToOracleType(parts[index])
+      let desc.object = get(parts, index + 1, '')
+      if (desc.type == 'PACKAGE' || desc.type == 'TYPE') &&
+            \ (parts[-1] == 'Body' || parts[-1] == 'Spec')
+        let desc.type .= '_' . toupper(parts[-1])
+      endif
+    end
+    return desc
+  endfunction
+
 endfunction"}}}
 
 
 " === PRIVATE FUNCTIONS ==="{{{
 
+" Get the list of users.
+function! s:GetUsers()
+  let sqlplus = vorax#GetSqlplusHandler()
+  let output = sqlplus.Query('select username from all_users order by 1;',
+        \ {'executing_msg' : 'Get users...',
+        \  'throbber' : vorax#GetDefaultThrobber(),
+        \  'done_msg' : 'Done.'})
+  if empty(output.errors)
+    return map(copy(output.resultset), '"[".v:val["USERNAME"]."]"')
+  else
+  	voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
+  	return []
+  endif
+endfunction
+
+" Whenever or not the provided path points to the [Users] node
+function! s:IsUsersNode(path)
+  return a:path == s:explorer.root . s:explorer.path_separator . '[Users]'
+endfunction
+
+" Convert a generic explorer category to an Oracle type.
+function! s:ToOracleType(vorax_category)
+  return toupper(substitute(a:vorax_category, 'v/(^[)|(s]$)', '', 'g'))
+endfunction
+
+" Get the generic explorer categories.
 function! s:GetExplorerCategories(include_users)
   let categories = ["[Tables]",
         \  "[Views]",
@@ -113,5 +175,11 @@ function! s:GetExplorerCategories(include_users)
   endif
   return categories
 endfunction
+
+" Click for the current object. This is a dummy function which is called from
+" the tree key mapping.
+function! s:Click()"{{{
+  call s:explorer.ClickNode(s:explorer.GetCurrentNode())
+endfunction"}}}
 
 "}}}

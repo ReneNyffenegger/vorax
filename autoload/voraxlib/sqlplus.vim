@@ -197,6 +197,38 @@ EORC
   endif
 endfunction "}}}
 
+" Query the database with the provided statement. Only one SQL-SELECT sould be
+" used. It returns an array of dictionaries of the form of:
+"
+" [{'col1' : val1, 'col2' : val2, ...} ...]
+"
+" The optional parameter is a dictionary having:
+"   { 'executing_msg'  : '<message_to_be_displayed_during exec>',
+"     'throbber'       : '<a throbber object instance>',
+"     'done_msg'       : '<a message to be displayed when the exec
+"                         completes>'}
+" Pay attention that the extra blanks from the column value are not preserved.
+" That's a limitation of sqlplus. Likewise, everything is returned as string.
+function! s:sqlplus.Query(statement, ...)"{{{
+  if exists('a:1')
+    let options = a:1
+  else
+  	let options = {}
+  endif
+  let options['sqlplus_options'] = [
+        \ {'option' : 'pause', 'value' : 'off'},
+        \ {'option' : 'termout', 'value' : 'on'},
+        \ {'option' : 'verify', 'value' : 'off'},
+        \ {'option' : 'pagesize', 'value' : '9999'},
+        \ {'option' : 'markup', 'value' : 'html on'},
+        \]
+  let output = self.Exec(a:statement, options)
+  ruby <<EORC
+  resultset = Vorax::TableReader.extract(output)
+  VIM::command("return #{Vorax::VimUtils.to_vim(resultset)}")
+EORC
+endfunction"}}}
+
 " Asynchronously exec the provided command without waiting for the output. The
 " result may be read in chunks afterwards using Read() calls. The optional
 " parameter is for providing the option of including the END_OF_REQUEST mark

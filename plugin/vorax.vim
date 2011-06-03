@@ -250,7 +250,7 @@ endif"}}}
 " :VoraxConnect"{{{
 if !exists(':VoraxConnect')
   command! -nargs=? -count=0 -complete=customlist,vorax#ProfilesForCompletion 
-        \ -bang VoraxConnect :call vorax#Connect(escape(<q-args>, '"\'), '<bang>')
+        \ -bang VoraxConnect :call vorax#Connect(<q-args>, '<bang>')
   nmap <unique> <script> <Plug>VoraxConnect :VoraxConnect<CR>
 endif"}}}
 " :VoraxExec"{{{
