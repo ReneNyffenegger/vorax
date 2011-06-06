@@ -173,8 +173,8 @@ EORC
       # exec with throbber
       output = sqlplus.exec(VIM::evaluate('a:command')) do
         msg = ""
-        msg << VIM::evaluate('a:1.executing_msg"') if VIM::evaluate('has_key(a:1, "executing_msg")') == 1
-        msg << ' ' << VIM::evaluate('a:1.throbber.Spin()') if VIM::evaluate('has_key(a:1, "throbber")') == 1
+        msg << VIM::evaluate('a:1.throbber.Spin()') if VIM::evaluate('has_key(a:1, "throbber")') == 1
+        msg << ' ' << VIM::evaluate('a:1.executing_msg"') if VIM::evaluate('has_key(a:1, "executing_msg")') == 1
         VIM::command("redraw")
         VIM::command("echon #{msg.inspect}")
       end

@@ -44,8 +44,13 @@ function! s:ExtendExplorer()"{{{
   function! s:explorer.GetSubNodes(path)"{{{
     if a:path == self.root
       return s:GetExplorerCategories(1)
-    elseif s:IsUsersNode(a:path)
+    elseif s:IsUsersCategoryNode(a:path)
       return s:GetUsers()
+    elseif s:IsAnUserNode(a:path)
+      return s:GetExplorerCategories(0)
+    elseif s:IsObjectsCategoryNode(a:path)
+      return s:GetObjects(a:path)
+    elseif 
     endif
   endfunction}}}
   
@@ -105,7 +110,7 @@ function! s:ExtendExplorer()"{{{
   "              etc.', 
   "  'object'  : '<the name of the object>'
   "  }
-  function! s:explorer.DescribePath(path)
+  function! s:explorer.DescribePath(path)"{{{
     let desc = {'owner' : '', 'type' : '', 'object' : ''}
     let parts = split(a:path, voraxlib#utils#LiteralRegexp(self.path_separator))
     let index = 1
@@ -113,20 +118,20 @@ function! s:ExtendExplorer()"{{{
     if parts[1] == '[Users]'
       let index = 3
       if exists('parts[2]')
-        let desc.owner = "'" . parts[2] . "'"
+        let desc.owner = "'" . substitute(parts[2], '\v(^\[)|(\]$)', '', 'g') . "'"
       endif
     endif
     if len(parts) > index
       " fill the desc dictionary only if the path is long enough
       let desc.type = s:ToOracleType(parts[index])
-      let desc.object = get(parts, index + 1, '')
+      let desc.object = substitute(get(parts, index + 1, ''),  '\v(^\[)|(\]$)', '', 'g')
       if (desc.type == 'PACKAGE' || desc.type == 'TYPE') &&
             \ (parts[-1] == 'Body' || parts[-1] == 'Spec')
         let desc.type .= '_' . toupper(parts[-1])
       endif
     end
     return desc
-  endfunction
+  endfunction"}}}
 
 endfunction"}}}
 
@@ -134,7 +139,7 @@ endfunction"}}}
 " === PRIVATE FUNCTIONS ==="{{{
 
 " Get the list of users.
-function! s:GetUsers()
+function! s:GetUsers()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
   let output = sqlplus.Query('select username from all_users order by 1;',
         \ {'executing_msg' : 'Get users...',
@@ -146,20 +151,54 @@ function! s:GetUsers()
   	voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
   	return []
   endif
+endfunction"}}}
+
+" Get the corresponding tables for the provided node path.
+function! s:GetObjects(path)
+  let info = s:explorer.DescribePath(a:path)
+  if info.owner != '' && info.type != ''
+    let sqlplus = vorax#GetSqlplusHandler()
+    let output = sqlplus.Query('select object_name from all_objects ' . 
+          \'where owner=' . info.owner . ' and object_type=''' . info.type . ''' order by 1;',
+          \ {'executing_msg' : 'Load objects...',
+          \  'throbber' : vorax#GetDefaultThrobber(),
+          \  'done_msg' : 'Done.'})
+    if empty(output.errors)
+      return map(copy(output.resultset), 'v:val["OBJECT_NAME"]')
+    else
+      voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
+    endif
+  endif
+  return []
 endfunction
 
 " Whenever or not the provided path points to the [Users] node
-function! s:IsUsersNode(path)
+function! s:IsUsersCategoryNode(path)"{{{
   return a:path == s:explorer.root . s:explorer.path_separator . '[Users]'
+endfunction"}}}
+
+" Whenever the provided path points out to a specific user
+function! s:IsAnUserNode(path)
+  let parts  = split(a:path, voraxlib#utils#LiteralRegexp(s:explorer.path_separator)) 
+  return len(parts) == 3 && parts[1] == '[Users]'
 endfunction
+
+" Is it the [Tables] node?
+function! s:IsObjectsCategoryNode(path)
+  let parts  = split(a:path, voraxlib#utils#LiteralRegexp(s:explorer.path_separator)) 
+  " Could be: root > [Tables] or
+  "           root > [Users] > [WhateverUser] > [Tables]
+  return (len(parts) == 2 || len(parts) == 4)
+endfunction
+
 
 " Convert a generic explorer category to an Oracle type.
-function! s:ToOracleType(vorax_category)
-  return toupper(substitute(a:vorax_category, 'v/(^[)|(s]$)', '', 'g'))
-endfunction
+function! s:ToOracleType(vorax_category)"{{{
+  return toupper(substitute(a:vorax_category, '\v(^\[)|(s\]$)', '', 'g'))
+endfunction"}}}
 
 " Get the generic explorer categories.
-function! s:GetExplorerCategories(include_users)
+function! s:GetExplorerCategories(include_users)"{{{
   let categories = ["[Tables]",
         \  "[Views]",
         \  "[Procedures]",
@@ -174,7 +213,7 @@ function! s:GetExplorerCategories(include_users)
     call add(categories, "[Users]")
   endif
   return categories
-endfunction
+endfunction"}}}
 
 " Click for the current object. This is a dummy function which is called from
 " the tree key mapping.
