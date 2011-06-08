@@ -17,6 +17,7 @@ let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 " are cleaned up
 if exists('s:profiles') | unlet s:profiles | endif
 if exists('s:sqlplus') | unlet s:sqlplus | endif
+if exists('g:vorax_explorer') | unlet g:vorax_explorer | endif
 if exists('s:output') | unlet s:output | endif
 if exists('s:default_throbber') | unlet s:default_throbber | endif
 
@@ -29,6 +30,7 @@ function! vorax#Connect(cstr, bang)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Connect(' . string(a:cstr) . ')') | endif
   let sqlplus = vorax#GetSqlplusHandler()
   let outputwin = vorax#GetOutputWindowHandler()
+  let explorer = vorax#GetExplorerHandler()
   " reset the last executed statement
   let sqlplus.last_stmt = ''
   if sqlplus.GetPid() && a:bang == '!'
@@ -56,6 +58,14 @@ function! vorax#Connect(cstr, bang)"{{{
                 \ {'sqlplus_options' : [{'option' : 'define', 'value' : '"&"'}]}))
         endif
         call outputwin.AppendText("\n" . output)
+      endif
+      " refresh the vorax db explorer window tree
+      let explorer.expanded_nodes = []
+      if explorer.window.IsOpen()
+        call explorer.Refresh()
+      else
+        " postpone refresh until toggle
+        let explorer.root = ''
       endif
     else
       echo 'Aborted!'
@@ -127,15 +137,56 @@ function! vorax#ExecSelection()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#ExecSelection') | endif
 endfunction"}}}
 
-" Provides completion for profile names. It is used in the VoraxConnect
-" command.
-function! vorax#ProfilesForCompletion(arglead, cmdline, cursorpos)"{{{
-  let profiles = s:profiles.GetAll()
-  let profile_names =  voraxlib#utils#SortUnique(
-        \ map(filter(copy(profiles), 
-              \ 'has_key(v:val, "id") && v:val.id =~ ''^'' . a:arglead'), 
-              \ 'v:val.id'))
-  return profile_names
+" Returns an array of lines with the source code for the provided
+" schema.object_name having the a:type specified. The optional param is a hash
+" with the following structure {'executing_msg' : '', 'throbber': ,
+" 'done_msg': ''}. (for details see the sqlplus.Query method).
+function vorax#GetDDL(schema, object_name, type, ...)"{{{
+  let query = "set long 1000000000 longc 60000\n" .
+            \ "set wrap on\n" .
+            \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', TRUE );\n" .
+            \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'BODY', TRUE );\n" .
+            \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'PRETTY', TRUE );\n" .
+            \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'CONSTRAINTS_AS_ALTER', TRUE );\n" .
+            \ "select dbms_metadata.get_ddl('" . a:type . "', '" . a:object_name . "', " . a:schema . ") src from dual;"
+  let sqlplus = vorax#GetSqlplusHandler()
+  let params = {}
+  if exists('a:1')
+  	let params = a:1
+  endif
+  let output = sqlplus.Query(query, params)
+  if empty(output.errors)
+    if !empty(output.resultset)
+      return split(output.resultset[0]['SRC'], '\r\?\n')
+    endif
+  else
+    voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
+    return []
+  endif
+endfunction"}}}
+
+" Load the provided schema.object_name of type a:type for editing.
+function vorax#LoadDbObject(schema, object_name, type)"{{{
+  let file_name = voraxlib#utils#GetFileName(a:object_name, a:type)
+  let bufnr = bufnr(file_name)
+  if bufnr == -1
+    " create a new buffer
+  	let params = {'executing_msg' : 'Building source for ' . a:object_name . '...',
+        \  'throbber' : vorax#GetDefaultThrobber(),
+        \  'done_msg' : 'Done.'}
+    let src = vorax#GetDDL(a:schema, a:object_name, a:type, params)
+    if !empty(src)
+      " remove leading blanks from the first line
+      let src[0] = substitute(src[0], '^\s*', '', 'g')
+      call s:OpenDbBuffer(file_name, src)
+    else
+      redraw
+      call voraxlib#utils#Warn('Empty source for the requested database object.')
+    endif
+  else
+    " just focus that buffer
+    exe 'buffer ' . bufnr
+  endif
 endfunction"}}}
 
 " Toggle the spooling of output to the configured spool file.
@@ -255,11 +306,11 @@ endfunction"}}}
 
 " Get the vorax explorer object.
 function! vorax#GetExplorerHandler()"{{{
-  if !exists('s:explorer')
+  if !exists('g:vorax_explorer')
     " Create the db explorer
-    let s:explorer = voraxlib#panel#explorer#New()
+    call voraxlib#panel#explorer#New()
   endif
-  return s:explorer
+  return g:vorax_explorer
 endfunction"}}}
 
 " Get the sqlplus wrapper object.
@@ -320,6 +371,17 @@ function! s:ShouldGoOnWithPauseOn()"{{{
     end
   endif
   return 1
+endfunction"}}}
+
+" Open a buffer under the provided file_name and with the a:content array.
+function s:OpenDbBuffer(file_name, content)"{{{
+  call voraxlib#utils#FocusCandidateWindow()
+  exe 'edit ' . a:file_name
+  " clear content if the file exists
+  normal gg"_dG
+  call append(0, a:content)
+  setlocal nomodified
+  normal gg
 endfunction"}}}
 
 "}}}

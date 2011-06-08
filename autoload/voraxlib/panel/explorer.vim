@@ -1,5 +1,5 @@
 " Description: Implements the VoraX database explorer panel/window. This is
-" a window with a tree with database objects.
+" a window with a tree containing database objects.
 " Mainainder: Alexandru Tica <alexandru.tica.at.gmail.com>
 " License: Apache License 2.0
 
@@ -16,6 +16,21 @@ if exists('s:initialized') | unlet s:initialized | endif
 " The profiles window instance.
 let s:explorer = {}
 
+" An explorer plugin skeleton.
+let s:plugin_skeleton = {'label' : '', 'shortcut' : '', 'description' : ''}
+
+" Is the plugin active for the provided node?
+function! s:plugin_skeleton.IsActive(path)
+endfunction
+
+" What to do when the plugin is invoked.
+function! s:plugin_skeleton.Callback()
+endfunction
+
+" Configure the plugin (e.g. keymap)
+function! s:plugin_skeleton.Configure()
+endfunction
+
 " Creates a new connection profiles window. Only one such window
 " is allowed in a VoraX instance. 
 function! voraxlib#panel#explorer#New()"{{{
@@ -30,10 +45,15 @@ function! voraxlib#panel#explorer#New()"{{{
     let s:explorer = voraxlib#widget#tree#New(win) 
     " Choose a path separator so that no clashes will occur
     let s:explorer.path_separator = '"'
+    let s:explorer['plugins'] = {}
     " Add additional methods to the s:profiles object.
     call s:ExtendExplorer()
+    " Register plugins
+    let g:vorax_explorer = s:explorer
+    runtime! vorax/plugin/explorer/**/*.vim
     let s:initialized = 1
   endif
+  " this global variable may be used by explorer plugins
   return s:explorer
 endfunction"}}}
 
@@ -74,6 +94,16 @@ function! s:ExtendExplorer()"{{{
     " set key mappings
     noremap <silent> <buffer> o :call <SID>Click()<CR>
     noremap <silent> <buffer> <CR> :call <SID>Click()<CR>
+    exe 'noremap <silent> <buffer> ' . g:vorax_explorer_window_menu_key . ' :call <SID>Menu()<CR>'
+
+    " configure plugins
+    for id in keys(s:explorer.plugins)
+      let plugin = s:explorer.plugins[id]
+      if plugin.shortcut != ''
+        exe 'noremap <silent> <buffer> ' . plugin.shortcut . ' :call g:vorax_explorer.plugins["' . escape(id, '/"') . '"].Callback()<CR>'
+      endif
+    endfor
+
   endfunction"}}}
   
   " Whenever or not the node is a leaf one.
@@ -86,11 +116,32 @@ function! s:ExtendExplorer()"{{{
     endif
   endfunction"}}}
 
+  " What to do when a profile node is clicked.
+  function! s:explorer.OnLeafClick(path)"{{{
+    let info = self.DescribePath(a:path)
+    call vorax#LoadDbObject(info.owner, info.object, info.type)
+  endfunction"}}}
+
+  " Get the skeleton for a new explorer plugin.
+  function! s:explorer.GetPluginSkeleton()"{{{
+    return copy(s:plugin_skeleton)
+  endfunction"}}}
+
+  " Register a new plugin.
+  function! s:explorer.RegisterPlugin(id, plugin)"{{{
+    let self.plugins[a:id] = a:plugin
+  endfunction"}}}
+
+  " Refresh the whole explorer.
+  function! s:explorer.Refresh()"{{{
+    let root = vorax#GetSqlplusHandler().GetConnectedTo()
+    call self.SetRoot(root)
+  endfunction"}}}
+
   " Toggle the profiles window.
   function! s:explorer.Toggle() "{{{
     if self.root == ''
-      let root = vorax#GetSqlplusHandler().GetConnectedTo()
-      call self.SetRoot(root)
+      call self.Refresh()
     else
     	call self.window.Toggle()
     endif
@@ -135,7 +186,6 @@ function! s:ExtendExplorer()"{{{
 
 endfunction"}}}
 
-
 " === PRIVATE FUNCTIONS ==="{{{
 
 " Get the list of users.
@@ -154,12 +204,12 @@ function! s:GetUsers()"{{{
 endfunction"}}}
 
 " Get the corresponding tables for the provided node path.
-function! s:GetObjects(path)
+function! s:GetObjects(path)"{{{
   let info = s:explorer.DescribePath(a:path)
   if info.owner != '' && info.type != ''
     let sqlplus = vorax#GetSqlplusHandler()
     let output = sqlplus.Query('select object_name from all_objects ' . 
-          \'where owner=' . info.owner . ' and object_type=''' . info.type . ''' order by 1;',
+          \'where owner=' . info.owner . ' and object_type=replace(''' . info.type . ''', ''_'', '' '') order by 1;',
           \ {'executing_msg' : 'Load objects...',
           \  'throbber' : vorax#GetDefaultThrobber(),
           \  'done_msg' : 'Done.'})
@@ -170,7 +220,7 @@ function! s:GetObjects(path)
     endif
   endif
   return []
-endfunction
+endfunction"}}}
 
 " Whenever or not the provided path points to the [Users] node
 function! s:IsUsersCategoryNode(path)"{{{
@@ -178,23 +228,22 @@ function! s:IsUsersCategoryNode(path)"{{{
 endfunction"}}}
 
 " Whenever the provided path points out to a specific user
-function! s:IsAnUserNode(path)
+function! s:IsAnUserNode(path)"{{{
   let parts  = split(a:path, voraxlib#utils#LiteralRegexp(s:explorer.path_separator)) 
   return len(parts) == 3 && parts[1] == '[Users]'
-endfunction
+endfunction"}}}
 
-" Is it the [Tables] node?
-function! s:IsObjectsCategoryNode(path)
+" Is it a [Category] node?
+function! s:IsObjectsCategoryNode(path)"{{{
   let parts  = split(a:path, voraxlib#utils#LiteralRegexp(s:explorer.path_separator)) 
   " Could be: root > [Tables] or
   "           root > [Users] > [WhateverUser] > [Tables]
   return (len(parts) == 2 || len(parts) == 4)
-endfunction
-
+endfunction"}}}
 
 " Convert a generic explorer category to an Oracle type.
 function! s:ToOracleType(vorax_category)"{{{
-  return toupper(substitute(a:vorax_category, '\v(^\[)|(s\]$)', '', 'g'))
+  return substitute(toupper(substitute(a:vorax_category, '\v(^\[)|(s\]$)', '', 'g')), ' ', '_', 'g')
 endfunction"}}}
 
 " Get the generic explorer categories.
@@ -208,7 +257,7 @@ function! s:GetExplorerCategories(include_users)"{{{
         \  "[Types]",
         \  "[Triggers]",
         \  "[Sequences]",
-        \  "[MViews]"]
+        \  "[Materialized Views]"]
   if a:include_users
     call add(categories, "[Users]")
   endif
@@ -219,6 +268,35 @@ endfunction"}}}
 " the tree key mapping.
 function! s:Click()"{{{
   call s:explorer.ClickNode(s:explorer.GetCurrentNode())
+endfunction"}}}
+
+" Display the menu for the current node.
+function! s:Menu()"{{{
+  let node = s:explorer.GetCurrentNode()
+  let state = { 
+              \ 'type': 'si',
+              \ 'query': 'Select the action you want to perform.',
+              \ 'pick_last_item': 0,
+              \ 'allow_suspend' : 0,
+              \ 'numeric_chars': extend(g:tlib_numeric_chars, {48:48, 49:48, 50:48, 51:48, 52:48, 53:48, 54:48, 55:48, 56:48, 57:48}),
+              \ 'key_handlers': [
+                  \ {'key': 9, 'agent': 'tlib#agent#Down', 'key_name': '<Tab>', 'help': 'Select the next item.'},
+                  \ {'key': "\<S-Tab>", 'agent': 'tlib#agent#Up', 'key_name': '<S-Tab>', 'help': 'Select the previous item.'},
+              \ ],
+              \ }
+  let state.base = []
+  let active_plugins = []
+  for id in keys(s:explorer.plugins)
+    let plugin = s:explorer.plugins[id]
+    if plugin.IsActive(node)
+      call add(state.base, plugin.label . ' [' . plugin.shortcut . '] : ' . plugin.description)
+      call add(active_plugins, plugin)
+    endif
+  endfor
+  let choice = tlib#input#ListD(state)
+  if choice
+    call active_plugins[choice-1].Callback()
+  endif
 endfunction"}}}
 
 "}}}

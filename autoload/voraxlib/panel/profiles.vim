@@ -66,6 +66,17 @@ function! voraxlib#panel#profiles#CategoriesList(arglead, cmdline, cursorpos)"{{
   return categories
 endfunction"}}}
 
+" Provides completion for profile names. It is used in the VoraxConnect
+" command.
+function! voraxlib#panel#profiles#ProfilesForCompletion(arglead, cmdline, cursorpos)"{{{
+  let profiles = vorax#GetProfilesHandler().GetAll()
+  let profile_names =  voraxlib#utils#SortUnique(
+        \ map(filter(copy(profiles), 
+              \ 'has_key(v:val, "id") && v:val.id =~ ''^'' . a:arglead'), 
+              \ 'v:val.id'))
+  return profile_names
+endfunction"}}}
+
 " Add additional methods.
 function! s:ExtendProfiles()"{{{
 
@@ -112,10 +123,12 @@ function! s:ExtendProfiles()"{{{
     setlocal hid
 
     " set colors
+    syn match VoraxProfileFlag #!#
     syn match Directory  '^\s*\(+\|-\).\+'
     syn match SpecialKey  '\*$'
-    syn match Error  '^\s*!.\+'
+    syn match Error  '\(^\s*!\)\@<=.\+'
     hi link Directory  Comment
+    hi def link VoraxProfileFlag ignore
 
     " set key mappings
     noremap <silent> <buffer> o :call <SID>Click()<CR>

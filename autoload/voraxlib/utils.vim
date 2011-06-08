@@ -401,7 +401,7 @@ endfunction"}}}
 
 " For the identified queries identified in the a:text apply the a:limit rownum
 " filter.
-function! voraxlib#utils#AddRownumFilter(text, limit)
+function! voraxlib#utils#AddRownumFilter(text, limit)"{{{
   let result = ''
   let statements = voraxlib#parser#script#Split(a:text)
   for statement in statements
@@ -414,7 +414,38 @@ function! voraxlib#utils#AddRownumFilter(text, limit)
     endif
   endfor
   return result
-endfunction
+endfunction"}}}
+
+" When a db object is about to be opened, we don't want the edit window
+" to be layed out randomly, or ontop of special windows like the results
+" window. This procedure finds out a suitable window for opening the
+" db object. If it cannot find any then a new split will be performed.
+function! voraxlib#utils#FocusCandidateWindow()"{{{
+  let winlist = []
+  " we save the current window because the after windo we may end up in
+  " another window
+  let original_win = winnr()
+  " iterate through all windows and get info from them
+  windo let winlist += [[bufnr('%'),  winnr(), &buftype]]
+  for w in winlist
+    if w[2] == "nofile" || w[2] == 'quickfix' || w[2] == 'help'
+      " do nothing
+    else
+      " great! we just found a suitable window... focus it please
+      exe w[1] . 'wincmd w'
+      return
+    endif
+  endfor
+  " if here, then no suitable window was found... we'll create one
+  " first of all, restore the old window
+  botright vertical split new
+endfunction"}}}
+
+" Given a describe path object returns the corresponding file name for that
+" object.
+function! voraxlib#utils#GetFileName(object, type)"{{{
+  return a:object . '.' . get(g:vorax_explorer_file_extensions, a:type, 'sql')
+endfunction"}}}
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

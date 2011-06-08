@@ -237,6 +237,23 @@ if !exists('g:vorax_explorer_window_size')
   " The size of the explorer window. 
   let g:vorax_explorer_window_size = 30
 endif"}}}
+" g:vorax_explorer_file_extensions"{{{
+if !exists('g:vorax_explorer_file_extensions')
+  " Configures the file extension for every database
+  " object type. If a type is not here then the .sql
+  " extension will be assumed.
+  let g:vorax_explorer_file_extensions =     {'PACKAGE' : 'pkg',
+                                        \     'PACKAGE_SPEC' : 'spc',
+                                        \     'PACKAGE_BODY' : 'bdy',
+                                        \     'FUNCTION' : 'fnc',
+                                        \     'PROCEDURE' : 'prc',
+                                        \     'TRIGGER' : 'trg',
+                                        \     'TYPE' : 'typ',
+                                        \     'TYPE_SPEC' : 'tps',
+                                        \     'TYPE_BODY' : 'tpb',
+                                        \     'TABLE' : 'tab',
+                                        \     'VIEW' : 'viw',}
+endif"}}}
 " g:vorax_test_constr"{{{
 if !exists('g:vorax_test_constr')
 	" This global variable is used by vorax unit tests. Ignore it if you do not
@@ -249,7 +266,7 @@ endif"}}}
 " ==============================================================================
 " :VoraxConnect"{{{
 if !exists(':VoraxConnect')
-  command! -nargs=? -count=0 -complete=customlist,vorax#ProfilesForCompletion 
+  command! -nargs=? -count=0 -complete=customlist,voraxlib#panel#profiles#ProfilesForCompletion 
         \ -bang VoraxConnect :call vorax#Connect(<q-args>, '<bang>')
   nmap <unique> <script> <Plug>VoraxConnect :VoraxConnect<CR>
 endif"}}}
@@ -365,7 +382,7 @@ if g:vorax_profiles_window_toggle_key != ''
 endif"}}}
 " g:vorax_profiles_window_menu_key"{{{
 if !exists('g:vorax_profiles_window_menu_key')
-  let g:vorax_profiles_window_menu_key = "m"
+  let g:vorax_profiles_window_menu_key = "<Tab>"
 endif"}}}
 " g:vorax_explorer_window_toggle_key"{{{
 if !exists('g:vorax_explorer_window_toggle_key')
@@ -377,6 +394,39 @@ if g:vorax_explorer_window_toggle_key != ''
   exe "nmap <unique> " . g:vorax_explorer_window_toggle_key . 
         \ " <Plug>VoraxExplorerWindowToggle"
 endif"}}}
+" g:vorax_explorer_window_menu_key"{{{
+if !exists('g:vorax_explorer_window_menu_key')
+  let g:vorax_explorer_window_menu_key = "<Tab>"
+endif"}}}
+" ==============================================================================
+
+" *** AUTOCOMMANDS SECTION 
+" ==============================================================================
+if exists('g:vorax_explorer_file_extensions')
+  " Set the proper file type
+  let sqlext = []
+  let plsqlext = []
+  for key in keys(g:vorax_explorer_file_extensions)
+    if key == 'PACKAGE' ||
+          \ key == 'PACKAGE_SPEC' ||
+          \ key == 'PACKAGE_BODY' ||
+          \ key == 'TYPE' ||
+          \ key == 'TYPE_SPEC' ||
+          \ key == 'TYPE_BODY' ||
+          \ key == 'TRIGGER'
+      call add(plsqlext, g:vorax_explorer_file_extensions[key])
+    else
+      call add(sqlext, g:vorax_explorer_file_extensions[key])
+    endif
+  endfor
+  if !empty(sqlext)
+    exe 'autocmd BufRead,BufNewFile *.{' . join(sqlext, ',') . '} set ft=sql'
+  endif
+  if !empty(plsqlext)
+    exe 'autocmd BufRead,BufNewFile *.{' . join(plsqlext, ',') . '} set ft=plsql'
+  endif
+endif
+
 " ==============================================================================
 
 " Restore compatibility flag
