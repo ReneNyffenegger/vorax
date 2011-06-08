@@ -89,6 +89,7 @@ function! s:ExtendExplorer()"{{{
 
     " set colors
     syn match Directory  '^\s*\(+\|-\).\+'
+    syn match Error  '.*!$'
     hi link Directory  Comment
 
     " set key mappings
@@ -175,7 +176,7 @@ function! s:ExtendExplorer()"{{{
     if len(parts) > index
       " fill the desc dictionary only if the path is long enough
       let desc.type = s:ToOracleType(parts[index])
-      let desc.object = substitute(get(parts, index + 1, ''),  '\v(^\[)|(\]$)', '', 'g')
+      let desc.object = substitute(get(parts, index + 1, ''),  '\v(^\[)|(\]$|(!$))', '', 'g')
       if (desc.type == 'PACKAGE' || desc.type == 'TYPE') &&
             \ (parts[-1] == 'Body' || parts[-1] == 'Spec')
         let desc.type .= '_' . toupper(parts[-1])
@@ -208,7 +209,7 @@ function! s:GetObjects(path)"{{{
   let info = s:explorer.DescribePath(a:path)
   if info.owner != '' && info.type != ''
     let sqlplus = vorax#GetSqlplusHandler()
-    let output = sqlplus.Query('select object_name from all_objects ' . 
+    let output = sqlplus.Query('select object_name || decode(status, ''INVALID'', ''!'', '''') object_name from all_objects ' . 
           \'where owner=' . info.owner . ' and object_type=replace(''' . info.type . ''', ''_'', '' '') order by 1;',
           \ {'executing_msg' : 'Load objects...',
           \  'throbber' : vorax#GetDefaultThrobber(),

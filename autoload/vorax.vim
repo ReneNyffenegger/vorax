@@ -376,7 +376,7 @@ endfunction"}}}
 " Open a buffer under the provided file_name and with the a:content array.
 function s:OpenDbBuffer(file_name, content)"{{{
   call voraxlib#utils#FocusCandidateWindow()
-  exe 'edit ' . a:file_name
+  silent exe 'edit ' . a:file_name
   " clear content if the file exists
   normal gg"_dG
   call append(0, a:content)
