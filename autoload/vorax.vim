@@ -148,7 +148,7 @@ function vorax#GetDDL(schema, object_name, type, ...)"{{{
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'BODY', TRUE );\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'PRETTY', TRUE );\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'CONSTRAINTS_AS_ALTER', TRUE );\n" .
-            \ "select dbms_metadata.get_ddl('" . a:type . "', '" . a:object_name . "', " . a:schema . ") src from dual;"
+            \ "select dbms_metadata.get_ddl('" . a:type . "', '" . a:object_name . "', '" . a:schema . "') src from dual;"
   let sqlplus = vorax#GetSqlplusHandler()
   let params = {}
   if exists('a:1')
@@ -160,7 +160,7 @@ function vorax#GetDDL(schema, object_name, type, ...)"{{{
       return split(output.resultset[0]['SRC'], '\r\?\n')
     endif
   else
-    voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
+    call voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
     return []
   endif
 endfunction"}}}

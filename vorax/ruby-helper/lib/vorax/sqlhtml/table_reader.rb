@@ -12,7 +12,7 @@ module Vorax
       body.children.each do |child|
         if child.name == 'text'
           value = CGI.unescapeHTML(child.text.mb_chars.gsub(/(\A\r?\n)|(\r?\n\Z)/, '').to_s)
-          if value =~ /^(ORA|SP[0-9]?\|PLS)-[0-9]\+/
+          if value =~ /^(ORA|SP[0-9]?|PLS)-[0-9]+/
             errors << value
           end
         end

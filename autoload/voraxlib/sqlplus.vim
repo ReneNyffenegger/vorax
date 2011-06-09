@@ -10,6 +10,9 @@ let g:_loaded_voraxlib_sqlplus = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
+" Initialize logger
+let s:log = voraxlib#logger#New(expand('<sfile>:t'))
+
 " the sqlplus object
 let s:sqlplus = {'ruby_key' : '', 'last_stmt' : '', 'html' : 0}
 
@@ -148,6 +151,7 @@ endfunction "}}}
 " Once again, these settings are not permanent and are set just during the
 " call. After that, they are restored to their original values.
 function! s:sqlplus.Exec(command, ...) dict "{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:sqlplus.Exec(' . string(a:command) . (exists('a:000') ? ', ' . string(a:000) : '') . ')') | endif
   if self.GetPid()
     if a:0 > 0 && has_key(a:1, 'executing_msg')
       " if a message is provided
@@ -162,6 +166,7 @@ function! s:sqlplus.Exec(command, ...) dict "{{{
         call add(requested_options, option['option'])
       endfor
       let current_options = self.GetConfigFor(requested_options)
+      if s:log.isDebugEnabled() | call s:log.debug('current_options=' . string(current_options)) | endif
       ruby <<EORC
       $sqlplus_factory[VIM::evaluate('self.ruby_key')].exec(VIM::evaluate('cmd'))
 EORC
@@ -190,6 +195,7 @@ EORC
     VIM::command('let &titlestring=' + sqlplus.connected_to.inspect) if sqlplus.session_owner_monitor != :never
     # display done msg
     VIM::command("redraw | echon #{VIM::evaluate('a:1.done_msg').inspect}") if VIM::evaluate('a:0 > 0 && has_key(a:1, "done_msg")') == 1
+    VIM::command(%[if s:log.isTraceEnabled() | call s:log.trace("END s:sqlplus.Exec => " . #{output.inspect}) | endif])
     VIM::command(%[return #{output.inspect}]) 
 EORC
   else
@@ -210,24 +216,32 @@ endfunction "}}}
 " Pay attention that the extra blanks from the column value are not preserved.
 " That's a limitation of sqlplus. Likewise, everything is returned as string.
 function! s:sqlplus.Query(statement, ...)"{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:sqlplus.Query(' . string(a:statement) . (exists('a:000') ? ', ' . string(a:000) : '') . ')') | endif
   if exists('a:1')
     let options = a:1
   else
   	let options = {}
   endif
-  let options['sqlplus_options'] = [
-        \ {'option' : 'pause', 'value' : 'off'},
-        \ {'option' : 'termout', 'value' : 'on'},
-        \ {'option' : 'verify', 'value' : 'off'},
-        \ {'option' : 'pagesize', 'value' : '9999'},
-        \ {'option' : 'markup', 'value' : 'html on'},
-        \]
+  let options['sqlplus_options'] = extend(self.GetSafeOptions(),
+        \ [{'option' : 'pagesize', 'value' : '9999'},
+        \ {'option' : 'markup', 'value' : 'html on'},])
   let output = self.Exec(a:statement, options)
+  if s:log.isTraceEnabled() | call s:log.trace('END s:sqlplus.Query') | endif
   ruby <<EORC
   resultset = Vorax::TableReader.extract(output)
   VIM::command("return #{Vorax::VimUtils.to_vim(resultset)}")
 EORC
 endfunction"}}}
+
+" Return a set of sqlplus options which guarantee that the statement is
+" executed as expected without interfearing with the user options like
+" autotrace or pause.
+function! s:sqlplus.GetSafeOptions()
+  return [{'option' : 'pause', 'value' : 'off'},
+        \ {'option' : 'termout', 'value' : 'on'},
+        \ {'option' : 'autotrace', 'value' : 'off'},
+        \ {'option' : 'verify', 'value' : 'off'},]
+endfunction
 
 " Asynchronously exec the provided command without waiting for the output. The
 " result may be read in chunks afterwards using Read() calls. The optional

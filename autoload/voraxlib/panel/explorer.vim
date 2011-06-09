@@ -13,6 +13,9 @@ set cpo&vim
 
 if exists('s:initialized') | unlet s:initialized | endif
 
+" Initialize logger
+let s:log = voraxlib#logger#New(expand('<sfile>:t'))
+
 " The profiles window instance.
 let s:explorer = {}
 
@@ -46,6 +49,7 @@ function! voraxlib#panel#explorer#New()"{{{
     " Choose a path separator so that no clashes will occur
     let s:explorer.path_separator = '"'
     let s:explorer['plugins'] = {}
+    let s:explorer['plugins_configured'] = 0
     " Add additional methods to the s:profiles object.
     call s:ExtendExplorer()
     " Register plugins
@@ -99,12 +103,7 @@ function! s:ExtendExplorer()"{{{
     exe 'noremap <silent> <buffer> ' . g:vorax_explorer_window_menu_key . ' :call <SID>Menu()<CR>'
 
     " configure plugins
-    for id in keys(s:explorer.plugins)
-      let plugin = s:explorer.plugins[id]
-      if plugin.shortcut != ''
-        exe 'noremap <silent> <buffer> ' . plugin.shortcut . ' :call g:vorax_explorer.plugins["' . escape(id, '/"') . '"].Callback()<CR>'
-      endif
-    endfor
+    call s:explorer._ConfigureMappingsForPlugins()
 
   endfunction"}}}
   
@@ -131,6 +130,7 @@ function! s:ExtendExplorer()"{{{
 
   " Register a new plugin.
   function! s:explorer.RegisterPlugin(id, plugin)"{{{
+    if s:log.isDebugEnabled() | call s:log.debug('Register explorer plugin: ID=' . string(a:id) . ' PLUGIN=' . string(a:plugin)) | endif
     let self.plugins[a:id] = a:plugin
   endfunction"}}}
 
@@ -164,14 +164,24 @@ function! s:ExtendExplorer()"{{{
   "  'object'  : '<the name of the object>'
   "  }
   function! s:explorer.DescribePath(path)"{{{
+    if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:explorer.DescribePath(' . string(a:path) . ')') | endif
     let desc = {'owner' : '', 'type' : '', 'object' : ''}
     let parts = split(a:path, voraxlib#utils#LiteralRegexp(self.path_separator))
     let index = 1
-    let desc.owner = 'user'
     if parts[1] == '[Users]'
       let index = 3
       if exists('parts[2]')
-        let desc.owner = "'" . substitute(parts[2], '\v(^\[)|(\]$)', '', 'g') . "'"
+        let desc.owner = substitute(parts[2], '\v(^\[)|(\]$)', '', 'g')
+      endif
+    endif
+    if desc.owner == ''
+      let result = vorax#GetSqlplusHandler().Query('select sys_context(''USERENV'', ''SESSION_USER'') crr_user from dual;')
+      if s:log.isDebugEnabled() | call s:log.debug('current user: ' . string(result)) | endif
+      if empty(result.errors)
+        let desc.owner = get(get(result.resultset, 0), 'CRR_USER')
+      else
+        if s:log.isErrorEnabled() | call s:log.error(string(result.errors)) | endif
+        call voraxlib#utils#Warn("WTF? What's with this error?\n" . join(result.errors, "\n"))
       endif
     endif
     if len(parts) > index
@@ -183,8 +193,25 @@ function! s:ExtendExplorer()"{{{
         let desc.type .= '_' . toupper(parts[-1])
       endif
     end
+    if s:log.isTraceEnabled() | call s:log.trace('END s:explorer.DescribePath => ' . string(desc)) | endif
     return desc
   endfunction"}}}
+
+  " Internal function for configuring mappings for the plugins.
+  function! s:explorer._ConfigureMappingsForPlugins()
+    if !s:explorer.plugins_configured
+      if s:log.isDebugEnabled() | call s:log.debug('Configure explorer plugins') | endif
+      for id in keys(s:explorer.plugins)
+        let plugin = s:explorer.plugins[id]
+        if plugin.shortcut != ''
+          let command = 'noremap <silent> <buffer> ' . plugin.shortcut . ' :call g:vorax_explorer.plugins["' . escape(id, '/"') . '"].Callback()<CR>'
+          if s:log.isDebugEnabled() | call s:log.debug(command) | endif
+          exe command
+        endif
+      endfor
+      let s:explorer.plugins_configured = 1
+    endif
+  endfunction
 
 endfunction"}}}
 
@@ -200,7 +227,7 @@ function! s:GetUsers()"{{{
   if empty(output.errors)
     return map(copy(output.resultset), '"[".v:val["USERNAME"]."]"')
   else
-  	voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
+  	call voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
   	return []
   endif
 endfunction"}}}
@@ -211,14 +238,14 @@ function! s:GetObjects(path)"{{{
   if info.owner != '' && info.type != ''
     let sqlplus = vorax#GetSqlplusHandler()
     let output = sqlplus.Query('select object_name || decode(status, ''INVALID'', ''!'', '''') object_name from all_objects ' . 
-          \'where owner=' . info.owner . ' and object_type=replace(''' . info.type . ''', ''_'', '' '') order by 1;',
+          \'where owner=''' . info.owner . ''' and object_type=replace(''' . info.type . ''', ''_'', '' '') order by 1;',
           \ {'executing_msg' : 'Load objects...',
           \  'throbber' : vorax#GetDefaultThrobber(),
           \  'done_msg' : 'Done.'})
     if empty(output.errors)
       return map(copy(output.resultset), 'v:val["OBJECT_NAME"]')
     else
-      voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
+      call voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
     endif
   endif
   return []
