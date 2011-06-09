@@ -9,6 +9,13 @@ if exists("g:loaded_vorax")
   finish
 endif
 
+" check for tlib
+runtime plugin/*tlib*.vim
+if !exists('loaded_tlib') || loaded_tlib < 40
+  echoerr 'tlib >= 0.40 is required'
+  finish
+endif
+
 " Current VoraX version
 let g:loaded_vorax = "3.0.0"
 
@@ -102,164 +109,187 @@ else
   endif
 endif " }}}
 " g:vorax_throbber_chars"{{{
-if !exists('g:vorax_throbber_chars')
-  let g:vorax_throbber_chars = ['.', 'o', 'O', '@', '*', ' ']
-endif"}}}
+
+" Default throbber symbols
+TLet g:vorax_throbber_chars = ['.', 'o', 'O', '@', '*', ' ']
+
+" }}}
 " g:vorax_session_owner_monitor {{{
-if !exists('g:vorax_session_owner_monitor') 
-  " How to get the user@db info. This info is usually displayed in the title
-  " and the status line. It helps the user to find out where is connected to. 
-  " The allowed values are:
-  "   0 = never    : VoraX will not update the title with the user@db info. In
-  "                  this case you must rely on other forms of displaying this 
-  "                  info. For example, you may configure in your login.sql file
-  "                  an sqlprompt with user@db into it.
-  "   1 = on login : VoraX will get the user@db info on connect only. This
-  "                  gives you the best balance of usefulness and performance.
-  "                  The drawback is that the title will not be updated on
-  "                  disconnects.
-  "   2 = always   : VoraX will get the user@db after every exec. The title is
-  "                  always kept in sync but this implies a performance
-  "                  penalty. Likewise, there are some issues with DBMS_XPLAN.
-  let g:vorax_session_owner_monitor = 1
-endif " }}}
+
+" How to get the user@db info. This info is usually displayed in the title
+" and the status line. It helps the user to find out where is connected to. 
+" The allowed values are:
+"   0 = never    : VoraX will not update the title with the user@db info. In
+"                  this case you must rely on other forms of displaying this 
+"                  info. For example, you may configure in your login.sql file
+"                  an sqlprompt with user@db into it.
+"   1 = on login : VoraX will get the user@db info on connect only. This
+"                  gives you the best balance of usefulness and performance.
+"                  The drawback is that the title will not be updated on
+"                  disconnects.
+"   2 = always   : VoraX will get the user@db after every exec. The title is
+"                  always kept in sync but this implies a performance
+"                  penalty. Likewise, there are some issues with DBMS_XPLAN.
+TLet g:vorax_session_owner_monitor = 1
+
+" }}}
 " g:vorax_limit_rows"{{{
-if !exists('g:vorax_limit_rows')
-	" Limit the rows returned by interactive executed queries. This setting
-	" doesn't affect queries contained in sqlplus scripts. If this variable is
-	" greater than 0 then every query will be wrapped in a:
-	" select * from (<actual_query>) where rownum <= g:vorax_limit_rows.
-	let g:vorax_limit_rows = 0
-endif"}}}
+
+" Limit the rows returned by interactive executed queries. This setting
+" doesn't affect queries contained in sqlplus scripts. If this variable is
+" greater than 0 then every query will be wrapped in a:
+" select * from (<actual_query>) where rownum <= g:vorax_limit_rows.
+TLet g:vorax_limit_rows = 0
+
+"}}}
 " g:vorax_sqlplus_default_options"{{{
-if !exists('g:vorax_sqlplus_default_options')
-  let g:vorax_sqlplus_default_options = ['set linesize 10000',
-                                       \ 'set tab off',
-                                       \ 'set flush on',
-                                       \ 'set sqlblanklines on',]
-endif"}}}
+
+" Options to be set as soon as a new sqlplus process is started.
+TLet g:vorax_sqlplus_default_options = ['set linesize 10000',
+                                      \ 'set tab off',
+                                      \ 'set flush on',
+                                      \ 'set sqlblanklines on',]
+
+"}}}
 " g:vorax_sqlplus_pause_warning"{{{
-if !exists('g:vorax_sqlplus_pause_warning')
-	" VoraX do not get along with the sqlplus PAUSE ON option. If this variable
-	" is 1 then a check is performed before every exec and a warning is
-	" displayed in case this option is enabled. If you don't care and you rely
-	" to the sqlplus SET PAUSE ON you can disable this warning.
-	let g:vorax_sqlplus_pause_warning = 1
-endif"}}}
+
+" VoraX do not get along with the sqlplus PAUSE ON option. If this variable
+" is 1 then a check is performed before every exec and a warning is
+" displayed in case this option is enabled. If you don't care and you rely
+" to the sqlplus SET PAUSE ON you can disable this warning.
+TLet g:vorax_sqlplus_pause_warning = 1
+
+"}}}
 " g:vorax_statement_highlight_group"{{{
-if !exists('g:vorax_statement_highlight_group')
-	" The highlight group to be used when the currently executing statement is
-	" highlighted. If you want to disable this feature then set this global
-	" variable on an empty string.
-	let g:vorax_statement_highlight_group = 'TODO'
-endif"}}}
+
+" The highlight group to be used when the currently executing statement is
+" highlighted. If you want to disable this feature then set this global
+" variable on an empty string.
+TLet g:vorax_statement_highlight_group = 'TODO'
+
+"}}}
 " g:vorax_output_window_anchor"{{{
-if !exists('g:vorax_output_window_anchor')
-	" The anchor of the output window. The allowed values are: topleft or
-	" botright.
-	let g:vorax_output_window_anchor = 'botright'
-endif"}}}
+
+" The anchor of the output window. The allowed values are: topleft or
+" botright.
+TLet g:vorax_output_window_anchor = 'botright'
+
+"}}}
 " g:vorax_output_window_orientation"{{{
-if !exists('g:vorax_output_window_orientation')
-  " The orientation of the output window. The allowed values are: 'v' for
-  " vertical and 'h' for horizontal.
-  let g:vorax_output_window_orientation = 'h'
-endif"}}}
+
+" The orientation of the output window. The allowed values are: 'v' for
+" vertical and 'h' for horizontal.
+TLet g:vorax_output_window_orientation = 'h'
+
+"}}}
 " g:vorax_output_window_size"{{{
-if !exists('g:vorax_output_window_size')
-  " The size of the output window. 
-  let g:vorax_output_window_size = 30
-endif"}}}
+
+" The size of the output window. 
+TLet g:vorax_output_window_size = 30
+
+"}}}
 " g:vorax_output_window_keep_focus_after_exec"{{{
-if !exists('g:vorax_output_keep_focus_after_exec')
-  " Whenever or not, after executing a statement, the output window to reamain
-  " focused. If 0 then the window from which the exec comes from is focused.
-  let g:vorax_output_window_keep_focus_after_exec = 0
-endif"}}}
+
+" Whenever or not, after executing a statement, the output window to reamain
+" focused. If 0 then the window from which the exec comes from is focused.
+TLet g:vorax_output_window_keep_focus_after_exec = 0
+
+"}}}
 " g:vorax_output_window_pause"{{{
-if !exists('g:vorax_output_window_pause')
-  " wherever or not the results printed to the output window to be displayed
-  " page by page. After the first page is spit the execution is susspended.
-  " The user has the possibility to get the next page or to simply cancel the
-  " current request.
-  let g:vorax_output_window_pause = 0
-endif"}}}
+
+" wherever or not the results printed to the output window to be displayed
+" page by page. After the first page is spit the execution is susspended.
+" The user has the possibility to get the next page or to simply cancel the
+" current request.
+TLet g:vorax_output_window_pause = 0
+
+"}}}
 " g:vorax_output_window_page_size"{{{
-if !exists('g:vorax_output_window_page_size')
-  " this global variable is used in connection with the
-  " g:vorax_output_window_pause and is used to configure how many lines a page
-  " should have. If g:vorax_output_window_pause is 1 then, after reaching the
-  " limit set by this variable, VoraX will stop writting into the output
-  " window until the user requests the next page. If
-  " g:vorax_output_window_page_size is 0 then the value is automatically computed 
-  " as the height of the output window. Negative values are not valid and
-  " they fall back to 0, with the above described meaning.
-  let g:vorax_output_window_page_size = 0
-endif"}}}
+
+" this global variable is used in connection with the
+" g:vorax_output_window_pause and is used to configure how many lines a page
+" should have. If g:vorax_output_window_pause is 1 then, after reaching the
+" limit set by this variable, VoraX will stop writting into the output
+" window until the user requests the next page. If
+" g:vorax_output_window_page_size is 0 then the value is automatically computed 
+" as the height of the output window. Negative values are not valid and
+" they fall back to 0, with the above described meaning.
+TLet g:vorax_output_window_page_size = 0
+
+"}}}
 " g:vorax_output_window_default_spool_file"{{{
-if !exists('g:vorax_output_window_default_spool_file')
-  " the default file to spool output window content. The value of this
-  " variable should be a valid VimL expression which evaluates to a valid file
-  " name. This expression is evaluated on every spooling activation.
-  let g:vorax_output_window_default_spool_file = 'g:vorax_home_dir."/".strftime("%Y-%m-%d").".spool"'
-endif"}}}
+
+" the default file to spool output window content. The value of this
+" variable should be a valid VimL expression which evaluates to a valid file
+" name. This expression is evaluated on every spooling activation.
+TLet g:vorax_output_window_default_spool_file = 'g:vorax_home_dir."/".strftime("%Y-%m-%d").".spool"'
+
+"}}}
 " g:vorax_profiles_window_anchor"{{{
-if !exists('g:vorax_profiles_window_anchor')
-	" The anchor of the profile window. The allowed values are: topleft or
-	" botright.
-	let g:vorax_profiles_window_anchor = 'botright'
-endif"}}}
+
+" The anchor of the profile window. The allowed values are: topleft or
+" botright.
+TLet g:vorax_profiles_window_anchor = 'botright'
+
+"}}}
 " g:vorax_profiles_window_orientation"{{{
-if !exists('g:vorax_profiles_window_orientation')
-  " The orientation of the profile window. The allowed values are: 'v' for
-  " vertical and 'h' for horizontal.
-  let g:vorax_profiles_window_orientation = 'v'
-endif"}}}
+
+" The orientation of the profile window. The allowed values are: 'v' for
+" vertical and 'h' for horizontal.
+TLet g:vorax_profiles_window_orientation = 'v'
+
+"}}}
 " g:vorax_profiles_window_size"{{{
-if !exists('g:vorax_profiles_window_size')
-  " The size of the profile window. 
-  let g:vorax_profiles_window_size = 30
-endif"}}}
+
+" The size of the profile window. 
+let g:vorax_profiles_window_size = 30
+
+"}}}
 " g:vorax_explorer_window_anchor"{{{
-if !exists('g:vorax_explorer_window_anchor')
-	" The anchor of the explorer window. The allowed values are: topleft or
-	" botright.
-	let g:vorax_explorer_window_anchor = 'topleft'
-endif"}}}
+
+" The anchor of the explorer window. The allowed values are: topleft or
+" botright.
+TLet g:vorax_explorer_window_anchor = 'topleft'
+
+"}}}
 " g:vorax_explorer_window_orientation"{{{
-if !exists('g:vorax_explorer_window_orientation')
-  " The orientation of the explorer window. The allowed values are: 'v' for
-  " vertical and 'h' for horizontal.
-  let g:vorax_explorer_window_orientation = 'v'
-endif"}}}
+
+" The orientation of the explorer window. The allowed values are: 'v' for
+" vertical and 'h' for horizontal.
+TLet g:vorax_explorer_window_orientation = 'v'
+
+"}}}
 " g:vorax_explorer_window_size"{{{
-if !exists('g:vorax_explorer_window_size')
-  " The size of the explorer window. 
-  let g:vorax_explorer_window_size = 30
-endif"}}}
+
+" The size of the explorer window. 
+TLet g:vorax_explorer_window_size = 30
+
+"}}}
 " g:vorax_explorer_file_extensions"{{{
-if !exists('g:vorax_explorer_file_extensions')
-  " Configures the file extension for every database
-  " object type. If a type is not here then the .sql
-  " extension will be assumed.
-  let g:vorax_explorer_file_extensions =     {'PACKAGE' : 'pkg',
-                                        \     'PACKAGE_SPEC' : 'spc',
-                                        \     'PACKAGE_BODY' : 'bdy',
-                                        \     'FUNCTION' : 'fnc',
-                                        \     'PROCEDURE' : 'prc',
-                                        \     'TRIGGER' : 'trg',
-                                        \     'TYPE' : 'typ',
-                                        \     'TYPE_SPEC' : 'tps',
-                                        \     'TYPE_BODY' : 'tpb',
-                                        \     'TABLE' : 'tab',
-                                        \     'VIEW' : 'viw',}
-endif"}}}
+
+" Configures the file extension for every database
+" object type. If a type is not here then the .sql
+" extension will be assumed.
+TLet g:vorax_explorer_file_extensions =     {'PACKAGE' : 'pkg',
+                                      \     'PACKAGE_SPEC' : 'spc',
+                                      \     'PACKAGE_BODY' : 'bdy',
+                                      \     'FUNCTION' : 'fnc',
+                                      \     'PROCEDURE' : 'prc',
+                                      \     'TRIGGER' : 'trg',
+                                      \     'TYPE' : 'typ',
+                                      \     'TYPE_SPEC' : 'tps',
+                                      \     'TYPE_BODY' : 'tpb',
+                                      \     'TABLE' : 'tab',
+                                      \     'VIEW' : 'viw',}
+
+"}}}
 " g:vorax_test_constr"{{{
-if !exists('g:vorax_test_constr')
-	" This global variable is used by vorax unit tests. Ignore it if you do not
-	" intend to run the test suite.
-	let g:vorax_test_constr = 'vorax/vorax@your_db'
-endif"}}}
+
+" This global variable is used by vorax unit tests. Ignore it if you do not
+" intend to run the test suite.
+TLet g:vorax_test_constr = 'vorax/vorax@your_db'
+
+"}}}
 " ==============================================================================
 
 " *** COMMANDS SECTION
@@ -329,51 +359,36 @@ endif"}}}
 " *** KEY MAPPINGS SECTION 
 " ==============================================================================
 " g:vorax_exec_key"{{{
-if !exists('g:vorax_exec_key')
-  let g:vorax_exec_key = "<Leader>e"
-endif"}}}
+TLet g:vorax_exec_key = "<Leader>e"
+"}}}
 " g:vorax_spooling_toggle_key"{{{
-if !exists('g:vorax_spooling_toggle_key')
-  let g:vorax_spooling_toggle_key = "<Leader>sp"
-endif
+TLet g:vorax_spooling_toggle_key = "<Leader>sp"
 exe "nmap <silent> <unique> " . g:vorax_spooling_toggle_key . " <Plug>VoraxSpoolingToggle"
 "}}}
 " g:vorax_compressed_output_toggle_key"{{{
-if !exists('g:vorax_compressed_output_toggle_key')
-  let g:vorax_compressed_output_toggle_key = "<Leader>co"
-endif
+TLet g:vorax_compressed_output_toggle_key = "<Leader>co"
 exe "nmap <silent> <unique> " . g:vorax_compressed_output_toggle_key . " <Plug>VoraxCompressedOutputToggle"
 "}}}
 " g:vorax_vertical_output_toggle_key"{{{
-if !exists('g:vorax_vertical_output_toggle_key')
-  let g:vorax_vertical_output_toggle_key = "<Leader>vo"
-endif
+TLet g:vorax_vertical_output_toggle_key = "<Leader>vo"
 exe "nmap <silent> <unique> " . g:vorax_vertical_output_toggle_key . " <Plug>VoraxVerticalOutputToggle"
 "}}}
 " g:vorax_limit_rows_toggle_key"{{{
-if !exists('g:vorax_limit_rows_toggle_key')
-  let g:vorax_limit_rows_toggle_key = "<Leader>lr"
-endif
+TLet g:vorax_limit_rows_toggle_key = "<Leader>lr"
 exe "nmap <silent> <unique> " . g:vorax_limit_rows_toggle_key . " <Plug>VoraxLimitRowsToggle"
 "}}}
 " g:vorax_paginating_toggle_key"{{{
-if !exists('g:vorax_paginating_toggle_key')
-  let g:vorax_paginating_toggle_key = "<Leader>pa"
-endif
+TLet g:vorax_paginating_toggle_key = "<Leader>pa"
 exe "nmap <silent> <unique> " . g:vorax_paginating_toggle_key . " <Plug>VoraxPaginatingToggle"
 "}}}
 " g:vorax_output_window_clear_key"{{{
-if !exists('g:vorax_output_window_clear_key')
-  let g:vorax_output_window_clear_key = "cle"
-endif"}}}
+Tlet g:vorax_output_window_clear_key = "cle"
+"}}}
 " g:vorax_output_window_pause_key"{{{
-if !exists('g:vorax_output_window_pause_key')
-  let g:vorax_output_window_pause_key = "<Space>"
-endif"}}}
+TLet g:vorax_output_window_pause_key = "<Space>"
+"}}}
 " g:vorax_profiles_window_toggle_key"{{{
-if !exists('g:vorax_profiles_window_toggle_key')
-  let g:vorax_profiles_window_toggle_key = "<Leader>pr"
-endif
+TLet g:vorax_profiles_window_toggle_key = "<Leader>pr"
 if g:vorax_profiles_window_toggle_key != '' 
       \ && !hasmapto('<Plug>VoraxProfilesWindowToggle') 
       \ && !hasmapto(g:vorax_profiles_window_toggle_key, 'n')
@@ -381,13 +396,10 @@ if g:vorax_profiles_window_toggle_key != ''
         \ " <Plug>VoraxProfilesWindowToggle"
 endif"}}}
 " g:vorax_profiles_window_menu_key"{{{
-if !exists('g:vorax_profiles_window_menu_key')
-  let g:vorax_profiles_window_menu_key = "<Tab>"
-endif"}}}
+TLet g:vorax_profiles_window_menu_key = "<Tab>"
+"}}}
 " g:vorax_explorer_window_toggle_key"{{{
-if !exists('g:vorax_explorer_window_toggle_key')
-  let g:vorax_explorer_window_toggle_key = "<Leader>ex"
-endif
+TLet g:vorax_explorer_window_toggle_key = "<Leader>ex"
 if g:vorax_explorer_window_toggle_key != '' 
       \ && !hasmapto('<Plug>VoraxExplorerWindowToggle') 
       \ && !hasmapto(g:vorax_explorer_window_toggle_key, 'n')
@@ -395,13 +407,13 @@ if g:vorax_explorer_window_toggle_key != ''
         \ " <Plug>VoraxExplorerWindowToggle"
 endif"}}}
 " g:vorax_explorer_window_menu_key"{{{
-if !exists('g:vorax_explorer_window_menu_key')
-  let g:vorax_explorer_window_menu_key = "<Tab>"
-endif"}}}
+TLet g:vorax_explorer_window_menu_key = "<Tab>"
+"}}}
 " ==============================================================================
 
 " *** AUTOCOMMANDS SECTION 
 " ==============================================================================
+" filetype detection {{{
 if exists('g:vorax_explorer_file_extensions')
   " Set the proper file type
   let sqlext = []
@@ -425,8 +437,7 @@ if exists('g:vorax_explorer_file_extensions')
   if !empty(plsqlext)
     exe 'autocmd BufRead,BufNewFile *.{' . join(plsqlext, ',') . '} set ft=plsql'
   endif
-endif
-
+endif "}}}
 " ==============================================================================
 
 " Restore compatibility flag
