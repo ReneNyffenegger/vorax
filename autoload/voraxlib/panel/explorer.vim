@@ -95,6 +95,7 @@ function! s:ExtendExplorer()"{{{
     " set key mappings
     noremap <silent> <buffer> o :call <SID>Click()<CR>
     noremap <silent> <buffer> <CR> :call <SID>Click()<CR>
+    exe 'noremap <silent> <buffer> ' . g:vorax_explorer_window_refresh_key . ' :call <SID>Refresh()<CR>'
     exe 'noremap <silent> <buffer> ' . g:vorax_explorer_window_menu_key . ' :call <SID>Menu()<CR>'
 
     " configure plugins
@@ -269,6 +270,11 @@ endfunction"}}}
 " the tree key mapping.
 function! s:Click()"{{{
   call s:explorer.ClickNode(s:explorer.GetCurrentNode())
+endfunction"}}}
+
+" Refresh the current node.
+function! s:Refresh()"{{{
+  call s:explorer.RefreshNode(s:explorer.GetCurrentNode())
 endfunction"}}}
 
 " Display the menu for the current node.

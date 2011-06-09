@@ -38,7 +38,7 @@ endfunction"}}}
 
 " Set the root of the tree. This also triggers the building of the tree
 " starting from the provided root.
-function! s:tree.SetRoot(root) dict"{{{
+function! s:tree.SetRoot(root) "{{{
   let self.root = a:root
   call self.window.Focus()
   setlocal nowrap
@@ -48,19 +48,19 @@ endfunction"}}}
 
 " Get the children nodes for the provided path. This is intended to be
 " overridden by the implementors.
-function! s:tree.GetSubNodes(path) dict"{{{
+function! s:tree.GetSubNodes(path) "{{{
   return []
 endfunction"}}}
 
 " Whenever or not the node identified by the given path is a leaf. This is
 " intended to be overridden by implementors.
-function! s:tree.IsLeaf(path) dict"{{{
+function! s:tree.IsLeaf(path) "{{{
   return 1
 endfunction"}}}
 
 " What to do when a leaf node is clicked. This is intended to be overridden by
 " implementors.
-function! s:tree.OnLeafClick(path) dict"{{{
+function! s:tree.OnLeafClick(path) "{{{
 endfunction"}}}
 
 " Click on the current node.
@@ -83,7 +83,7 @@ function! s:tree.ClickNode(path)"{{{
 endfunction"}}}
 
 " Get the path to the current node.
-function! s:tree.GetCurrentNode() dict"{{{
+function! s:tree.GetCurrentNode() "{{{
   let crr_pos = getpos(".")
   normal ^
   let xpos = col('.') - 1
@@ -94,7 +94,7 @@ function! s:tree.GetCurrentNode() dict"{{{
 endfunction"}}}
 
 " Expand the current node.
-function! s:tree.ExpandCurrentNode() dict "{{{
+function! s:tree.ExpandCurrentNode() "{{{
   let crr_pos = getpos(".")
   normal ^
   let xpos = col('.') - 1
@@ -104,7 +104,7 @@ function! s:tree.ExpandCurrentNode() dict "{{{
 endfunction"}}}
 
 " Collapse the current node.
-function! s:tree.CollapseCurrentNode() dict "{{{
+function! s:tree.CollapseCurrentNode() "{{{
   let crr_pos = getpos(".")
   normal ^
   let xpos = col('.') - 1
@@ -114,7 +114,7 @@ function! s:tree.CollapseCurrentNode() dict "{{{
 endfunction"}}}
 
 " Show and selects the provided node
-function! s:tree.RevealNode(path) dict"{{{
+function! s:tree.RevealNode(path) "{{{
   " split the provided path
   let parts = split(a:path, self.path_separator)
   normal gg
@@ -156,6 +156,12 @@ function! s:tree.RevealNode(path) dict"{{{
   endfor
   exe 'normal' . (ypos - 1) . 'G'
 endfunction!"}}}
+
+" Refresh the provided path
+function! s:tree.RefreshNode(path)
+  call self._BuildTree()
+  call self.RevealNode(a:path)
+endfunction
 
 " *** INTERNAL FUNCTONS ***"{{{
 

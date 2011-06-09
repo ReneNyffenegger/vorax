@@ -75,7 +75,7 @@ function! s:ExtendWindow()"{{{
     setlocal nolist
     setlocal foldcolumn=0 nofoldenable
     setlocal noreadonly
-    setlocal statusline=%!voraxlib#panel#output#StatusLine() 
+    exe 'setlocal statusline=' . g:vorax_output_window_statusline
 
     " define mappings
     if exists('g:vorax_output_window_clear_key') && g:vorax_output_window_clear_key != ''

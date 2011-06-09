@@ -225,6 +225,14 @@ TLet g:vorax_output_window_page_size = 0
 TLet g:vorax_output_window_default_spool_file = 'g:vorax_home_dir."/".strftime("%Y-%m-%d").".spool"'
 
 "}}}
+" g:vorax_output_window_statusline"{{{
+
+" The statusline definition for the output window. You are free to overwrite
+" to whatever you want if you feel that the default provided one doesn't quite
+" fit.
+TLet g:vorax_output_window_statusline = "%!voraxlib#panel#output#StatusLine()"
+
+"}}}
 " g:vorax_profiles_window_anchor"{{{
 
 " The anchor of the profile window. The allowed values are: topleft or
@@ -382,7 +390,7 @@ TLet g:vorax_paginating_toggle_key = "<Leader>pa"
 exe "nmap <silent> <unique> " . g:vorax_paginating_toggle_key . " <Plug>VoraxPaginatingToggle"
 "}}}
 " g:vorax_output_window_clear_key"{{{
-Tlet g:vorax_output_window_clear_key = "cle"
+TLet g:vorax_output_window_clear_key = "cle"
 "}}}
 " g:vorax_output_window_pause_key"{{{
 TLet g:vorax_output_window_pause_key = "<Space>"
@@ -408,6 +416,9 @@ if g:vorax_explorer_window_toggle_key != ''
 endif"}}}
 " g:vorax_explorer_window_menu_key"{{{
 TLet g:vorax_explorer_window_menu_key = "<Tab>"
+"}}}
+" g:vorax_explorer_window_refresh_key"{{{
+TLet g:vorax_explorer_window_refresh_key = "R"
 "}}}
 " ==============================================================================
 
