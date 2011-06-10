@@ -55,7 +55,8 @@ function! vorax#Connect(cstr, bang)"{{{
         call outputwin.AppendText(sqlplus.GetBanner() . "\n\n")
         if !voraxlib#utils#HasErrors(output)
           call outputwin.AppendText(sqlplus.Exec("prompt &_O_VERSION", 
-                \ {'sqlplus_options' : [{'option' : 'define', 'value' : '"&"'}]}))
+                \ {'sqlplus_options' : [{'option' : 'define', 'value' : '"&"'}, 
+                                      \ {'option' : 'sqlprompt', 'value' : "''"}]}))
         endif
         call outputwin.AppendText("\n" . output)
       endif
@@ -97,6 +98,27 @@ function! vorax#Exec(command)"{{{
   endif
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#Exec') | endif
 endfunction"}}}
+
+" Send the whole current buffer content to sqlplus for execution.
+function! vorax#CompileBuffer()
+  if &ft == 'plsql'
+    let content = join(getline(0, line('$')), "\n")
+    if substitute(content, '\_s', '', 'g') != ''
+      let sqlplus = vorax#GetSqlplusHandler()
+      let content = voraxlib#utils#AddSqlDelimitator(content)
+      let exec_file = sqlplus.Pack(substitute(content, '\_s*\_$', '', 'g'), {'include_eor' : 1}) 
+      let output = sqlplus.Exec(exec_file, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+            \ [{'option' : 'echo', 'value' : 'off'}, {'option' : 'feedback', 'value' : 'on'}])})
+      call vorax#GetOutputWindowHandler().AppendText(output)
+      " go back to the previous buffer
+      wincmd p
+    else
+    	call voraxlib#utils#Warn('Nothing to compile. Empty buffer!')
+    endif
+  else
+    call voraxlib#utils#Warn('Only PL/SQL buffers can be compiled.')
+  endif
+endfunction
 
 " Execute the statement under cursor form the current buffer.
 function! vorax#ExecCurrent()"{{{
@@ -171,7 +193,7 @@ function vorax#LoadDbObject(schema, object_name, type)"{{{
   let bufnr = bufnr(file_name)
   if bufnr == -1
     " create a new buffer
-  	let params = {'executing_msg' : 'Building source for ' . a:object_name . '...',
+  	let params = {'executing_msg' : 'Fetching source for ' . a:object_name . '...',
         \  'throbber' : vorax#GetDefaultThrobber(),
         \  'done_msg' : 'Done.'}
     let src = vorax#GetDDL(a:schema, a:object_name, a:type, params)

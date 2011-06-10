@@ -313,6 +313,11 @@ if !exists(':VoraxExec')
   command! -nargs=1 VoraxExec :call vorax#Exec(<q-args>)
   nmap <unique> <script> <Plug>VoraxExec :VoraxExec<CR>
 endif"}}}
+" :VoraxCompileBuffer"{{{
+if !exists(':VoraxCompileBuffer')
+  command! -nargs=0 VoraxCompileBuffer :call vorax#CompileBuffer()
+  nmap <unique> <script> <Plug>VoraxCompileBuffer :VoraxCompileBuffer<CR>
+endif"}}}
 " :VoraxExecCurrent"{{{
 if !exists(':VoraxExecCurrent')
   command! -nargs=0 -bar VoraxExecCurrent :call vorax#ExecCurrent()
@@ -420,6 +425,9 @@ TLet g:vorax_explorer_window_menu_key = "<Tab>"
 " g:vorax_explorer_window_refresh_key"{{{
 TLet g:vorax_explorer_window_refresh_key = "R"
 "}}}
+" g:vorax_compile_plsql_buffer_key {{{
+TLet g:vorax_compile_plsql_buffer_key = '<F8>'
+"}}}
 " ==============================================================================
 
 " *** AUTOCOMMANDS SECTION 
@@ -436,9 +444,13 @@ if exists('g:vorax_explorer_file_extensions')
           \ key == 'TYPE' ||
           \ key == 'TYPE_SPEC' ||
           \ key == 'TYPE_BODY' ||
-          \ key == 'TRIGGER'
+          \ key == 'TRIGGER' ||
+          \ key == 'FUNCTION' ||
+          \ key == 'PROCEDURE'
+      " plsql buffers
       call add(plsqlext, g:vorax_explorer_file_extensions[key])
     else
+      " sql buffers
       call add(sqlext, g:vorax_explorer_file_extensions[key])
     endif
   endfor

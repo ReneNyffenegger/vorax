@@ -6,12 +6,6 @@ function! TestVoraxUtilsSortUnique()
   call VUAssertTrue(voraxlib#utils#SortUnique(['a', 'b', 'a', 'd', 'd', 'c']) == ['a', 'b', 'c', 'd'], ': Test SortUnique() 2')
 endfunction
 
-function! TestVoraxUtilsFlattenList()
-  " test FlattenList
-  call VUAssertTrue(voraxlib#utils#FlattenList([1, 2, [3, [4, 5], 7], 8]) == [1, 2, 3, 4, 5, 7, 8], ': Test FlattenList() 1')
-  call VUAssertTrue(voraxlib#utils#FlattenList([1, [1, 1], 2]) == [1, 1, 1, 2], ': Test FlattenList() 2')
-endfunction
-
 function! TestVoraxUtilsAddUnique()
   " test AddUnique
   let list = [1, 2, 3]

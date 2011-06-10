@@ -19,7 +19,7 @@ let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 " The profiles window instance.
 let s:explorer = {}
 
-" An explorer plugin skeleton.
+" The generic explorer plugin skeleton. {{{
 let s:plugin_skeleton = {'label' : '', 'shortcut' : '', 'description' : ''}
 
 " Is the plugin active for the provided node?
@@ -30,9 +30,11 @@ endfunction
 function! s:plugin_skeleton.Callback()
 endfunction
 
-" Configure the plugin (e.g. keymap)
+" Configure the plugin (e.g. keymaps)
 function! s:plugin_skeleton.Configure()
 endfunction
+
+"}}}
 
 " Creates a new connection profiles window. Only one such window
 " is allowed in a VoraX instance. 
@@ -188,10 +190,6 @@ function! s:ExtendExplorer()"{{{
       " fill the desc dictionary only if the path is long enough
       let desc.type = s:ToOracleType(parts[index])
       let desc.object = substitute(get(parts, index + 1, ''),  '\v(^\[)|(\]$|(!$))', '', 'g')
-      if (desc.type == 'PACKAGE' || desc.type == 'TYPE') &&
-            \ (parts[-1] == 'Body' || parts[-1] == 'Spec')
-        let desc.type .= '_' . toupper(parts[-1])
-      endif
     end
     if s:log.isTraceEnabled() | call s:log.trace('END s:explorer.DescribePath => ' . string(desc)) | endif
     return desc
@@ -220,7 +218,7 @@ endfunction"}}}
 " Get the list of users.
 function! s:GetUsers()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
-  let output = sqlplus.Query('select username from all_users order by 1;',
+  let output = sqlplus.Query('select username from all_users where username != sys_context(''USERENV'', ''SESSION_USER'') order by 1;',
         \ {'executing_msg' : 'Get users...',
         \  'throbber' : vorax#GetDefaultThrobber(),
         \  'done_msg' : 'Done.'})

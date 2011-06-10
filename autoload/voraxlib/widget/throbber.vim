@@ -19,7 +19,7 @@ let s:throbber = {
 function! voraxlib#widget#throbber#New(...)
   let t = copy(s:throbber)
   if a:0 > 0
-    let t.chars = voraxlib#utils#FlattenList(a:000)
+    let t.chars = tlib#list#Flatten(a:000)
   endif
   return t
 endfunction

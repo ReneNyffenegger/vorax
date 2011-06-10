@@ -5,7 +5,7 @@
 " switch to vorax completion
 "setlocal omnifunc=Vorax_Complete
 
-" we don't have indenting for plsql therefore indent 
+" we don't have indenting for plsql yet therefore indent 
 " like an sql file please
 exec 'runtime indent/sql.vim'
 
@@ -18,6 +18,14 @@ endif
 " take $# as word characters
 setlocal isk+=$
 setlocal isk+=#
+
+" configure mappings
+if exists('g:vorax_compile_plsql_buffer_key')
+      \ && g:vorax_compile_plsql_buffer_key != ''
+      \ && !hasmapto('<Plug>VoraxCompileBuffer') 
+      \ && maparg(g:vorax_compile_plsql_buffer_key, 'n') == ""
+  exe "nmap <unique> " . g:vorax_compile_plsql_buffer_key . " <Plug>VoraxCompileBuffer"
+endif
 
 " matchit functionality 
 " Some standard expressions for use with the matchit strings

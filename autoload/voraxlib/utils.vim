@@ -45,11 +45,6 @@ function! voraxlib#utils#SortUnique(list, ...)"{{{
   return result
 endfunction"}}}
 
-" Flatten the provided list.
-function! voraxlib#utils#FlattenList(list)"{{{
-  ruby VIM::command(%!return #{Vorax::VimUtils.to_vim(VIM::evaluate('a:list').flatten)}!)
-endfunction"}}}
-
 " Add the provided item to a:list only if that item is not already in the list
 function! voraxlib#utils#AddUnique(list, item)"{{{
   if index(a:list, a:item) == -1
