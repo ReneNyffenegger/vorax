@@ -33,7 +33,7 @@
 "   :so %
 " and look at the displayed statistics.
 
-let g:vorax_test_gui = 1
+let g:vorax_test_gui = 0
 
 if !exists('g:vorax_test_gui') | let g:vorax_test_gui = 1 | endif
 

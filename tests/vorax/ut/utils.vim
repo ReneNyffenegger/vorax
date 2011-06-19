@@ -62,7 +62,7 @@ endfunction
 
 function! TestVoraxUtilsRemoveAllSqlComments()
   let cmd = "\n--muci\n/* ab\n c */\nselect /*+ hint */ * from cat;--test\n/*comment 2*/"
-  call VUAssertEquals(' select * from cat; ', 
+  call VUAssertEquals("\nselect\n* from cat;\n", 
                     \ voraxlib#utils#RemoveAllSqlComments(cmd),
                     \ 'test 1')
 endfunction
@@ -174,6 +174,7 @@ function! TestVoraxUtilsHasSqlDelimitator()
   call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;"), 0, 'Incomplete plsql block 3.')
   call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;\n/"), 1, 'Complete plsql block 1.')
   call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend \"muci\"\n;"), 0, 'InComplete plsql block 3.')
+  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("select * from cat --muci\n/\n"), 1, 'Statement with comment at the end')
 endfunction
 
 function! TestVoraxUtilsRemoveSqlDelimitator()

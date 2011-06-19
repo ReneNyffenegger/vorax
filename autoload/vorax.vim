@@ -163,7 +163,7 @@ endfunction"}}}
 " schema.object_name having the a:type specified. The optional param is a hash
 " with the following structure {'executing_msg' : '', 'throbber': ,
 " 'done_msg': ''}. (for details see the sqlplus.Query method).
-function vorax#GetDDL(schema, object_name, type, ...)"{{{
+function! vorax#GetDDL(schema, object_name, type, ...)"{{{
   let query = "set long 1000000000 longc 60000\n" .
             \ "set wrap on\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', TRUE );\n" .
@@ -188,7 +188,7 @@ function vorax#GetDDL(schema, object_name, type, ...)"{{{
 endfunction"}}}
 
 " Load the provided schema.object_name of type a:type for editing.
-function vorax#LoadDbObject(schema, object_name, type)"{{{
+function! vorax#LoadDbObject(schema, object_name, type)"{{{
   let file_name = voraxlib#utils#GetFileName(a:object_name, a:type)
   let bufnr = bufnr(file_name)
   if bufnr == -1
@@ -396,7 +396,7 @@ function! s:ShouldGoOnWithPauseOn()"{{{
 endfunction"}}}
 
 " Open a buffer under the provided file_name and with the a:content array.
-function s:OpenDbBuffer(file_name, content)"{{{
+function! s:OpenDbBuffer(file_name, content)"{{{
   call voraxlib#utils#FocusCandidateWindow()
   silent exe 'edit ' . a:file_name
   " clear content if the file exists

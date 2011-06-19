@@ -266,7 +266,7 @@ endfunction"}}}
 " be invalid if the comment is removed completelly)
 function! voraxlib#utils#RemoveAllSqlComments(command)"{{{
   ruby <<EORC
-  result = VIM::evaluate("a:command").gsub(/#{VIM::evaluate('s:sql_strip_comments_pattern')}/, ' ')
+  result = VIM::evaluate("a:command").gsub(/#{VIM::evaluate('s:sql_strip_comments_pattern')}/, "\n")
   VIM::command("return #{result.inspect}")
 EORC
 endfunction"}}}
@@ -342,7 +342,7 @@ endfunction"}}}
 " Whenever or not the provided statement has the sql delimitator at the end.
 function! voraxlib#utils#HasSqlDelimitator(statement)"{{{
   let statement = voraxlib#utils#RemoveAllSqlComments(a:statement)
-  if statement =~ '\v\n+\s*/\s*\n*$'
+  if statement =~ '\v\n\s*/\s*\n*$'
     " the statement has an ending /
   	return 1
   elseif statement =~ s:plsql_end_marker

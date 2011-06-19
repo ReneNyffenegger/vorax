@@ -5,7 +5,6 @@ $KCODE = 'u'
 require 'rubygems'
 require 'active_support/multibyte'
 require 'nokogiri'
-require 'antlr3'
 require 'cgi'
 
 # Unicode proxy
@@ -38,5 +37,5 @@ Vorax::source('vorax/sqlhtml/sql_html_beautifier.rb')
 Vorax::source('vorax/sqlhtml/table_reader.rb')
 
 # load grammars
-Vorax::source('vorax/parser/SqlSplitter.rb')
+Vorax::source('vorax/parser/sql_splitter.rb')
 
