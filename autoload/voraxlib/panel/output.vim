@@ -437,16 +437,17 @@ function! s:RegisterClearHighlight()"{{{
     " store the current cursor position
     let [s:crr_l, s:crr_c] = [line('.'), col('.')]
     if s:log.isDebugEnabled() | call s:log.debug('s:RegisterClearHighlight(): [s:crr_l, s:crr_c]=' .string([s:crr_l, s:crr_c])) | endif
-    au VoraX CursorMoved <buffer> call s:ClearHighlight()
-    au VoraX CursorMovedI <buffer> call s:ClearHighlight()
+    au VoraX CursorMoved <buffer> call s:ClearHighlightOnMove()
+    au VoraX CursorMovedI <buffer> call s:ClearHighlightOnMove()
+    au VoraX BufLeave <buffer> call s:ClearHighlightOnLeave()
   endif
 endfunction"}}}
 
 " This function is internally called from an autocommand in order to clear the
 " highlighting of the current executed SQL statement.
-function! s:ClearHighlight()"{{{
+function! s:ClearHighlightOnMove()"{{{
   if (exists('s:crr_l') && exists('s:crr_c')) && 
-        \ (line('.') != s:crr_l || col('.') != s:crr_c)
+        \ (line('.') != s:crr_l || col('.') != s:crr_c) 
     " only if the cursor was really moved. This event is quite impredictible
     " and may be triggered by other plugins.
     match none
@@ -455,6 +456,15 @@ function! s:ClearHighlight()"{{{
     if exists('s:crr_l') | unlet s:crr_l | endif
     if exists('s:crr_c') | unlet s:crr_c | endif
   endif
+endfunction"}}}
+
+" This function is internally called from an autocommand in order to clear the
+" highlighting of the current executed SQL statement.
+function! s:ClearHighlightOnLeave()"{{{
+  match none
+  au! VoraX BufLeave  <buffer>
+  if exists('s:crr_l') | unlet s:crr_l | endif
+  if exists('s:crr_c') | unlet s:crr_c | endif
 endfunction"}}}
 
 " Aborts the execution of the current statement.

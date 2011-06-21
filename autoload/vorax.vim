@@ -100,7 +100,7 @@ function! vorax#Exec(command)"{{{
 endfunction"}}}
 
 " Send the whole current buffer content to sqlplus for execution.
-function! vorax#CompileBuffer()
+function! vorax#CompileBuffer()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#CompileBuffer()') | endif
   if &ft == 'plsql'
     " get the content of the buffer
@@ -139,7 +139,7 @@ function! vorax#CompileBuffer()
     call voraxlib#utils#Warn('Only PL/SQL buffers can be compiled.')
   endif
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#CompileBuffer()') | endif
-endfunction
+endfunction"}}}
 
 " Execute the statement under cursor form the current buffer.
 function! vorax#ExecCurrent()"{{{

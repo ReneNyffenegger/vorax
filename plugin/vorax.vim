@@ -142,6 +142,12 @@ TLet g:vorax_session_owner_monitor = 1
 TLet g:vorax_limit_rows = 0
 
 "}}}
+" g:vorax_open_compilation_errors_command"{{{
+
+" The command used to display the compilation errors using the quickfix window.
+TLet g:vorax_open_compilation_errors_command = 'botright cwindow'
+
+"}}}
 " g:vorax_sqlplus_default_options"{{{
 
 " Options to be set as soon as a new sqlplus process is started.

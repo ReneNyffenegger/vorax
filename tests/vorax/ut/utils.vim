@@ -211,3 +211,32 @@ function! TestVoraxUtilsAddRownumFilter()
   call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;with x as (select * from dual) select * from x', 10), 
         \ bwrap . 'select * from cat' . ewrap."set autotrace on;\n" . bwrap . 'with x as (select * from dual) select * from x' . ewrap, 'test 3')
 endfunction
+
+function! TestVoraxGetStartLineOfPlsqlObject()
+  let g:vorax_explorer_file_extensions =     {'PACKAGE' : 'pkg',
+                                        \     'PACKAGE_SPEC' : 'spc',
+                                        \     'PACKAGE_BODY' : 'bdy',
+                                        \     'FUNCTION' : 'fnc',
+                                        \     'PROCEDURE' : 'prc',
+                                        \     'TRIGGER' : 'trg',
+                                        \     'TYPE' : 'typ',
+                                        \     'TYPE_SPEC' : 'tps',
+                                        \     'TYPE_BODY' : 'tpb',}
+  silent exe 'split ' . s:ut_dir . '/../sql/func.fnc'
+  call VUAssertEquals(4, voraxlib#utils#GetStartLineOfPlsqlObject('FUNCTION'), 'Test offset for function')
+  bwipe!
+  silent exe 'split ' . s:ut_dir . '/../sql/proc.prc'
+  call VUAssertEquals(3, voraxlib#utils#GetStartLineOfPlsqlObject('PROCEDURE'), 'Test offset for proc')
+  bwipe!
+  silent exe 'split ' . s:ut_dir . '/../sql/trigger.trg'
+  call VUAssertEquals(3, voraxlib#utils#GetStartLineOfPlsqlObject('TRIGGER'), 'Test offset for trigger')
+  bwipe!
+  silent exe 'split ' . s:ut_dir . '/../sql/package.pkg'
+  call VUAssertEquals(2, voraxlib#utils#GetStartLineOfPlsqlObject('PACKAGE_SPEC'), 'Test offset for pkg spec')
+  call VUAssertEquals(9, voraxlib#utils#GetStartLineOfPlsqlObject('PACKAGE_BODY'), 'Test offset for pkg body')
+  bwipe!
+  silent exe 'split ' . s:ut_dir . '/../sql/type.typ'
+  call VUAssertEquals(2, voraxlib#utils#GetStartLineOfPlsqlObject('TYPE_SPEC'), 'Test offset for pkg spec')
+  call VUAssertEquals(9, voraxlib#utils#GetStartLineOfPlsqlObject('TYPE_BODY'), 'Test offset for pkg body')
+  bwipe!
+endfunction

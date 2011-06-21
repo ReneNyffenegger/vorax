@@ -484,8 +484,13 @@ endfunction"}}}
 " module starts. This is used to correctly report the errors from the
 " ALL_ERRORS view.
 function! voraxlib#utils#GetStartLineOfPlsqlObject(type)"{{{
-  if a:type == 'TRIGGER' || a:type == 'FUNCTION' || a:type == 'PROCEDURE'
+  if !exists('b:current_syntax') || b:current_syntax != 'plsql'
+    throw 'A sql syntax must be enabled for the current buffer.'
+  endif
+  if a:type == 'TRIGGER'
     let pattern = '\c\<declare\>\|\<begin\>'
+  elseif a:type == 'FUNCTION' || a:type == 'PROCEDURE'
+    let pattern = '\c\<as\>\|\<is\>'
   elseif a:type == 'PACKAGE' || a:type == 'TYPE' || a:type == 'PACKAGE_SPEC' || a:type == 'TYPE_SPEC'
     let pattern = '\c\<package\>\|\<type\>'
   elseif a:type == 'PACKAGE_BODY' || a:type == 'TYPE_BODY'
