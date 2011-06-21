@@ -442,6 +442,120 @@ function! voraxlib#utils#GetFileName(object, type)"{{{
   return a:object . '.' . get(g:vorax_explorer_file_extensions, a:type, 'sql')
 endfunction"}}}
 
+" Get the line where the declaration of the package or type body begins. This
+" function is internally used in order to adjust compilation errors reported
+" into the ALL_ERRORS view with the actual position within the buffer.
+function! voraxlib#utils#GetPlsqlBodyLine()"{{{
+  if !exists('b:current_syntax') || b:current_syntax != 'plsql'
+    throw 'A sql syntax must be enabled for the current buffer.'
+  endif
+  let delimitator_pattern = '^\s*\/\s*$'
+  let state = winsaveview()
+  " ignore events
+  let _eventignore = &eventignore
+  set eventignore=all
+  normal gg
+  let [l, c] = [0, 0]
+  while 1
+    let [l, c] = searchpos(delimitator_pattern, 'W')  
+    if [l, c] == [0, 0] || synIDattr(synIDtrans(synID(l, c, 1)), "name") == 'Statement'
+      " exit if the delimitator is not within a special highlight group
+      break
+    endif
+  endwhile
+  if [l, c] != [0, 0]
+    " great! we found the end delimitator of the spec. Start to look at the
+    " package or type keyword.
+    while 1
+      let [l, c] = searchpos('\c\<package\>\|\<type\>', 'W')  
+      if [l, c] == [0, 0] || synIDattr(synIDtrans(synID(l, c, 1)), "name") == 'Statement'
+        " exit if the delimitator is not within a special highlight group
+        break
+      endif
+    endwhile
+  endif
+  call winrestview(state)
+  " restore events
+  let &eventignore = _eventignore
+  return l
+endfunction"}}}
+
+" This function is used to detect the line where the declaration of a plsql
+" module starts. This is used to correctly report the errors from the
+" ALL_ERRORS view.
+function! voraxlib#utils#GetStartLineOfPlsqlObject(type)"{{{
+  if a:type == 'TRIGGER' || a:type == 'FUNCTION' || a:type == 'PROCEDURE'
+    let pattern = '\c\<declare\>\|\<begin\>'
+  elseif a:type == 'PACKAGE' || a:type == 'TYPE' || a:type == 'PACKAGE_SPEC' || a:type == 'TYPE_SPEC'
+    let pattern = '\c\<package\>\|\<type\>'
+  elseif a:type == 'PACKAGE_BODY' || a:type == 'TYPE_BODY'
+    return voraxlib#utils#GetPlsqlBodyLine()
+  else
+  	return 0
+  endif
+  let state = winsaveview()
+  " ignore events
+  let _eventignore = &eventignore
+  set eventignore=all
+  normal gg
+  let [l, c] = [0, 0]
+  while 1
+    let [l, c] = searchpos(pattern, 'W')  
+    if [l, c] == [0, 0] || synIDattr(synIDtrans(synID(l, c, 1)), "name") == 'Statement'
+      " exit if the delimitator is not within a special highlight group
+      break
+    endif
+  endwhile
+  call winrestview(state)
+  " restore events
+  let &eventignore = _eventignore
+  return l
+endfunction"}}}
+
+" Fill the quick fix window with all errors from the ALL_VIEW.
+function! voraxlib#utils#DisplayCompilationErrors(owner, object, type)"{{{
+  if a:type == 'PACKAGE' || a:type == 'TYPE'
+    let offset_spec = voraxlib#utils#GetStartLineOfPlsqlObject(a:type . '_SPEC')
+    let offset_body = voraxlib#utils#GetStartLineOfPlsqlObject(a:type . '_BODY')
+    if offset_spec > 0 && offset_body > 0
+      let offset = "decode(type, '" . a:type . "', " . (offset_spec - 1) . ", " .
+                  \ "decode(type, '" . a:type . " BODY', " . (offset_body - 1) . ", 0)" . ")"
+    else
+      let offset = 0
+    endif
+    let filter_clause = "('" . a:type . "', '" . a:type . " BODY')"
+  else
+    let offset = voraxlib#utils#GetStartLineOfPlsqlObject(a:type) - 1
+    if offset > 0
+      let offset -= 1
+    endif
+    let filter_clause = "('" . a:type . "')"
+  endif
+  let query = "select  line + " . offset . " line, " .
+                    \ "position, " . 
+                    \ "replace(replace(text, chr(10), ' '), chr(92), chr(92) || chr(92)) text " .
+                  \ "from all_errors " . 
+                  \ "where owner = '" . a:owner . "' " .
+                  \ "and name = '" . a:object . "' " .
+                  \ "and type in " . filter_clause . " order by 1;"
+  let data = vorax#GetSqlplusHandler().Query(query)
+  if empty(data.errors)
+    let qerr = []
+    for record in data.resultset
+      let qerr += [{'bufnr' : bufnr('%'), 'lnum' : str2nr(record['LINE']), 
+            \ 'col' : str2nr(record['POSITION']), 'text' : record['TEXT']}]
+    endfor
+    if len(qerr) > 0
+      " if we have errors to show
+      call setqflist(qerr, 'r')
+      botright cwindow
+    else
+      " just close the cwindow
+      cclose
+    endif
+  endif
+endfunction"}}}
+
 let &cpo = s:cpo_save
 unlet s:cpo_save
 

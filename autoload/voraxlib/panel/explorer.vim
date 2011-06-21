@@ -52,6 +52,7 @@ function! voraxlib#panel#explorer#New()"{{{
     let s:explorer.path_separator = '"'
     let s:explorer['plugins'] = {}
     let s:explorer['plugins_configured'] = 0
+    let s:explorer['must_refresh'] = 0
     " Add additional methods to the s:profiles object.
     call s:ExtendExplorer()
     " Register plugins
@@ -84,7 +85,7 @@ function! s:ExtendExplorer()"{{{
   function! s:explorer.window.Configure()"{{{
     " set options
     setlocal foldcolumn=0
-    setlocal winfixwidth
+    "setlocal winfixwidth
     setlocal buftype=nofile
     setlocal nobuflisted
     setlocal nospell
@@ -138,8 +139,12 @@ function! s:ExtendExplorer()"{{{
 
   " Refresh the whole explorer.
   function! s:explorer.Refresh()"{{{
+    let self.window.Focus()
+    let state = winsaveview()
     let root = vorax#GetSqlplusHandler().GetConnectedTo()
     call self.SetRoot(root)
+    let self.must_refresh = 0
+    call winrestview(state)
   endfunction"}}}
 
   " Toggle the profiles window.
@@ -147,7 +152,10 @@ function! s:ExtendExplorer()"{{{
     if self.root == ''
       call self.Refresh()
     else
-    	call self.window.Toggle()
+      call self.window.Toggle()
+    	if self.must_refresh && self.window.IsOpen()
+        call self.Refresh()
+      endif
     endif
   endfunction"}}}
 

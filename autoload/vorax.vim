@@ -101,23 +101,44 @@ endfunction"}}}
 
 " Send the whole current buffer content to sqlplus for execution.
 function! vorax#CompileBuffer()
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#CompileBuffer()') | endif
   if &ft == 'plsql'
+    " get the content of the buffer
     let content = join(getline(0, line('$')), "\n")
     if substitute(content, '\_s', '', 'g') != ''
+      " only if it's not empty
       let sqlplus = vorax#GetSqlplusHandler()
       let content = voraxlib#utils#AddSqlDelimitator(content)
+      " execute the buffer content which, for a plsql buffer, it means a compilation
       let exec_file = sqlplus.Pack(substitute(content, '\_s*\_$', '', 'g'), {'include_eor' : 1}) 
       let output = sqlplus.Exec(exec_file, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
-            \ [{'option' : 'echo', 'value' : 'off'}, {'option' : 'feedback', 'value' : 'on'}])})
+            \ [
+            \ {'option' : 'echo', 'value' : 'off'}, 
+            \ {'option' : 'feedback', 'value' : 'on'},
+            \ {'option' : 'markup', 'value' : 'html off'},
+            \ ])})
+      " look for errors in ALL_ERRORS view
+      call voraxlib#utils#DisplayCompilationErrors(b:vorax_module['owner'], 
+                                                 \ b:vorax_module['object'], 
+                                                 \ b:vorax_module['type'])
       call vorax#GetOutputWindowHandler().AppendText(output)
+      " refresh db explorer
+      if g:vorax_explorer.window.IsOpen()
+        call g:vorax_explorer.Refresh()
+      else
+        let g:vorax_explorer.must_refresh = 1
+      endif
       " go back to the previous buffer
       wincmd p
     else
+      if s:log.isErrorEnabled() | call s:log.error('Empty buffer!') | endif
     	call voraxlib#utils#Warn('Nothing to compile. Empty buffer!')
     endif
   else
+    if s:log.isErrorEnabled() | call s:log.error('Not a PL/SQL buffer!') | endif
     call voraxlib#utils#Warn('Only PL/SQL buffers can be compiled.')
   endif
+  if s:log.isTraceEnabled() | call s:log.trace('END vorax#CompileBuffer()') | endif
 endfunction
 
 " Execute the statement under cursor form the current buffer.
@@ -191,7 +212,7 @@ endfunction"}}}
 function! vorax#LoadDbObject(schema, object_name, type)"{{{
   let file_name = voraxlib#utils#GetFileName(a:object_name, a:type)
   let bufnr = bufnr(file_name)
-  if bufnr == -1
+  if bufnr == -1 || join(getbufline(bufnr, 0, '$'), '') == ''
     " create a new buffer
   	let params = {'executing_msg' : 'Fetching source for ' . a:object_name . '...',
         \  'throbber' : vorax#GetDefaultThrobber(),
@@ -201,13 +222,17 @@ function! vorax#LoadDbObject(schema, object_name, type)"{{{
       " remove leading blanks from the first line
       let src[0] = substitute(src[0], '^\s*', '', 'g')
       call s:OpenDbBuffer(file_name, src)
+      let b:vorax_module = {'owner' : a:schema, 'type' : a:type, 'object' : a:object_name}
     else
       redraw
       call voraxlib#utils#Warn('Empty source for the requested database object.')
     endif
   else
-    " just focus that buffer
-    exe 'buffer ' . bufnr
+    if bufnr != -1
+      " just focus that buffer
+      silent call voraxlib#utils#FocusCandidateWindow()
+      exe 'buffer ' . bufnr
+    endif
   endif
 endfunction"}}}
 
@@ -397,8 +422,8 @@ endfunction"}}}
 
 " Open a buffer under the provided file_name and with the a:content array.
 function! s:OpenDbBuffer(file_name, content)"{{{
-  call voraxlib#utils#FocusCandidateWindow()
-  silent exe 'edit ' . a:file_name
+  silent! call voraxlib#utils#FocusCandidateWindow()
+  silent! exe 'edit ' . a:file_name
   " clear content if the file exists
   normal gg"_dG
   call append(0, a:content)

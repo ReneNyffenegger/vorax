@@ -62,7 +62,7 @@ function! s:ExtendWindow()"{{{
   function! s:output_window.Configure() dict"{{{
     setlocal hidden
     setlocal updatetime=50
-    setlocal winfixheight
+    "setlocal winfixheight
     setlocal noswapfile
     setlocal buftype=nofile
     setlocal nowrap
