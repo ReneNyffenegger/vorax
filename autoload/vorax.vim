@@ -121,6 +121,7 @@ function! vorax#CompileBuffer()"{{{
       call voraxlib#utils#DisplayCompilationErrors(b:vorax_module['owner'], 
                                                  \ b:vorax_module['object'], 
                                                  \ b:vorax_module['type'])
+      let crr_window = winnr()
       call vorax#GetOutputWindowHandler().AppendText(output)
       " refresh db explorer
       if g:vorax_explorer.window.IsOpen()
@@ -128,8 +129,8 @@ function! vorax#CompileBuffer()"{{{
       else
         let g:vorax_explorer.must_refresh = 1
       endif
-      " go back to the previous buffer
-      wincmd p
+      " go back to the originating buffer
+      exe crr_window . 'wincmd w'
     else
       if s:log.isErrorEnabled() | call s:log.error('Empty buffer!') | endif
     	call voraxlib#utils#Warn('Nothing to compile. Empty buffer!')

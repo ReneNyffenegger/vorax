@@ -1,0 +1,17 @@
+create or replace 
+package my_pkg as
+
+  procedure test;
+
+end;
+/
+create or replace
+package body my_pkg as
+
+  procedure test as
+  begin
+    null;
+  end;
+
+end;
+/
