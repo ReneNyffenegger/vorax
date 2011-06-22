@@ -14,7 +14,7 @@ set cpo&vim
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
 " the sqlplus object
-let s:sqlplus = {'ruby_key' : '', 'last_stmt' : '', 'html' : 0}
+let s:sqlplus = {'ruby_key' : '', 'last_stmt' : {}, 'html' : 0}
 
 " the current object count. it is incremented on each new sqlplus object
 " creation

@@ -166,12 +166,12 @@ TLet g:vorax_sqlplus_default_options = ['set linesize 10000',
 TLet g:vorax_sqlplus_pause_warning = 1
 
 "}}}
-" g:vorax_statement_highlight_group"{{{
+" g:vorax_keep_selection_after_exec"{{{
 
-" The highlight group to be used when the currently executing statement is
-" highlighted. If you want to disable this feature then set this global
-" variable on an empty string.
-TLet g:vorax_statement_highlight_group = 'TODO'
+" Whenever or not to keep the current visual selection after the statement was
+" executed. Does work only if the g:vorax_output_window_keep_focus_after_exec
+" is 0.
+TLet g:vorax_keep_selection_after_exec = 1
 
 "}}}
 " g:vorax_output_window_anchor"{{{
@@ -418,7 +418,7 @@ endif"}}}
 TLet g:vorax_profiles_window_menu_key = "<Tab>"
 "}}}
 " g:vorax_explorer_window_toggle_key"{{{
-TLet g:vorax_explorer_window_toggle_key = "<Leader>ex"
+TLet g:vorax_explorer_window_toggle_key = "<Leader>xo"
 if g:vorax_explorer_window_toggle_key != '' 
       \ && !hasmapto('<Plug>VoraxExplorerWindowToggle') 
       \ && !hasmapto(g:vorax_explorer_window_toggle_key, 'n')

@@ -32,7 +32,7 @@ function! vorax#Connect(cstr, bang)"{{{
   let outputwin = vorax#GetOutputWindowHandler()
   let explorer = vorax#GetExplorerHandler()
   " reset the last executed statement
-  let sqlplus.last_stmt = ''
+  let sqlplus.last_stmt = {}
   if sqlplus.GetPid() && a:bang == '!'
     " destroy the sqlplus process if any attached
     if s:log.isDebugEnabled() | call s:log.debug('Connect with bang. Destroy the old attached sqlplus process.') | endif
@@ -82,16 +82,16 @@ function! vorax#Exec(command)"{{{
   if s:ShouldGoOnWithPauseOn()
     if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
     " save the last command. this is require in order to be able to replay it.
-    let sqlplus.last_stmt = voraxlib#utils#AddSqlDelimitator(a:command)
+    let sqlplus.last_stmt = {'cmd' : voraxlib#utils#AddSqlDelimitator(a:command), 'from_buf' : bufnr('%')}
     if s:log.isDebugEnabled() | call s:log.debug('with delimitator added: '.string(sqlplus.last_stmt)) | endif
     if exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0
-      let sqlplus.last_stmt = voraxlib#utils#AddRownumFilter(sqlplus.last_stmt, g:vorax_limit_rows)
+      let sqlplus.last_stmt = voraxlib#utils#AddRownumFilter(sqlplus.last_stmt['cmd'], g:vorax_limit_rows)
       if s:log.isDebugEnabled() | call s:log.debug('limit rows enabled. statements coverted to: '.string(sqlplus.last_stmt)) | endif
     endif
     " exec the command in bg. All trailing CR/spaces are removed before exec.
     " This is important especially in connection with set echo on. With CRs
     " the sqlprompt will be echoed
-    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt, '\_s*\_$', '', 'g'), {'include_eor' : 1}), 0)
+    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\_$', '', 'g'), {'include_eor' : 1}), 0)
     call outputwin.StartMonitor()
   else
     if s:log.isDebugEnabled() | call s:log.debug('User decided to cancel the exec because of the pause on.') | endif
@@ -146,17 +146,8 @@ function! vorax#ExecCurrent()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#ExecCurrent()') | endif
   if voraxlib#utils#IsSqlOracleBuffer()
     try
-      let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
-      let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
-      if s:log.isDebugEnabled() | call s:log.debug('[start_l, start_c, end_l, end_c] = [' . start_l . ', ' . start_c . ', ' . end_l . ', ' . end_c . ']') | endif
-      if voraxlib#utils#IsHighlightEnabled()
-        " highlight the statement under cursor
-        call voraxlib#utils#HighlightRange(g:vorax_statement_highlight_group, 
-              \ start_l, start_c, end_l, end_c)
-      endif
-      let statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
-      let statement = voraxlib#utils#TrimSqlComments(statement)
-      call vorax#Exec(statement)
+      call voraxlib#utils#SelectCurrentStatement()
+      call vorax#ExecSelection()
     catch /^A sql syntax must be enabled for the current buffer.$/
       call voraxlib#utils#Warn("Cannot detect the current statement if syntax is not enabled!")
       if s:log.isErrorEnabled() | call s:log.error('Syntax is not enabled! Cannot detect the current statement.') | endif
@@ -171,11 +162,6 @@ endfunction"}}}
 " Execute the currently selected block in the current buffer.
 function! vorax#ExecSelection()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#ExecSelection()') | endif
-  if voraxlib#utils#IsHighlightEnabled()
-    " highlight the statement under cursor
-    call voraxlib#utils#HighlightRange(g:vorax_statement_highlight_group, 
-          \ getpos("'<")[1], virtcol("'<"), getpos("'>")[1], virtcol("'>"))
-  endif
   call vorax#Exec(voraxlib#utils#SelectedBlock())
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#ExecSelection') | endif
 endfunction"}}}

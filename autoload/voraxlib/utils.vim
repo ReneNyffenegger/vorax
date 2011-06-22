@@ -10,6 +10,9 @@ let g:_loaded_voraxlib_utils = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
+" Initialize logger
+let s:log = voraxlib#logger#New(expand('<sfile>:t'))
+
 " How statements are sepparated
 let s:sql_delimitator_pattern = ';\|^\s*\/\s*$'
 let s:plsql_end_marker = '\v\_s+end\_s*"?[^"]*"?\_s*;\_s*\_$'
@@ -112,13 +115,43 @@ function! voraxlib#utils#PickOption(prompt, choices)"{{{
 endfunction"}}}
 
 " Get the currently selected block.
-function! voraxlib#utils#SelectedBlock() range"{{{
-    let save = @"
-    silent normal gvy
-    let vis_cmd = @"
-    let @" = save
-    return vis_cmd
+function! voraxlib#utils#SelectedBlock() "{{{
+  let reg_ = [@", getregtype('"')]
+  let regA = [@a, getregtype('a')]
+  if mode() =~# "[vV\<C-v>]"
+    silent normal! "aygv
+  else
+    let pos = getpos('.')
+    silent normal! gv"ay
+    call setpos('.', pos)
+  endif
+  let text = @a
+  call setreg('"', reg_[0], reg_[1])
+  call setreg('a', regA[0], regA[1])
+  return text
 endfunction "}}}
+
+" Visual select the provided range.
+function! voraxlib#utils#SelectRange(start_l, start_c, end_l, end_c)
+  let tail = a:end_c - a:start_c
+  let lines = a:end_l - a:start_l
+  if mode() !=# 'n'
+    exec "normal \<Esc>"
+  endif
+  exec 'normal' a:start_l.'gg'.a:start_c.'|'.
+        \ 'v'.(lines > 0 ? lines . 'j' : '').
+        \ (tail > 0 ? tail . 'l' : '')
+endfunction
+
+" Visual select the current statement
+function! voraxlib#utils#SelectCurrentStatement()
+  let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
+  let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
+  let tail = end_c - start_c
+  let lines = end_l - start_l
+  if s:log.isDebugEnabled() | call s:log.debug('[start_l, start_c, end_l, end_c] = [' . start_l . ', ' . start_c . ', ' . end_l . ', ' . end_c . ']') | endif
+  call voraxlib#utils#SelectRange(start_l, start_c, end_l, end_c)
+endfunction
 
 " Get the text within the provided range from the current buffer.
 function! voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)"{{{
@@ -281,12 +314,6 @@ function! voraxlib#utils#IsSqlOracleBuffer()"{{{
   " If g:sql_type_default is not initialized then assume Oracle.
   return (exists('g:sql_type_default') && g:sql_type_default == 'sqloracle' && &ft == 'sql' )
       \ || (!exists('g:sql_type_default'))
-endfunction"}}}
-
-" whenever or not the executing statement should be highlighted.
-function! voraxlib#utils#IsHighlightEnabled()"{{{
-  return exists('g:vorax_statement_highlight_group') 
-        \ && g:vorax_statement_highlight_group != ''
 endfunction"}}}
 
 " returns the a range of lines from the provide a:text starting from the

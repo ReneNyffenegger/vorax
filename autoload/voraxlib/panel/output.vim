@@ -153,14 +153,7 @@ function! s:ExtendWindow()"{{{
   " Start the monitor for the output window.
   function! s:output_window.StartMonitor()"{{{
     call s:ResetWork()
-    if g:vorax_output_window_keep_focus_after_exec
-      " register an autocommand to the originating buffer. This has to be done
-      " now because after stopping the monitor the originating window will not
-      " be focused
-      call s:RegisterClearHighlight()
-    else
-      let s:originating_window = winnr()
-    endif
+    let s:originating_window = winnr()
     call self.Focus()
     au VoraX CursorHold <buffer> call s:FetchResults()
     call s:SetupInteractivity()
@@ -183,8 +176,10 @@ function! s:ExtendWindow()"{{{
     if !g:vorax_output_window_keep_focus_after_exec
       " restore focus to the originating window
       exe s:originating_window.'wincmd w'
-      " register the clear highlight action.
-      call s:RegisterClearHighlight()
+      let sqlplus = vorax#GetSqlplusHandler()
+      if g:vorax_keep_selection_after_exec
+        normal gv
+      endif
     endif
     let &showcmd = s:old_showcmd
   endfunction"}}}
@@ -426,45 +421,6 @@ function! s:ProcessUserInput()"{{{
     call s:output_window.AppendText(val . "\n")
   endif
   call vorax#GetSqlplusHandler().SendText(val . "\n")
-endfunction"}}}
-
-" Registers an autocommand for the current buffer to clear any highlighting
-" when the cursor moves. This is done only if it's an oracle sql buffer and a
-" highlight group was setup.
-function! s:RegisterClearHighlight()"{{{
-  if voraxlib#utils#IsSqlOracleBuffer() &&
-        \ voraxlib#utils#IsHighlightEnabled()
-    " store the current cursor position
-    let [s:crr_l, s:crr_c] = [line('.'), col('.')]
-    if s:log.isDebugEnabled() | call s:log.debug('s:RegisterClearHighlight(): [s:crr_l, s:crr_c]=' .string([s:crr_l, s:crr_c])) | endif
-    au VoraX CursorMoved <buffer> call s:ClearHighlightOnMove()
-    au VoraX CursorMovedI <buffer> call s:ClearHighlightOnMove()
-    au VoraX BufLeave <buffer> call s:ClearHighlightOnLeave()
-  endif
-endfunction"}}}
-
-" This function is internally called from an autocommand in order to clear the
-" highlighting of the current executed SQL statement.
-function! s:ClearHighlightOnMove()"{{{
-  if (exists('s:crr_l') && exists('s:crr_c')) && 
-        \ (line('.') != s:crr_l || col('.') != s:crr_c) 
-    " only if the cursor was really moved. This event is quite impredictible
-    " and may be triggered by other plugins.
-    match none
-    au! VoraX CursorMoved <buffer>
-    au! VoraX CursorMovedI <buffer>
-    if exists('s:crr_l') | unlet s:crr_l | endif
-    if exists('s:crr_c') | unlet s:crr_c | endif
-  endif
-endfunction"}}}
-
-" This function is internally called from an autocommand in order to clear the
-" highlighting of the current executed SQL statement.
-function! s:ClearHighlightOnLeave()"{{{
-  match none
-  au! VoraX BufLeave  <buffer>
-  if exists('s:crr_l') | unlet s:crr_l | endif
-  if exists('s:crr_c') | unlet s:crr_c | endif
 endfunction"}}}
 
 " Aborts the execution of the current statement.
