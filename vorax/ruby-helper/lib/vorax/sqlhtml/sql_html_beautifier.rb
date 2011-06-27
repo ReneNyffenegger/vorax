@@ -20,7 +20,7 @@ module Vorax
     end
 
     def beautify(html)
-      body = Nokogiri::HTML(html, nil, 'utf-8').xpath('/html/body')
+      body = Nokogiri::HTML(html.gsub(/&amp;/, '&amp;amp;'), nil, 'utf-8').xpath('/html/body')
       return walk(body)
     end
 

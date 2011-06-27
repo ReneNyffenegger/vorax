@@ -11,7 +11,7 @@ module Vorax
       # search for errors
       body.children.each do |child|
         if child.name == 'text'
-          value = CGI.unescapeHTML(child.text.mb_chars.gsub(/(\A\r?\n)|(\r?\n\Z)/, '').to_s)
+          value = child.text.mb_chars.gsub(/(\A\r?\n)|(\r?\n\Z)/, '').to_s
           if value =~ /^(ORA|SP[0-9]?|PLS)-[0-9]+/
             errors << value
           end
@@ -19,11 +19,11 @@ module Vorax
       end
       table = body.xpath('table[1]')
       if table
-        table.xpath("tr[1]/th").each { |col| columns << CGI.unescapeHTML(col.text).strip }
+        table.xpath("tr[1]/th").each { |col| columns << col.text.strip }
         idx = 0
         table.xpath('tr/*').each do |tr|
           if tr.name == 'td'
-            value = CGI.unescapeHTML(tr.text.mb_chars.gsub(/(\A\r?\n)|(\r?\n\Z)/, '').to_s)
+            value = tr.text.mb_chars.gsub(/(\A\r?\n)|(\r?\n\Z)/, '').to_s
             record[columns[idx]] = value
             idx += 1
             if idx == columns.count
