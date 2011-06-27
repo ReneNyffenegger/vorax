@@ -106,8 +106,24 @@ function! vorax#CompileBuffer()"{{{
     " get the content of the buffer
     let content = join(getline(0, line('$')), "\n")
     if substitute(content, '\_s', '', 'g') != ''
+      let crr_win = winnr()
       " only if it's not empty
       let sqlplus = vorax#GetSqlplusHandler()
+      if b:vorax_module['type'] !~? '\(BODY\)\|\(SPEC\)'
+        " get the status of the object but only if it's not a SPEC or BODY object. We'll use this
+        " information to decide later if we have to refresh the dbexplorer or
+        " not
+        let result = sqlplus.Query("select status from all_objects where owner='" . 
+              \ b:vorax_module['owner'] . "' and object_name='" . b:vorax_module['object'] . "' " .
+              \ "and object_type='" . b:vorax_module['type'] . "';")
+        if empty(result.errors)
+          if result.resultset[0]['STATUS'] =~? 'INVALID'
+          	let initial_valid = 0
+          else
+          	let initial_valid = 1
+          endif
+        endif
+      endif
       let content = voraxlib#utils#AddSqlDelimitator(content)
       " execute the buffer content which, for a plsql buffer, it means a compilation
       let exec_file = sqlplus.Pack(substitute(content, '\_s*\_$', '', 'g'), {'include_eor' : 1}) 
@@ -118,18 +134,31 @@ function! vorax#CompileBuffer()"{{{
             \ {'option' : 'markup', 'value' : 'html off'},
             \ ])})
       " look for errors in ALL_ERRORS view
-      call voraxlib#utils#DisplayCompilationErrors(b:vorax_module['owner'], 
+      let qerr = voraxlib#utils#GetQuickFixCompilationErrors(b:vorax_module['owner'], 
                                                  \ b:vorax_module['object'], 
                                                  \ b:vorax_module['type'])
+      let after_valid = 1
+      if len(qerr) > 0
+        " if we have errors to show
+        call setqflist(qerr, 'r')
+        botright cwindow
+        let after_valid = 0
+      else
+        " just close the cwindow
+        cclose
+      endif
       call vorax#GetOutputWindowHandler().AppendText(output)
       " refresh db explorer
-      if g:vorax_explorer.window.IsOpen()
-        call g:vorax_explorer.Refresh()
-      else
-        let g:vorax_explorer.must_refresh = 1
+      if exists('initial_valid') &&
+            \ initial_valid != after_valid
+        if g:vorax_explorer.window.IsOpen()
+          call g:vorax_explorer.Refresh()
+        else
+          let g:vorax_explorer.must_refresh = 1
+        endif
       endif
       " go back to the previous buffer
-      wincmd p
+      exe crr_win . 'wincmd w'
     else
       if s:log.isErrorEnabled() | call s:log.error('Empty buffer!') | endif
     	call voraxlib#utils#Warn('Nothing to compile. Empty buffer!')

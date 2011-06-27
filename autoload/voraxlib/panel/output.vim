@@ -75,6 +75,7 @@ function! s:ExtendWindow()"{{{
     setlocal nolist
     setlocal foldcolumn=0 nofoldenable
     setlocal noreadonly
+    setlocal nobuflisted
     exe 'setlocal statusline=' . g:vorax_output_window_statusline
 
     " define mappings

@@ -544,8 +544,8 @@ function! voraxlib#utils#GetStartLineOfPlsqlObject(type)"{{{
   return l
 endfunction"}}}
 
-" Fill the quick fix window with all errors from the ALL_VIEW.
-function! voraxlib#utils#DisplayCompilationErrors(owner, object, type)"{{{
+" Get all errors from the ALL_VIEW to be filled in the quick fix window.
+function! voraxlib#utils#GetQuickFixCompilationErrors(owner, object, type)"{{{
   if a:type == 'PACKAGE' || a:type == 'TYPE'
     let offset_spec = voraxlib#utils#GetStartLineOfPlsqlObject(a:type . '_SPEC')
     let offset_body = voraxlib#utils#GetStartLineOfPlsqlObject(a:type . '_BODY')
@@ -577,15 +577,9 @@ function! voraxlib#utils#DisplayCompilationErrors(owner, object, type)"{{{
       let qerr += [{'bufnr' : bufnr('%'), 'lnum' : str2nr(record['LINE']), 
             \ 'col' : str2nr(record['POSITION']), 'text' : record['TEXT']}]
     endfor
-    if len(qerr) > 0
-      " if we have errors to show
-      call setqflist(qerr, 'r')
-      botright cwindow
-    else
-      " just close the cwindow
-      cclose
-    endif
+    return qerr
   endif
+  return []
 endfunction"}}}
 
 let &cpo = s:cpo_save
