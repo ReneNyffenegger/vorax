@@ -137,6 +137,7 @@ function! vorax#CompileBuffer()"{{{
       let qerr = voraxlib#utils#GetQuickFixCompilationErrors(b:vorax_module['owner'], 
                                                  \ b:vorax_module['object'], 
                                                  \ b:vorax_module['type'])
+<<<<<<< HEAD
       let after_valid = 1
       if len(qerr) > 0
         " if we have errors to show
@@ -147,6 +148,9 @@ function! vorax#CompileBuffer()"{{{
         " just close the cwindow
         cclose
       endif
+=======
+      let crr_window = winnr()
+>>>>>>> 6ec2f8d5c56eb3bb23d31f63d1c2876cedba3f0c
       call vorax#GetOutputWindowHandler().AppendText(output)
       " refresh db explorer
       if exists('initial_valid') &&
@@ -157,8 +161,13 @@ function! vorax#CompileBuffer()"{{{
           let g:vorax_explorer.must_refresh = 1
         endif
       endif
+<<<<<<< HEAD
       " go back to the previous buffer
       exe crr_win . 'wincmd w'
+=======
+      " go back to the originating buffer
+      exe crr_window . 'wincmd w'
+>>>>>>> 6ec2f8d5c56eb3bb23d31f63d1c2876cedba3f0c
     else
       if s:log.isErrorEnabled() | call s:log.error('Empty buffer!') | endif
     	call voraxlib#utils#Warn('Nothing to compile. Empty buffer!')
