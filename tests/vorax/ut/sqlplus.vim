@@ -8,7 +8,7 @@ function! TestVoraxSqlplusLifeCycle()
   " the banner
   call VUAssertTrue(sqlplus.GetBanner() =~ 'SQL\*Plus', 'Test banner')
   " test run dir
-  call VUAssertTrue(sqlplus.GetRunDir() != '', 'Test rundir')
+  call VUAssertTrue(sqlplus.GetTempDir() != '', 'Test rundir')
   " destroy the process at the end
   call sqlplus.Destroy()
   " is this pid still there?
@@ -93,9 +93,9 @@ endfunction
 function! TestVoraxSqlplusPack()
   let sqlplus = voraxlib#sqlplus#New()
   " pack as an array of commands
-  call VUAssertTrue(sqlplus.Pack(['set linesize 1000', 'select * from cat;'], {'target_file' : 'my_pack_file.sql'}) == '@my_pack_file.sql', 'Test pack 1')
+  call VUAssertTrue(sqlplus.Pack(['set linesize 1000', 'select * from cat;'], {'target_file' : 'my_pack_file.sql'}) == '@' . sqlplus.GetTempDir(). '/my_pack_file.sql', 'Test pack 1')
   " pack as CR delimited list of commands
-  call VUAssertTrue(sqlplus.Pack("set linesize 1000\nselect * from cat;", {'target_file': 'my_pack_file.sql'}) == '@my_pack_file.sql', 'Test pack 2')
+  call VUAssertTrue(sqlplus.Pack("set linesize 1000\nselect * from cat;", {'target_file': 'my_pack_file.sql'}) == '@'.sqlplus.GetTempDir().'/my_pack_file.sql', 'Test pack 2')
   call sqlplus.Destroy()
 endfunction
 

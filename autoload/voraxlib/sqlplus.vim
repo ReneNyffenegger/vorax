@@ -31,17 +31,21 @@ function! voraxlib#sqlplus#New() " {{{
   " from the $sqlplus_factory
   let sqlplus.ruby_key = s:oc
   let s:oc += 1
-  " define sqlplus run directory. Every new sqlplus instance gets a new temp
+  " define sqlplus tmp directory. Every new sqlplus instance gets a new temp
   " dir.
-  let run_dir = substitute(fnamemodify(tempname(), ':p:h:8'), '\\', '/', 'g')
+  let tmp_dir = substitute(fnamemodify(tempname(), ':p:h:8'), '\\', '/', 'g')
   " create the sqlplus process and put it into the oracle factory under the
   " ruby_key
   if has('unix')
     " unix interface
-    ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::UnixProcess.new, VIM::evaluate('insert(copy(g:vorax_sqlplus_default_options), "host stty -echo", 0)'), VIM::evaluate('run_dir'))
+    ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::UnixProcess.new, VIM::evaluate('insert(copy(g:vorax_sqlplus_default_options), "host stty -echo", 0)'), VIM::evaluate('tmp_dir'))
   elseif has('win32') || has('win64')
     " windows interface
-    ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::WindowsProcess.new, VIM::evaluate('g:vorax_sqlplus_default_options'), VIM::evaluate('run_dir'))
+    ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::WindowsProcess.new, VIM::evaluate('g:vorax_sqlplus_default_options'), VIM::evaluate('tmp_dir'))
+  endif
+  if g:vorax_session_owner_monitor == 1
+    " show a warn message if a login.sql file is found in the current dir
+    ruby VIM::command('call voraxlib#utils#Warn("A login.sql file was found in the current directory.\nExpect problems if g:vorax_session_owner_monitor is 1 (on_login).\nPress any key to continue.") | call getchar()') if $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')].local_login_warning
   endif
   return sqlplus
 endfunction " }}}
@@ -119,10 +123,10 @@ EORC
   endif
 endfunction "}}}
 
-" Get the sqlplus run directory (the directory from where the sqlplus was
-" launched).
-function! s:sqlplus.GetRunDir() dict "{{{
-  ruby VIM::command(%!return '#{$sqlplus_factory[VIM::evaluate("self.ruby_key")].run_dir}'!)
+" Get the sqlplus temp directory (the directory from where the sqlplus puts
+" various temp files).
+function! s:sqlplus.GetTempDir() dict "{{{
+  ruby VIM::command(%!return '#{$sqlplus_factory[VIM::evaluate("self.ruby_key")].tmp_dir}'!)
 endfunction "}}}
 
 " Send text to the sqlplus process. May be used for interactive stuff (e.g.
@@ -236,12 +240,12 @@ endfunction"}}}
 " Return a set of sqlplus options which guarantee that the statement is
 " executed as expected without interfearing with the user options like
 " autotrace or pause.
-function! s:sqlplus.GetSafeOptions()
+function! s:sqlplus.GetSafeOptions()"{{{
   return [{'option' : 'pause', 'value' : 'off'},
         \ {'option' : 'termout', 'value' : 'on'},
         \ {'option' : 'autotrace', 'value' : 'off'},
         \ {'option' : 'verify', 'value' : 'off'},]
-endfunction
+endfunction"}}}
 
 " Asynchronously exec the provided command without waiting for the output. The
 " result may be read in chunks afterwards using Read() calls. The optional
@@ -301,7 +305,7 @@ endfunction"}}}
 
 " Pack several SQL commands provided through the a:commands array. The
 " optional parameter is a dictionary with the following structure:
-" {'target_file' : '<filename relative to the sqlplus run_dir>',
+" {'target_file' : '<filename relative to the sqlplus tmp_dir>',
 "  'include_eor' : '0|1 whenever or not to include the END_OF_REQUEST marker}
 " Packing before executing is recommended especially in
 " case of sending a lot of statements to be executed (e.g. packages,

@@ -6,29 +6,44 @@ module Vorax
     attr_reader :connected_to,          # user@db session
                 :startup_msg,           # sqlplus initialization message (banner)
                 :session_owner_monitor, # monitoring mode
-                :run_dir                # the sqlplus run directory
+                :tmp_dir,               # the sqlplus tmp directory
+                :local_login_warning    # whenever or not the current directory already have a login.sql file
 
     attr_reader :read_buffer_size     # the default read chunk size
 
     # Create a new sqlplus abstraction. The initializer expects
     # a GenericProcess compliant object, specific to the current
     # OS platform. The bootstrap_commands are statements to be
-    # executed at the sqlplus initialization time. The run_dir parameter specifies
-    # the directory under which the sqlplus process should be started. This doesn't
+    # executed at the sqlplus initialization time. The tmp_dir parameter specifies
+    # the directory under which the sqlplus process should create temp files. This doesn't
     # change the current directory.
     # If debug is true than the output of the sqlplus is also redirected to
     # the sqlplus.log file. The "tee" utility must be available.
     # The sqlplus_params allows to specify sqlplus additional
     # parameters (e.g. -S for silence).
-    def initialize(process, bootstrap_commands = [], run_dir = Dir.tmpdir, debug = false, sqlplus_params = "")
-      @run_dir = run_dir
+    def initialize(process, bootstrap_commands = [], tmp_dir = Dir.tmpdir, debug = false, sqlplus_params = "")
+      @tmp_dir = tmp_dir
       if process
-        crr_dir = Dir.pwd
         begin
-          Dir.chdir(@run_dir)
           @read_buffer_size = [32767, END_OF_REQUEST.bytesize].max
           @process = process
-          @process.create("sqlplus #{sqlplus_params} /nolog #{pack(bootstrap_commands, 'bootstrap.sql', true)}" + 
+          # env path separator
+          separator = ':'
+          if RUBY_PLATFORM.downcase.include?("mswin") ||
+              RUBY_PLATFORM.downcase.include?("mingw")
+            # on windows is ';'
+            separator = ';' 
+          end
+          if File.exists?('login.sql')
+            @local_login_warning = true
+          else
+            # put the tmp_dir first on SQLPATH so that, the vorax generated login.sql to be found first in case the
+            # session_owner_monitor is set to :on_login. This has to be set here in order the sqlplus process to inherit
+            # this setting.
+            ENV['SQLPATH'] = "#{tmp_dir}#{separator}#{ENV['SQLPATH']}"
+            @local_login_warning = false
+          end
+          @process.create("sqlplus #{sqlplus_params} /nolog #{pack(bootstrap_commands, '_vorax_bootstrap.sql', true)}" + 
                           (debug ? " | tee sqlplus.log" : ""))
           # contain the current connected user@db, but
           # only if connection monitor is activated
@@ -50,8 +65,6 @@ module Vorax
           while buf = self.read()
             @startup_msg << buf
           end
-        ensure
-          Dir.chdir(crr_dir)
         end
       else
         raise 'A process implementation must be provided'
@@ -130,7 +143,7 @@ module Vorax
       return if @session_owner_monitor == mode # forget it if no state change
       @session_owner_monitor = mode
       if @session_owner_monitor == :on_login
-        @conn_changed_file = "connection_changed.#{pid}"
+        @conn_changed_file = "_vorax_connection_changed.#{pid}"
         login_file_content = ''
         # is the SQLPATH variable initialized?
         if sqlpath = ENV['SQLPATH']
@@ -143,11 +156,11 @@ module Vorax
             end
           end
         end
-        login_file_content << "host echo  > #@run_dir/#@conn_changed_file" 
-        File.open("#@run_dir/login.sql", 'w') { |f| f.puts(login_file_content) }
+        login_file_content << "host echo  > #@tmp_dir/#@conn_changed_file" 
+        File.open("#@tmp_dir/login.sql", 'w') { |f| f.puts(login_file_content) }
       elsif @session_owner_monitor == :never || @session_owner_monitor == :always
         @connected_to = '@' if @session_owner_monitor == :never
-        File.delete("#@run_dir/login.sql") if File.exists?("#@run_dir/login.sql")
+        File.delete("#@tmp_dir/login.sql") if File.exists?("#@tmp_dir/login.sql")
       end
     end
 
@@ -189,7 +202,7 @@ module Vorax
             # get the currently connected user@db
             if gather_session_owner?
               @connected_to = session_owner
-              File.delete("#@run_dir/#@conn_changed_file") if @session_owner_monitor == :on_login
+              File.delete("#@tmp_dir/#@conn_changed_file") if @session_owner_monitor == :on_login
             end
           else
             # be prepared for breaks within the END_OF_REQUEST marker
@@ -211,7 +224,7 @@ module Vorax
     # attributes (e.g. echo, verify, define etc.)
     def config_for(*settings)
       # store the actual configuration
-      settings_file = "#@run_dir/sqlplus_settings.#{pid}"
+      settings_file = "#@tmp_dir/_vorax_sqlplus_settings.#{pid}"
       exec("store set #{settings_file} replace")
       # compute regexp pattern
       patterns = []
@@ -284,8 +297,8 @@ module Vorax
       file_content = cmds.join("\n")
       file_content << "\nprompt #{END_OF_REQUEST}\n" if include_eor
       filename = DEFAULT_PACK_FILE if filename.nil?
-      File.open("#@run_dir/#{filename}", 'w') {|f| f.write(file_content) }
-      "@#{filename}"
+      File.open("#@tmp_dir/#{filename}", 'w') {|f| f.write(file_content) }
+      "@#@tmp_dir/#{filename}"
     end
 
     # Get the user@db for the current sqlplus session.
@@ -361,8 +374,9 @@ module Vorax
     def gather_session_owner?
       (@session_owner_monitor == :always) || 
         (@session_owner_monitor == :on_login && 
-         File.exists?("#@run_dir/#@conn_changed_file"))
+         File.exists?("#@tmp_dir/#@conn_changed_file"))
     end
+
 
   end
 end

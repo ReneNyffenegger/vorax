@@ -725,7 +725,6 @@ function! voraxlib#utils#ResolveDbObject(object)
                             \  {'option' : 'markup', 'value' : 'html off'},
                             \ ])})
   let result = substitute(result, '\%(\_s\|[\r]\)*$', '', 'g')
-  echom result
   let info = {}
   if len(result) > 0
     " we have results
