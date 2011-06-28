@@ -87,7 +87,7 @@ function! s:ExtendWindow()"{{{
   " Write the provided text at the end of the output window. If 
   " multiple lines has to be appended then provide the
   " a:text parameter as an array.
-  function! s:output_window.AppendText(text) dict"{{{
+  function! s:output_window.AppendText(text) "{{{
     if !self.HasFocus()
       " focus the window if not active
       call self.Focus()
@@ -174,6 +174,7 @@ function! s:ExtendWindow()"{{{
     au VoraX CursorHold <buffer> call s:FetchResults()
     autocmd! VoraX CursorHold <buffer>
     call s:RemoveInteractivity()
+    call self.EnsureEmptyLineAtTheEnd()
     if !g:vorax_output_window_keep_focus_after_exec
       " restore focus to the originating window
       exe s:originating_window.'wincmd w'
@@ -225,7 +226,16 @@ EORC
       VIM::command("voraxlib#utils#Warn('The spool file could not be closed.')")
     end
 EORC
-    let s:output_window.spooling=0
+    let self.spooling=0
+  endfunction"}}}
+  
+  " Add an empty line at the end of the output window if the last line is not
+  " empty.
+  function! s:output_window.EnsureEmptyLineAtTheEnd()"{{{
+    " ensure an empty line between execs
+    if get(getbufline(self.name, '$'), 0, '') !~ '^\s*$'
+      call self.AppendText("\n")
+    endif
   endfunction"}}}
 
 endfunction"}}}

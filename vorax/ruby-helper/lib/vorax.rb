@@ -5,6 +5,7 @@ $KCODE = 'u'
 require 'rubygems'
 require 'active_support/multibyte'
 require 'nokogiri'
+require 'cgi'
 
 # Unicode proxy
 class String

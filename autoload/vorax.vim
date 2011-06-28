@@ -49,14 +49,27 @@ function! vorax#Connect(cstr, bang)"{{{
             \ {'executing_msg' : 'Connecting...' , 
             \  'throbber' : vorax#GetDefaultThrobber(),
             \  'done_msg' : 'Done.',
-            \  'sqlplus_options' : [{'option' : 'sqlprompt', 'value' : "''"}]})
+            \  'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+                                      \ [
+                                      \ {'option' : 'echo', 'value' : 'off'}, 
+                                      \ {'option' : 'feedback', 'value' : 'on'},
+                                      \ {'option' : 'sqlprompt', 'value' : "''"},
+                                      \ {'option' : 'markup', 'value' : 'html off'},
+                                      \ ]) 
+            \ })
       if sqlplus.GetPid()
         " only if sqlplus process is still alive
         call outputwin.AppendText(sqlplus.GetBanner() . "\n\n")
         if !voraxlib#utils#HasErrors(output)
           call outputwin.AppendText(sqlplus.Exec("prompt &_O_VERSION", 
-                \ {'sqlplus_options' : [{'option' : 'define', 'value' : '"&"'}, 
-                                      \ {'option' : 'sqlprompt', 'value' : "''"}]}))
+            \  {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+                                      \ [
+                                      \ {'option' : 'echo', 'value' : 'off'}, 
+                                      \ {'option' : 'feedback', 'value' : 'on'},
+                                      \ {'option' : 'sqlprompt', 'value' : "''"},
+                                      \ {'option' : 'markup', 'value' : 'html off'},
+                                      \ {'option' : 'define', 'value' : '"&"'}, 
+                                      \ {'option' : 'sqlprompt', 'value' : "''"}])}))
         endif
         call outputwin.AppendText("\n" . output)
       endif
@@ -98,6 +111,35 @@ function! vorax#Exec(command)"{{{
   endif
   if s:log.isTraceEnabled() | call s:log.trace('END vorax#Exec') | endif
 endfunction"}}}
+
+" Describe the provided identifier
+function! vorax#Describe(identifier, verbose)
+  let identifier = a:identifier
+  if identifier == ''
+    " if the identifier is empty assume the one under cursor
+    let identifier = voraxlib#utils#GetIdentifierUnderCursor()
+  endif
+  let object_data = voraxlib#utils#ResolveDbObject(identifier)
+  if exists('object_data.type') && 
+        \ object_data.type =~ '^\(TABLE\)\|\(VIEW\)\|\(PACKAGE\)\|\(TYPE\)\|\(FUNCTION\)\|\(PROCEDURE\)$'
+    if a:verbose
+    else
+      " simple desc
+      let object = object_data.schema . '.' . object_data.object . (object_data.dblink != '' ? '@' .object_data.dblink : '')
+      let sqlplus = vorax#GetSqlplusHandler()
+      let outputwin = vorax#GetOutputWindowHandler()
+      let output = sqlplus.Exec("desc " . object, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+              \ [
+              \ {'option' : 'echo', 'value' : 'off'}, 
+              \ {'option' : 'feedback', 'value' : 'on'},
+              \ {'option' : 'sqlprompt', 'value' : "''"},
+              \ {'option' : 'linesize', 'value' : '120'},
+              \ {'option' : 'markup', 'value' : 'html off'},
+              \ ])})
+      call outputwin.AppendText(output)
+    endif
+  endif
+endfunction
 
 " Send the whole current buffer content to sqlplus for execution.
 function! vorax#CompileBuffer()"{{{

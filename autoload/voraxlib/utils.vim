@@ -582,6 +582,181 @@ function! voraxlib#utils#GetQuickFixCompilationErrors(owner, object, type)"{{{
   return []
 endfunction"}}}
 
+" Given a line of text, a pattern and a position (0 based) it retruns the
+" [start_pos, end_pos] spanning the provided pattern or [-1, -1] otherwise.
+function! voraxlib#utils#PatternRange(line, pattern, start_position)
+  let start = match(a:line, a:pattern, a:start_position)
+  let end = matchend(a:line, a:pattern, a:start_position) - 1
+  return [start, end]
+endfunction
+
+" Return the column where the provided pattern is found but only on the
+" current line. The flags are the same as in the search() function. If the
+" pattern is not found 0 is returned.
+function! voraxlib#utils#SearchLine(pattern, flags)
+  let line_no = line('.')
+  let [l, c] = searchpos(a:pattern, a:flags)
+  if l != line_no
+  	return 0
+  else
+  	return c
+  endif
+endfunction
+
+" Get the identifier under cursor.
+function! voraxlib#utils#GetIdentifierUnderCursor()
+  let line = getline('.')
+  let line_no = line('.')
+  let col = getpos('.')[2]
+  let quoted_string_pattern = '"[^"]\+"' 
+  let simple_name = '[A-Z0-9_#$]\+'
+  let identifier = '\%(\%(' . quoted_string_pattern . '\)\|\%(' . simple_name . '\)\)'
+  let db_link = '\%(@' . simple_name . '\)\?'
+  
+  " search for something like: identifier.identifier.identifier or
+  " identifier.identifier or identifier
+  for i in range(3, 1, -1)
+    let pattern = '\c' . join(repeat([identifier], i) , '\.') . db_link
+    let start_col = voraxlib#utils#SearchLine(pattern, 'bcnW')
+    if start_col > 0
+      " great! there is such a pattern on the current line.
+      " is it under cursor?
+      let [start, end] = voraxlib#utils#PatternRange(line, pattern, start_col - 1)
+      if col - 1 >= start && col - 1 <= end
+        " the cursor is under this identifier
+        return strpart(line, start, end - start + 1)
+      endif
+    endif
+  endfor
+  
+endfunction
+
+" Given a composed identifier it returns a dictionary with the following structure:
+" {'part1' : '', 'part2' : '', 'part3' : '', 'dblink' : ''}
+function! voraxlib#utils#SplitIdentifier(identifier)
+  let result = {'part1' : '', 'part2' : '', 'part3' : '', 'dblink' : ''}
+  " split the identifier using '@' as separator
+  let split_first = split(a:identifier, '\(@\)\(\%([^"]\|"[^"]*"\)*$\)\@=')
+  let leading_parts = get(split_first, 0, '')
+  let parts = split(leading_parts, '\(\.\)\(\%([^"]\|"[^"]*"\)*$\)\@=')
+  let result.dblink = toupper(get(split_first, 1, ''))
+  for i in range(1, 3)
+    let var = 'part' . i
+    let {var} = get(parts, i-1, '')
+    if {var}[0] == '"'
+    	let {var} = substitute({var}, '"', '', 'g')
+    else
+    	let {var} = toupper({var})
+    end
+  endfor
+  let [result.part1, result.part2, result.part3] = [part1, part2, part3]
+  return result
+endfunction
+
+" This function is used to resolve a object name within the database
+" context. It returnes a dictionary with the following keys:
+"   'schema' => the schema of the object
+"   'object' => the actual object
+"   'dblink' => the name of the dblink if any
+"   'type'   => the type of the object:
+"                 2  = tables
+"                 4  = views
+"                 5  = synonym
+"                 7  = procedure
+"                 8  = function
+"                 9  = packages
+"                 13 = types
+function! voraxlib#utils#ResolveDbObject(object)
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#utils#ResolveDbObject(' . string(a:object) . ')') | endif
+  let sqlplus = vorax#GetSqlplusHandler()
+  let statement = 
+        \ "declare\n".
+        \ "   type t_context is varray(3) of integer;\n" .
+        \ "   schema varchar2(30);\n" .
+        \ "   part1 varchar2(30);\n" .
+        \ "   part2 varchar2(30);\n" .
+        \ "   dblink varchar2(100);\n" .
+        \ "   part1_type number;\n" .
+        \ "   object_number number;\n" .
+        \ "   l_obj varchar2(100);\n" .
+        \ "   l_skip boolean := false;\n" .
+        \ "   try_ctx t_context := t_context(1, 2, 7);\n" .
+        \ "   invalid_context exception;\n" .
+        \ "   no_object exception;\n" .
+        \ "   pragma exception_init(invalid_context, -04047);\n" .
+        \ "   pragma exception_init(no_object, -06564);\n" .
+        \ " begin\n" .
+        \ "   for ctx in try_ctx.first .. try_ctx.last loop\n" .
+        \ "     begin\n" .
+        \ "       DBMS_UTILITY.NAME_RESOLVE (\n" .
+        \ "          '" . a:object . "', \n" .
+        \ "          try_ctx(ctx),\n" .
+        \ "          schema, \n" .
+        \ "          part1, \n" .
+        \ "          part2,\n" .
+        \ "          dblink, \n" .
+        \ "          part1_type, \n" .
+        \ "          object_number);\n" .
+        \ "       l_skip := false;\n" .
+        \ "     exception\n" .
+        \ "       when invalid_context then\n" .
+        \ "         l_skip := true;\n" .
+        \ "       when no_object then\n" .
+        \ "         return;\n" .
+        \ "     end;\n" .
+        \ "     if l_skip = false then\n" .
+        \ "       if part1 is not null then\n" .
+        \ "          l_obj := part1;\n" .
+        \ "       elsif part1 is null and part2 is not null then\n" .
+        \ "          l_obj := part2;\n" .
+        \ "       end if;\n" .
+        \ "       dbms_output.put_line(schema || '\"' || l_obj || '\"' || dblink || '\"' || part1_type);\n" .
+        \ "       return;\n" .
+        \ "     end if;\n" .
+        \ "   end loop;\n" .
+        \ " end;\n" .
+        \ "/\n"
+  let result = sqlplus.Exec(sqlplus.Pack(statement, {'include_eor' : 1}), 
+        \ {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+                            \ [{'option' : 'serveroutput', 'value' : 'on'},
+                            \  {'option' : 'pagesize', 'value' : '0'},
+                            \  {'option' : 'feedback', 'value' : 'off'},
+                            \  {'option' : 'echo', 'value' : 'off'}, 
+                            \  {'option' : 'markup', 'value' : 'html off'},
+                            \ ])})
+  let result = substitute(result, '\%(\_s\|[\r]\)*$', '', 'g')
+  echom result
+  let info = {}
+  if len(result) > 0
+    " we have results
+    let fields = split(result, '"')
+    if len(fields) == 4
+      let info['schema'] = fields[0]
+      let info['object'] = fields[1]
+      let info['dblink'] = fields[2]
+      if fields[3] == '2'
+        let info['type'] = 'TABLE'
+      elseif fields[3] == '4'
+        let info['type'] = 'VIEW'
+      elseif fields[3] == '5'
+        let info['type'] = 'SYNONYM'
+      elseif fields[3] == '7'
+        let info['type'] = 'PROCEDURE'
+      elseif fields[3] == '8'
+        let info['type'] = 'FUNCTION'
+      elseif fields[3] == '9'
+        let info['type'] = 'PACKAGE'
+      elseif fields[3] == '13'
+        let info['type'] = 'TYPE'
+      else
+      	let info['type'] = fields[3]
+      endif
+    endif
+  endif
+  if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#utils#ResolveDbObject(object). returned value='.string(info)) | endif
+  return info
+endfunction
+
 let &cpo = s:cpo_save
 unlet s:cpo_save
 

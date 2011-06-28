@@ -2,6 +2,8 @@ require 'vorax/sqlhtml/abstract_tag_handler.rb'
 require 'vorax/sqlhtml/table_tag_handler.rb'
 require 'vorax/sqlhtml/p_tag_handler.rb'
 require 'vorax/sqlhtml/text_tag_handler.rb'
+require 'vorax/sqlhtml/br_tag_handler.rb'
+require 'vorax/sqlhtml/b_tag_handler.rb'
 
 module Vorax
 

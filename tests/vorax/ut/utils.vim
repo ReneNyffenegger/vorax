@@ -240,3 +240,58 @@ function! TestVoraxGetStartLineOfPlsqlObject()
   call VUAssertEquals(9, voraxlib#utils#GetStartLineOfPlsqlObject('TYPE_BODY'), 'Test offset for pkg body')
   bwipe!
 endfunction
+
+function! TestVoraxGetIdentifierUnderCursor()
+  silent exe 'split ' . s:ut_dir . '/../sql/describe_objects.sql'
+  call setpos('.', [bufnr('%'), 1, 22, 0])
+  let expected = '"TALEK"."MY TABLE"."COL1"'
+  call VUAssertEquals(expected, voraxlib#utils#GetIdentifierUnderCursor(), 'Test 1')
+
+  call setpos('.', [bufnr('%'), 1, 59, 0])
+  let expected = '"TALEK"."MY TABLE"."COL2"'
+  call VUAssertEquals(expected, voraxlib#utils#GetIdentifierUnderCursor(), 'Test 2')
+
+  call setpos('.', [bufnr('%'), 1, 35, 0])
+  let expected = '"TALEK"."MY TABLE"."COL2"'
+  call VUAssertEquals(expected, voraxlib#utils#GetIdentifierUnderCursor(), 'Test 3')
+
+  call setpos('.', [bufnr('%'), 1, 88, 0])
+  let expected = '"TALEK"."MY TABLE"'
+  call VUAssertEquals(expected, voraxlib#utils#GetIdentifierUnderCursor(), 'Test 4')
+
+  call setpos('.', [bufnr('%'), 1, 67, 0])
+  let expected = '"my column"'
+  call VUAssertEquals(expected, voraxlib#utils#GetIdentifierUnderCursor(), 'Test 5')
+
+  call setpos('.', [bufnr('%'), 1, 76, 0])
+  let expected = 'col4'
+  call VUAssertEquals(expected, voraxlib#utils#GetIdentifierUnderCursor(), 'Test 6')
+
+  call setpos('.', [bufnr('%'), 2, 27, 0])
+  let expected = 'v$session@dbl_link'
+  call VUAssertEquals(expected, voraxlib#utils#GetIdentifierUnderCursor(), 'Test 7')
+
+  bwipe!
+endfunction
+
+function! TestVoraxSplitIdentifier()
+  let expected = {'part1' : 'TALEK', 'part2' : 'MUCI', 'part3' : 'COL1', 'dblink' : ''}
+  call VUAssertEquals(expected, voraxlib#utils#SplitIdentifier('talek.muci.col1'), 'Test 1')
+
+  let expected = {'part1' : 'OWNER', 'part2' : 'my table', 'part3' : '', 'dblink' : ''}
+  call VUAssertEquals(expected, voraxlib#utils#SplitIdentifier('owner."my table"'), 'Test 2')
+
+  let expected = {'part1' : 'OWNER', 'part2' : 'my table', 'part3' : '', 'dblink' : 'APOLL'}
+  call VUAssertEquals(expected, voraxlib#utils#SplitIdentifier('owner."my table"@apoll'), 'Test 3')
+endfunction
+
+function! TestVoraxUtilsResolveDbObject()
+  call VoraxReloadEnvironment()
+  call vorax#GetSqlplusHandler().Exec('connect ' . g:vorax_test_constr)
+
+  let expected = {'schema' : 'SYS', 'object' : 'USER_CATALOG', 'dblink' : '', 'type' : 'VIEW'}
+  call VUAssertEquals(expected, voraxlib#utils#ResolveDbObject('cat'), 'Test 1')
+
+  let expected = {'schema' : 'SYS', 'object' : 'DBMS_STATS', 'dblink' : '', 'type' : 'PACKAGE'}
+  call VUAssertEquals(expected, voraxlib#utils#ResolveDbObject('dbms_stats'), 'Test 2')
+endfunction

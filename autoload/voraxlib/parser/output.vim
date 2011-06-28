@@ -37,6 +37,8 @@ function! voraxlib#parser#output#Compress(html, vertical)
     # register default handlers
     vorax_html.register_tag_handler(Vorax::TextTagHandler.new)
     vorax_html.register_tag_handler(Vorax::PTagHandler.new)
+    vorax_html.register_tag_handler(Vorax::BrTagHandler.new)
+    vorax_html.register_tag_handler(Vorax::BTagHandler.new)
     if VIM::evaluate('exists("params")') == 1
       vorax_html.register_tag_handler(Vorax::TableTagHandler.new(VIM::evaluate('colsep'), 
                                                                  VIM::evaluate('underline'), 

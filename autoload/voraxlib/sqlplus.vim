@@ -341,7 +341,7 @@ endfunction"}}}
 " Enable html output.
 function! s:sqlplus.EnableHtml()"{{{
   if !self.html
-    ruby $sqlplus_factory[VIM::evaluate('self.ruby_key')].exec("set markup html on entmap off preformat off")
+    ruby $sqlplus_factory[VIM::evaluate('self.ruby_key')].exec("set markup html on entmap on preformat off")
     let self.html = 1
   endif
 endfunction"}}}
