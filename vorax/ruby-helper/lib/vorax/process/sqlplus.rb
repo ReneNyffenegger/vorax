@@ -147,12 +147,16 @@ module Vorax
         login_file_content = ''
         # is the SQLPATH variable initialized?
         if sqlpath = ENV['SQLPATH']
-          sqlpath.split(/[;:]+/).each do |path|
-            # for every path in SQLPATH search for login.sql file
-            if File.exists?("#{path}/login.sql")
-              # file found
-              File.open("#{path}/login.sql") { |f| login_file_content << f.read }
-              break
+          # skip the first path because it's our temp location
+          paths = sqlpath.split(/[;:]+/)[(1..-1)]
+          if paths
+            paths.each do |path|
+              # for every path in SQLPATH search for login.sql file
+              if File.exists?("#{path}/login.sql")
+                # file found
+                File.open("#{path}/login.sql") { |f| login_file_content << f.read }
+                break
+              end
             end
           end
         end

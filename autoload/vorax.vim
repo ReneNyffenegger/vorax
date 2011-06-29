@@ -113,7 +113,7 @@ function! vorax#Exec(command)"{{{
 endfunction"}}}
 
 " Describe the provided identifier
-function! vorax#Describe(identifier, verbose)
+function! vorax#Describe(identifier, verbose)"{{{
   let identifier = a:identifier
   if identifier == ''
     " if the identifier is empty assume the one under cursor
@@ -136,10 +136,14 @@ function! vorax#Describe(identifier, verbose)
               \ {'option' : 'linesize', 'value' : '120'},
               \ {'option' : 'markup', 'value' : 'html off'},
               \ ])})
+      let crr_win = winnr()
       call outputwin.AppendText(output)
+      if !g:vorax_output_window_keep_focus_after_exec
+      	exec crr_win . 'wincmd w'
+      endif
     endif
   endif
-endfunction
+endfunction"}}}
 
 " Send the whole current buffer content to sqlplus for execution.
 function! vorax#CompileBuffer()"{{{
