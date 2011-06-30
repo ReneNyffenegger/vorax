@@ -160,7 +160,7 @@ module Vorax
             end
           end
         end
-        login_file_content << "host echo  > #@tmp_dir/#@conn_changed_file" 
+        login_file_content << "host echo  > #{@process.convert_path(@tmp_dir + '/' + @conn_changed_file)}" 
         File.open("#@tmp_dir/login.sql", 'w') { |f| f.puts(login_file_content) }
       elsif @session_owner_monitor == :never || @session_owner_monitor == :always
         @connected_to = '@' if @session_owner_monitor == :never
@@ -228,7 +228,7 @@ module Vorax
     # attributes (e.g. echo, verify, define etc.)
     def config_for(*settings)
       # store the actual configuration
-      settings_file = "#@tmp_dir/_vorax_sqlplus_settings.#{pid}"
+      settings_file = @process.convert_path("#@tmp_dir/_vorax_sqlplus_settings.#{pid}")
       exec("store set #{settings_file} replace")
       # compute regexp pattern
       patterns = []
@@ -301,7 +301,7 @@ module Vorax
       file_content = cmds.join("\n")
       file_content << "\nprompt #{END_OF_REQUEST}\n" if include_eor
       filename = DEFAULT_PACK_FILE if filename.nil?
-      File.open("#@tmp_dir/#{filename}", 'w') {|f| f.write(file_content) }
+      File.open(@process.convert_path("#@tmp_dir/#{filename}"), 'w') {|f| f.write(file_content) }
       "@#@tmp_dir/#{filename}"
     end
 
@@ -330,10 +330,10 @@ module Vorax
     # This is the end marker till the output from
     # the sqlplus process must be read after executing
     # a statement.
-    END_OF_REQUEST = '~~~ VORAX_END_OF_REQUEST ~~~' unless defined?(END_OF_REQUEST)
+    END_OF_REQUEST = '___VORAX_END_OF_REQUEST___' unless defined?(END_OF_REQUEST)
 
     # This marker is used to mark a cancel request.
-    CANCEL_MARKER = '~~~ VORAX_CANCEL_REQUEST ~~~' unless defined?(CANCEL_MARKER)
+    CANCEL_MARKER = '___VORAX_CANCEL_REQUEST___' unless defined?(CANCEL_MARKER)
 
     # Where to pack the sql commands by default.
     DEFAULT_PACK_FILE = "run_this.sql" unless defined?(DEFAULT_PACK_FILE)

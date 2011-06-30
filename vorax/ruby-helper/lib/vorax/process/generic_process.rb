@@ -37,6 +37,12 @@ module Vorax
       raise "pid() must be overridden"
     end
 
+    # How the path should be converted in order for the process to be understandable
+    # (for cygwin is important)
+    def convert_path(path)
+      return path
+    end
+
 
   end
 

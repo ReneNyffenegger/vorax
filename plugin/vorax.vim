@@ -320,9 +320,13 @@ if !exists(':VoraxExec')
   nmap <unique> <script> <Plug>VoraxExec :VoraxExec<CR>
 endif"}}}
 " :VoraxDescribe"{{{
-if !exists(':VoraxDescribe')
+if exists(':VoraxDescribe') != 2
   command! -nargs=? VoraxDescribe :call vorax#Describe(<q-args>, 0)
   nmap <unique> <script> <Plug>VoraxDescribe :VoraxDescribe<CR>
+endif"}}}
+if exists(':VoraxDescribeVerbose') != 2
+  command! -nargs=? VoraxDescribeVerbose :call vorax#Describe(<q-args>, 1)
+  nmap <unique> <script> <Plug>VoraxDescribeVerbose :VoraxDescribeVerbose<CR>
 endif"}}}
 " :VoraxCompileBuffer"{{{
 if !exists(':VoraxCompileBuffer')
@@ -387,7 +391,9 @@ TLet g:vorax_exec_key = "<Leader>e"
 "}}}
 " g:vorax_describe_key"{{{
 TLet g:vorax_describe_key = "<Leader>d"
-exe "nmap <silent> <unique> " . g:vorax_describe_key . " <Plug>VoraxDescribe"
+"}}}
+" g:vorax_describe_verbose_key"{{{
+TLet g:vorax_describe_verbose_key = "<Leader>D"
 "}}}
 " g:vorax_spooling_toggle_key"{{{
 TLet g:vorax_spooling_toggle_key = "<Leader>sp"

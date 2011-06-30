@@ -12,6 +12,7 @@ set cpo&vim
 
 " Initialize logger
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
+let s:script_dir = expand('<sfile>:p:h')
 
 " In case it's a script reload (see testing) then ensure the following vars
 " are cleaned up
@@ -122,13 +123,38 @@ function! vorax#Describe(identifier, verbose)"{{{
   let object_data = voraxlib#utils#ResolveDbObject(identifier)
   if exists('object_data.type') && 
         \ object_data.type =~ '^\(TABLE\)\|\(VIEW\)\|\(PACKAGE\)\|\(TYPE\)\|\(FUNCTION\)\|\(PROCEDURE\)$'
+    let sqlplus = vorax#GetSqlplusHandler()
+    let outputwin = vorax#GetOutputWindowHandler()
+    let crr_win = winnr()
     if a:verbose
+      if object_data.type =~ '^\(TABLE\)\|\(VIEW\)$'
+        " verbose desc is availablre for tables and views only
+        let desc_script = fnamemodify(s:script_dir . '/../vorax/scripts/desc_table.sql', ':p:8')
+        let desc_script = substitute(desc_script, '\\\\\|\\', '/', 'g')
+        let output = sqlplus.Exec("@" . desc_script . ' "' . object_data.schema . '" "' . object_data.object . '"' , 
+              \ {'executing_msg' : 'Fetching describe info for ' . object_data.schema . "." . object_data.object . '...',
+              \  'throbber' : vorax#GetDefaultThrobber(),
+              \  'done_msg' : 'Done.',
+              \  'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+                  \ [
+                  \ {'option' : 'echo', 'value' : 'off'}, 
+                  \ {'option' : 'feedback', 'value' : 'off'},
+                  \ {'option' : 'verify', 'value' : 'off'},
+                  \ {'option' : 'define', 'value' : 'on'},
+                  \ {'option' : 'sqlprompt', 'value' : "''"},
+                  \ {'option' : 'linesize', 'value' : '180'},
+                  \ {'option' : 'markup', 'value' : 'html off'},
+                \ ])})
+        call outputwin.AppendText(output)
+      endif
     else
       " simple desc
       let object = object_data.schema . '.' . object_data.object . (object_data.dblink != '' ? '@' .object_data.dblink : '')
-      let sqlplus = vorax#GetSqlplusHandler()
-      let outputwin = vorax#GetOutputWindowHandler()
-      let output = sqlplus.Exec("desc " . object, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+      let output = sqlplus.Exec("desc " . object,
+            \ {'executing_msg' : 'Fetching describe info for ' . object . '...',
+            \  'throbber' : vorax#GetDefaultThrobber(),
+            \  'done_msg' : 'Done.',
+            \ 'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
               \ [
               \ {'option' : 'echo', 'value' : 'off'}, 
               \ {'option' : 'feedback', 'value' : 'on'},
@@ -136,12 +162,11 @@ function! vorax#Describe(identifier, verbose)"{{{
               \ {'option' : 'linesize', 'value' : '120'},
               \ {'option' : 'markup', 'value' : 'html off'},
               \ ])})
-      let crr_win = winnr()
       call outputwin.AppendText(output)
+    endif
       if !g:vorax_output_window_keep_focus_after_exec
       	exec crr_win . 'wincmd w'
       endif
-    endif
   endif
 endfunction"}}}
 
@@ -454,6 +479,21 @@ function! vorax#GetOutputWindowHandler()"{{{
   endif
   return s:output
 endfunction"}}}
+
+" Create key mappings for sql and plsql buffers (common mappings)
+function! vorax#CreateCommonKeyMappings()
+  if g:vorax_describe_key != '' 
+        \ && !hasmapto('<Plug>VoraxDescribe') 
+        \ && maparg(g:vorax_describe_key, 'n') == ""
+    exe "nmap <silent> <unique> " . g:vorax_describe_key . " <Plug>VoraxDescribe"
+  endif
+  if g:vorax_describe_verbose_key!= '' 
+        \ && !hasmapto('<Plug>VoraxDescribeVerbose') 
+        \ && maparg(g:vorax_describe_verbose_key, 'n') == ""
+    exe "nmap <silent> <unique> " . g:vorax_describe_verbose_key . " <Plug>VoraxDescribeVerbose"
+  endif
+endfunction
+
 
 " === PRIVATE FUNCTIONS ==="{{{
 

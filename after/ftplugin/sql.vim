@@ -22,5 +22,8 @@ if voraxlib#utils#IsSqlOracleBuffer()
     exe "xmap <unique> " . g:vorax_exec_key . " <Plug>VoraxExecSelection"
   endif"}}}
 
+  " create common mappings
+  call vorax#CreateCommonKeyMappings()
+
 endif
 

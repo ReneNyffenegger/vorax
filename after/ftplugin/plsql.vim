@@ -27,6 +27,9 @@ if exists('g:vorax_compile_plsql_buffer_key')
   exe "nmap <unique> " . g:vorax_compile_plsql_buffer_key . " <Plug>VoraxCompileBuffer"
 endif
 
+" create common mappings
+call vorax#CreateCommonKeyMappings()
+
 " matchit functionality 
 " Some standard expressions for use with the matchit strings
 let s:notend = '\%(\<end\s\+\)\@<!'
