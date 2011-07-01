@@ -99,7 +99,7 @@ function! vorax#Exec(command)"{{{
     let sqlplus.last_stmt = {'cmd' : voraxlib#utils#AddSqlDelimitator(a:command), 'from_buf' : bufnr('%')}
     if s:log.isDebugEnabled() | call s:log.debug('with delimitator added: '.string(sqlplus.last_stmt)) | endif
     if exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0
-      let sqlplus.last_stmt = voraxlib#utils#AddRownumFilter(sqlplus.last_stmt['cmd'], g:vorax_limit_rows)
+      let sqlplus.last_stmt['cmd'] = voraxlib#utils#AddRownumFilter(sqlplus.last_stmt['cmd'], g:vorax_limit_rows)
       if s:log.isDebugEnabled() | call s:log.debug('limit rows enabled. statements coverted to: '.string(sqlplus.last_stmt)) | endif
     endif
     " exec the command in bg. All trailing CR/spaces are removed before exec.
@@ -481,7 +481,8 @@ function! vorax#GetOutputWindowHandler()"{{{
 endfunction"}}}
 
 " Create key mappings for sql and plsql buffers (common mappings)
-function! vorax#CreateCommonKeyMappings()
+function! vorax#CreateCommonKeyMappings()"{{{
+  " describe mappings
   if g:vorax_describe_key != '' 
         \ && !hasmapto('<Plug>VoraxDescribe') 
         \ && maparg(g:vorax_describe_key, 'n') == ""
@@ -492,8 +493,32 @@ function! vorax#CreateCommonKeyMappings()
         \ && maparg(g:vorax_describe_verbose_key, 'n') == ""
     exe "nmap <silent> <unique> " . g:vorax_describe_verbose_key . " <Plug>VoraxDescribeVerbose"
   endif
-endfunction
+  if g:vorax_describe_key != '' 
+        \ && maparg(g:vorax_describe_key, 'v') == ""
+    exe "xmap <silent> <unique> " . g:vorax_describe_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 0)<cr>"
+  endif
+  if g:vorax_describe_verbose_key != '' 
+        \ && maparg(g:vorax_describe_verbose_key, 'v') == ""
+    exe "xmap <silent> <unique> " . g:vorax_describe_verbose_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 1)<cr>"
+  endif
+endfunction"}}}
 
+" Create a new sql scratch buffer to try on various sql statements.
+function! vorax#NewSqlScratch()"{{{
+  silent! call voraxlib#utils#FocusCandidateWindow()
+  if exists('s:scratch_no')
+  	let s:scratch_no += 1
+  else
+    let s:scratch_no = 1
+  endif
+  silent! exe 'edit ' . '__scratch' . string(s:scratch_no) . '__.sql'
+  setlocal hidden
+  setlocal noswapfile
+  setlocal buftype=nowrite
+  setlocal noreadonly
+  setlocal nowrap
+  setlocal nomodified
+endfunction"}}}
 
 " === PRIVATE FUNCTIONS ==="{{{
 

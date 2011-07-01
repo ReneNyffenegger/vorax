@@ -46,7 +46,7 @@ module Vorax
           end
         end
       end
-      return buffer.chomp
+      return buffer
     end
 
     def compressed(node)
@@ -95,7 +95,7 @@ module Vorax
           idx = 0
         end
       end
-      buffer.chomp
+      buffer
     end
 
   end

@@ -450,7 +450,7 @@ function! voraxlib#utils#FocusCandidateWindow()"{{{
   " iterate through all windows and get info from them
   windo let winlist += [[bufnr('%'),  winnr(), &buftype]]
   for w in winlist
-    if w[2] == "nofile" || w[2] == 'quickfix' || w[2] == 'help'
+    if (w[2] == "nofile" || w[2] == 'quickfix' || w[2] == 'help') " && bufname('%') !~ '^__scratch[0-9]\+__$'
       " do nothing
     else
       " great! we just found a suitable window... focus it please

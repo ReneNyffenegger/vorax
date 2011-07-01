@@ -315,6 +315,7 @@ endfunction"}}}
 " It returns the sqlplus command to actually execute all commands via the 
 " pack file (e.g. @target_file).
 function! s:sqlplus.Pack(commands, ...)"{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:sqlplus.Pack(' . string(a:commands) . (exists('a:000') ? ', ' . string(a:000) : '') . ')') | endif
   if type(a:commands) == 3
     let commands = a:commands
   elseif type(a:commands) == 1
@@ -340,6 +341,7 @@ function! s:sqlplus.Pack(commands, ...)"{{{
   VIM::command(%!return #{$sqlplus_factory[VIM::evaluate('self.ruby_key')].pack(*params).inspect}!)
 EORC
   endif
+  if s:log.isTraceEnabled() | call s:log.trace('END s:sqlplus.Pack') | endif
 endfunction"}}}
 
 " Enable html output.

@@ -171,7 +171,7 @@ TLet g:vorax_sqlplus_pause_warning = 1
 " Whenever or not to keep the current visual selection after the statement was
 " executed. Does work only if the g:vorax_output_window_keep_focus_after_exec
 " is 0.
-TLet g:vorax_keep_selection_after_exec = 1
+TLet g:vorax_keep_selection_after_exec = 0
 
 "}}}
 " g:vorax_output_window_anchor"{{{
@@ -309,7 +309,7 @@ TLet g:vorax_test_constr = 'vorax/vorax@your_db'
 " *** COMMANDS SECTION
 " ==============================================================================
 " :VoraxConnect"{{{
-if !exists(':VoraxConnect')
+if exists(':VoraxConnect') != 2
   command! -nargs=? -count=0 -complete=customlist,voraxlib#panel#profiles#ProfilesForCompletion 
         \ -bang VoraxConnect :call vorax#Connect(<q-args>, '<bang>')
   nmap <unique> <script> <Plug>VoraxConnect :VoraxConnect<CR>
@@ -324,61 +324,67 @@ if exists(':VoraxDescribe') != 2
   command! -nargs=? VoraxDescribe :call vorax#Describe(<q-args>, 0)
   nmap <unique> <script> <Plug>VoraxDescribe :VoraxDescribe<CR>
 endif"}}}
+" :VoraxDescribeVerbose"{{{
 if exists(':VoraxDescribeVerbose') != 2
   command! -nargs=? VoraxDescribeVerbose :call vorax#Describe(<q-args>, 1)
   nmap <unique> <script> <Plug>VoraxDescribeVerbose :VoraxDescribeVerbose<CR>
 endif"}}}
+" :VoraxScratch"{{{
+if exists(':VoraxScratch') != 2
+  command! -nargs=0 VoraxScratch :call vorax#NewSqlScratch()
+  nmap <unique> <script> <Plug>VoraxScratch :VoraxScratch<CR>
+endif"}}}
 " :VoraxCompileBuffer"{{{
-if !exists(':VoraxCompileBuffer')
+if exists(':VoraxCompileBuffer') != 2
   command! -nargs=0 VoraxCompileBuffer :call vorax#CompileBuffer()
   nmap <unique> <script> <Plug>VoraxCompileBuffer :VoraxCompileBuffer<CR>
 endif"}}}
 " :VoraxExecCurrent"{{{
-if !exists(':VoraxExecCurrent')
+if exists(':VoraxExecCurrent') != 2
   command! -nargs=0 -bar VoraxExecCurrent :call vorax#ExecCurrent()
   nmap <unique> <script> <Plug>VoraxExecCurrent :VoraxExecCurrent<CR>
 endif"}}}
 " :VoraxExecSelection"{{{
-if !exists(':VoraxExecSelection')
+if exists(':VoraxExecSelection') != 2
   command! -nargs=0 -bar -range VoraxExecSelection :call vorax#ExecSelection()
   xmap <unique> <script> <Plug>VoraxExecSelection :VoraxExecSelection<CR>
 endif"}}}
 " :VoraxProfilesWindowToggle"{{{
-if !exists(':VoraxProfilesWindowToggle')
+if exists(':VoraxProfilesWindowToggle') != 2
   command! -nargs=0 -bar VoraxProfilesWindowToggle 
         \:call vorax#GetProfilesHandler().Toggle()
   nmap <unique> <script> <Plug>VoraxProfilesWindowToggle 
         \:VoraxProfilesWindowToggle<CR>
 endif"}}}
 " :VoraxExplorerWindowToggle"{{{
-if !exists(':VoraxExplorerWindowToggle')
+if exists(':VoraxExplorerWindowToggle') != 2
   command! -nargs=0 -bar VoraxExplorerWindowToggle 
         \:call vorax#GetExplorerHandler().Toggle()
   nmap <unique> <script> <Plug>VoraxExplorerWindowToggle 
         \:VoraxExplorerWindowToggle<CR>
 endif"}}}
 " :VoraxSpoolingToggle"{{{
-if !exists(':VoraxSpoolingToggle')
+if exists(':VoraxSpoolingToggle') != 2
   command! -nargs=0 -bar VoraxSpoolingToggle :call vorax#ToggleSpooling()
   nmap <unique> <script> <Plug>VoraxSpoolingToggle :VoraxSpoolingToggle<CR>
 endif"}}}
 " :VoraxCompressedOutputToggle"{{{
-if !exists(':VoraxCompressedOutputToggle')
+if exists(':VoraxCompressedOutputToggle') != 2
   command! -nargs=0 -bar VoraxCompressedOutputToggle :call vorax#ToggleCompressedOutput()
   nmap <unique> <script> <Plug>VoraxCompressedOutputToggle :VoraxCompressedOutputToggle<CR>
 endif"}}}
 " :VoraxVerticalOutputToggle"{{{
-if !exists(':VoraxVerticalOutputToggle')
+if exists(':VoraxVerticalOutputToggle') != 2
   command! -nargs=0 -bar VoraxVerticalOutputToggle :call vorax#ToggleVerticalOutput()
   nmap <unique> <script> <Plug>VoraxVerticalOutputToggle :VoraxVerticalOutputToggle<CR>
 endif"}}}
 " :VoraxLimitRowsToggle"{{{
-if !exists(':VoraxLimitRowsToggle')
+if exists(':VoraxLimitRowsToggle') != 2
   command! -nargs=0 VoraxLimitRowsToggle :call vorax#ToggleLimitRows()
   nmap <unique> <script> <Plug>VoraxLimitRowsToggle :VoraxLimitRowsToggle<CR>
 endif"}}}
 " :VoraxPaginatingToggle"{{{
-if !exists(':VoraxPaginatingToggle')
+if exists(':VoraxPaginatingToggle') != 2
   command! -nargs=0 VoraxPaginatingToggle :call vorax#TogglePaginating()
   nmap <unique> <script> <Plug>VoraxPaginatingToggle :VoraxPaginatingToggle<CR>
 endif"}}}
@@ -394,6 +400,10 @@ TLet g:vorax_describe_key = "<Leader>d"
 "}}}
 " g:vorax_describe_verbose_key"{{{
 TLet g:vorax_describe_verbose_key = "<Leader>D"
+"}}}
+" g:vorax_scratch_key"{{{
+TLet g:vorax_scratch_key = "<Leader>ss"
+exe "nmap <silent> <unique> " . g:vorax_scratch_key . " <Plug>VoraxScratch"
 "}}}
 " g:vorax_spooling_toggle_key"{{{
 TLet g:vorax_spooling_toggle_key = "<Leader>sp"
