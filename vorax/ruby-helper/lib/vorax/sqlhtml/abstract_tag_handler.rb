@@ -4,7 +4,7 @@ module Vorax
   class AbstractTagHandler
 
     # The string representation for this tag.
-    def visit(node)
+    def visit(node, handlers)
       throw RuntimeError.new('Implement me')
     end
 

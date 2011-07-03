@@ -16,7 +16,7 @@ module Vorax
       @vertical = vertical
     end
 
-    def visit(node)
+    def visit(node, handlers)
       if node.name == 'table'
         if @vertical
           return vertical(node)
