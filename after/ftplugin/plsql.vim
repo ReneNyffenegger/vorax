@@ -3,7 +3,7 @@
 " License: Apache License 2.0
 
 " switch to vorax completion
-"setlocal omnifunc=Vorax_Complete
+setlocal omnifunc=voraxlib#omni#Complete
 
 " we don't have indenting for plsql yet therefore indent 
 " like an sql file please
@@ -20,11 +20,12 @@ setlocal isk+=$
 setlocal isk+=#
 
 " configure mappings
+let mapdesc = maparg(g:vorax_compile_plsql_buffer_key, 'n', 0, 1)
+let g:debug = mapdesc
 if exists('g:vorax_compile_plsql_buffer_key')
       \ && g:vorax_compile_plsql_buffer_key != ''
-      \ && !hasmapto('<Plug>VoraxCompileBuffer') 
-      \ && maparg(g:vorax_compile_plsql_buffer_key, 'n') == ""
-  exe "nmap <unique> " . g:vorax_compile_plsql_buffer_key . " <Plug>VoraxCompileBuffer"
+      \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+  exe "nmap <buffer> " . g:vorax_compile_plsql_buffer_key . " <Plug>VoraxCompileBuffer"
 endif
 
 " create common mappings

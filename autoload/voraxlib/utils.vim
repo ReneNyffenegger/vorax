@@ -132,7 +132,7 @@ function! voraxlib#utils#SelectedBlock() "{{{
 endfunction "}}}
 
 " Visual select the provided range.
-function! voraxlib#utils#SelectRange(start_l, start_c, end_l, end_c)
+function! voraxlib#utils#SelectRange(start_l, start_c, end_l, end_c)"{{{
   let tail = a:end_c - a:start_c
   let lines = a:end_l - a:start_l
   if mode() !=# 'n'
@@ -141,16 +141,41 @@ function! voraxlib#utils#SelectRange(start_l, start_c, end_l, end_c)
   exec 'normal' a:start_l.'gg'.a:start_c.'|'.
         \ 'v'.(lines > 0 ? lines . 'j' : '').
         \ (tail > 0 ? tail . 'l' : '')
-endfunction
+endfunction"}}}
 
 " Visual select the current statement
-function! voraxlib#utils#SelectCurrentStatement()
+function! voraxlib#utils#SelectCurrentStatement()"{{{
   let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
   let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
   let tail = end_c - start_c
   let lines = end_l - start_l
   if s:log.isDebugEnabled() | call s:log.debug('[start_l, start_c, end_l, end_c] = [' . start_l . ', ' . start_c . ', ' . end_l . ', ' . end_c . ']') | endif
   call voraxlib#utils#SelectRange(start_l, start_c, end_l, end_c)
+endfunction"}}}
+
+" Get the current statement under cursor
+function! voraxlib#utils#GetCurrentStatement()"{{{
+  let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
+  let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
+  let tail = end_c - start_c
+  let lines = end_l - start_l
+  if s:log.isDebugEnabled() | call s:log.debug('[start_l, start_c, end_l, end_c] = [' . start_l . ', ' . start_c . ', ' . end_l . ', ' . end_c . ']') | endif
+  return voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
+endfunction"}}}
+
+" Get the position of the cursor relative to the start of the statement. The
+" returned value is an absolute/normalized one without a [line,col] pair but
+" an absolute index number. This function also accept two optional parameters:
+" line, col which, if provided, the relative position is computed based on
+" these values.
+function! voraxlib#utils#GetRelativePosition(...)
+  let [crr_l, crr_c] = [line('.'), col('.')]
+  if a:0 != 2
+    let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
+  else
+  	let [start_l, start_c] = [a:1, a:2]
+  endif
+  return len(voraxlib#utils#GetTextFromRange(start_l, start_c, crr_l, crr_c))
 endfunction
 
 " Get the text within the provided range from the current buffer.
@@ -584,16 +609,16 @@ endfunction"}}}
 
 " Given a line of text, a pattern and a position (0 based) it retruns the
 " [start_pos, end_pos] spanning the provided pattern or [-1, -1] otherwise.
-function! voraxlib#utils#PatternRange(line, pattern, start_position)
+function! voraxlib#utils#PatternRange(line, pattern, start_position)"{{{
   let start = match(a:line, a:pattern, a:start_position)
   let end = matchend(a:line, a:pattern, a:start_position) - 1
   return [start, end]
-endfunction
+endfunction"}}}
 
 " Return the column where the provided pattern is found but only on the
 " current line. The flags are the same as in the search() function. If the
 " pattern is not found 0 is returned.
-function! voraxlib#utils#SearchLine(pattern, flags)
+function! voraxlib#utils#SearchLine(pattern, flags)"{{{
   let line_no = line('.')
   let [l, c] = searchpos(a:pattern, a:flags)
   if l != line_no
@@ -601,10 +626,10 @@ function! voraxlib#utils#SearchLine(pattern, flags)
   else
   	return c
   endif
-endfunction
+endfunction"}}}
 
 " Get the identifier under cursor.
-function! voraxlib#utils#GetIdentifierUnderCursor()
+function! voraxlib#utils#GetIdentifierUnderCursor()"{{{
   let line = getline('.')
   let line_no = line('.')
   let col = getpos('.')[2]
@@ -629,11 +654,11 @@ function! voraxlib#utils#GetIdentifierUnderCursor()
     endif
   endfor
   
-endfunction
+endfunction"}}}
 
 " Given a composed identifier it returns a dictionary with the following structure:
 " {'part1' : '', 'part2' : '', 'part3' : '', 'dblink' : ''}
-function! voraxlib#utils#SplitIdentifier(identifier)
+function! voraxlib#utils#SplitIdentifier(identifier)"{{{
   let result = {'part1' : '', 'part2' : '', 'part3' : '', 'dblink' : ''}
   " split the identifier using '@' as separator
   let split_first = split(a:identifier, '\(@\)\(\%([^"]\|"[^"]*"\)*$\)\@=')
@@ -651,7 +676,7 @@ function! voraxlib#utils#SplitIdentifier(identifier)
   endfor
   let [result.part1, result.part2, result.part3] = [part1, part2, part3]
   return result
-endfunction
+endfunction"}}}
 
 " This function is used to resolve a object name within the database
 " context. It returnes a dictionary with the following keys:
@@ -666,7 +691,7 @@ endfunction
 "                 8  = function
 "                 9  = packages
 "                 13 = types
-function! voraxlib#utils#ResolveDbObject(object)
+function! voraxlib#utils#ResolveDbObject(object)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#utils#ResolveDbObject(' . string(a:object) . ')') | endif
   let sqlplus = vorax#GetSqlplusHandler()
   let statement = 
@@ -754,7 +779,7 @@ function! voraxlib#utils#ResolveDbObject(object)
   endif
   if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#utils#ResolveDbObject(object). returned value='.string(info)) | endif
   return info
-endfunction
+endfunction"}}}
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

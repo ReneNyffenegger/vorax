@@ -37,5 +37,8 @@ Vorax::source('vorax/sqlhtml/sql_html_beautifier.rb')
 Vorax::source('vorax/sqlhtml/table_reader.rb')
 
 # load grammars
-Vorax::source('vorax/parser/sql_splitter.rb')
+Vorax::source('vorax/parser/SqlSplitter.rb')
+Vorax::source('vorax/parser/PlsqlLexer.rb')
+Vorax::source('vorax/parser/PlsqlParser.rb')
+Vorax::source('vorax/parser/Alias.rb')
 

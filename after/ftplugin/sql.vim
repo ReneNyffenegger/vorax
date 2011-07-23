@@ -9,6 +9,14 @@ if voraxlib#utils#IsSqlOracleBuffer()
   setlocal isk+=$
   setlocal isk+=#
 
+  " code completion
+  setlocal omnifunc=voraxlib#omni#Complete
+  let g:acp_behavior['sql'] = [ 
+                              \ {'meets': 'acp#meetsForKeyword', 'repeat': 0, 'command': '^N'}, 
+                              \ {'meets': 'acp#meetsForFile', 'repeat': 1, 'command': '^X^F'},
+                              \ {'command' : "\<C-x>\<C-o>", 'meets' : 'voraxlib#omni#Meets', 'repeat' : 0},
+                              \ ]
+
   " init sql buffer mappings
   " Mappings for exec statement"{{{
   if g:vorax_exec_key != '' 

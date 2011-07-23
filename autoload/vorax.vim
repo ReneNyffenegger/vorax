@@ -483,23 +483,25 @@ endfunction"}}}
 " Create key mappings for sql and plsql buffers (common mappings)
 function! vorax#CreateCommonKeyMappings()"{{{
   " describe mappings
+  let mapdesc = maparg(g:vorax_describe_key, 'n', 0, 1)
   if g:vorax_describe_key != '' 
-        \ && !hasmapto('<Plug>VoraxDescribe') 
-        \ && maparg(g:vorax_describe_key, 'n') == ""
-    exe "nmap <silent> <unique> " . g:vorax_describe_key . " <Plug>VoraxDescribe"
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "nmap <silent> <unique> <buffer> " . g:vorax_describe_key . " <Plug>VoraxDescribe"
   endif
+  let mapdesc = maparg(g:vorax_describe_verbose_key, 'n', 0, 1)
   if g:vorax_describe_verbose_key!= '' 
-        \ && !hasmapto('<Plug>VoraxDescribeVerbose') 
-        \ && maparg(g:vorax_describe_verbose_key, 'n') == ""
-    exe "nmap <silent> <unique> " . g:vorax_describe_verbose_key . " <Plug>VoraxDescribeVerbose"
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "nmap <silent> <unique> <buffer>" . g:vorax_describe_verbose_key . " <Plug>VoraxDescribeVerbose"
   endif
+  let mapdesc = maparg(g:vorax_describe_key, 'v', 0, 1)
   if g:vorax_describe_key != '' 
-        \ && maparg(g:vorax_describe_key, 'v') == ""
-    exe "xmap <silent> <unique> " . g:vorax_describe_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 0)<cr>"
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "xmap <silent> <unique> <buffer>" . g:vorax_describe_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 0)<cr>"
   endif
+  let mapdesc = maparg(g:vorax_describe_verbose_key, 'v', 0, 1)
   if g:vorax_describe_verbose_key != '' 
-        \ && maparg(g:vorax_describe_verbose_key, 'v') == ""
-    exe "xmap <silent> <unique> " . g:vorax_describe_verbose_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 1)<cr>"
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "xmap <silent> <unique> <buffer>" . g:vorax_describe_verbose_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 1)<cr>"
   endif
 endfunction"}}}
 

@@ -457,7 +457,7 @@ TLet g:vorax_explorer_window_menu_key = "<Tab>"
 TLet g:vorax_explorer_window_refresh_key = "R"
 "}}}
 " g:vorax_compile_plsql_buffer_key {{{
-TLet g:vorax_compile_plsql_buffer_key = '<F8>'
+TLet g:vorax_compile_plsql_buffer_key = '<F9>'
 "}}}
 " ==============================================================================
 

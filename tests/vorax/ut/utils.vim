@@ -286,7 +286,6 @@ function! TestVoraxSplitIdentifier()
 endfunction
 
 function! TestVoraxUtilsResolveDbObject()
-  call VoraxReloadEnvironment()
   call vorax#GetSqlplusHandler().Exec('connect ' . g:vorax_test_constr)
 
   let expected = {'schema' : 'SYS', 'object' : 'USER_CATALOG', 'dblink' : '', 'type' : 'VIEW'}
@@ -294,4 +293,32 @@ function! TestVoraxUtilsResolveDbObject()
 
   let expected = {'schema' : 'SYS', 'object' : 'DBMS_STATS', 'dblink' : '', 'type' : 'PACKAGE'}
   call VUAssertEquals(expected, voraxlib#utils#ResolveDbObject('dbms_stats'), 'Test 2')
+endfunction
+
+function! TestVoraxUtilsGetCurrentStatement()
+  silent exe 'split ' . s:ut_dir . '/../sql/under_cursor.sql'
+
+  call setpos('.', [bufnr('%'), 6, 3, 0])
+  let statement = voraxlib#utils#GetCurrentStatement()
+  call VUAssertEquals(statement, "select *\nfrom cat;", 'voraxlib#utils#GetCurrentStatement test 1')
+
+  bwipe!
+endfunction
+
+function! TestVoraxUtilsGetRelativePosition()
+  call VoraxReloadEnvironment()
+  silent exe 'split ' . s:ut_dir . '/../sql/under_cursor.sql'
+
+  call setpos('.', [bufnr('%'), 6, 3, 0])
+  let pos = voraxlib#utils#GetRelativePosition()
+  call VUAssertEquals(pos, 12, 'voraxlib#utils#GetRelativePosition test 1')
+
+  call setpos('.', [bufnr('%'), 6, 48, 0])
+  let pos = voraxlib#utils#GetRelativePosition()
+  call VUAssertEquals(pos, 5, 'voraxlib#utils#GetRelativePosition test 2')
+
+  let pos = voraxlib#utils#GetRelativePosition(6, 44)
+  call VUAssertEquals(pos, 5, 'voraxlib#utils#GetRelativePosition test 2')
+
+  bwipe!
 endfunction
