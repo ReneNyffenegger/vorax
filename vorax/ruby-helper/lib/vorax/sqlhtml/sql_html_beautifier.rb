@@ -33,7 +33,7 @@ module Vorax
       element.children.each do |child|
         # walk just for the first level of children (depth = 1)
         @registered_tag_handlers.each do |h|
-          buf << h.visit(child).to_s
+          buf << h.visit(child, @registered_tag_handlers).to_s
         end
       end
       return buf
