@@ -44,7 +44,7 @@ endfunction"}}}
 " Returns the status line format for the output window.
 function! voraxlib#panel#output#StatusLine()"{{{
   let sqlplus = vorax#GetSqlplusHandler()
-  return ' %l/%L - %P%= '.
+  return ' %l/%v - %P%= '.
         \ (exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0 ? 'limit=' . string(g:vorax_limit_rows) . ' ' : '') .
         \ (s:IsPaginatingEnabled() ? 'pause=' . (g:vorax_output_window_page_size == 0 ? 'auto' : string(g:vorax_output_window_page_size)) . ' ' : '') .
         \ (sqlplus.html && !s:output_window.buffer.vertical ? 'compressed ' : '') . 
