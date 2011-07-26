@@ -13,14 +13,11 @@ set cpo&vim
 " Initialize logger
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
-" The omni completion context. This dictionary helps to decide what kind of
-" completion should be performed.
-let s:context = { 'statement' : '', 
-                \ 'head' : '', 
-                \ 'relpos' : 0, 
-                \ 'prefix' : '', 
-                \ 'type' : '', 
-                \ 'complete_from' : -1}
+function! voraxlib#omni#OnPopupClose()
+  if getline('.') =~ '\.$'
+  	call feedkeys("\<C-x>\<C-o>")
+  endif
+endfunction
 
 " The VoraX omni function.
 function! voraxlib#omni#Complete(findstart, base)
@@ -28,26 +25,40 @@ function! voraxlib#omni#Complete(findstart, base)
   " be replaced by whatever is chosen from the completion list
   if a:findstart
     " compute the completion context
-    call s:ComputeCompletionContext()
+    if !exists('s:context')
+      " only if not already computed as part of voraxlib#omni#Meets
+      call s:ComputeCompletionContext()
+    endif
     return s:context.complete_from
   else
     let result = [] " here we'll put the items to be shown in the completion list
-    if s:context.type == 'word' && a:base != ""
+    if s:context.type == 'word'
       " completion for a local object
       let result = s:SyntaxItems(a:base)
       call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:base))
       call extend(result, s:WordsFromOutput(a:base))
-      return result
-      "let result = sort(result, "s:CompareEntries")
     "elseif s:params == 1
       "complete procedure parameters
       "let result = s:CurrentArguments()
-    "elseif len(parts) == 1
-      "" we have a prefix which can be: an alias, an object, a schema... we can't tell
-      "" for sure therefore we'll try in this order
+    elseif s:context.type == 'dot'
+      " we have a prefix which involves dot
+      let prefix_components = split(s:context.prefix, '\.')
+      if len(prefix_components) == 1
+        " we have a prefix which can be: an alias or an object... we can't tell
+        " for sure therefore we'll try in this order
 
-      "" check for an alias
-      "let result = s:ColumnsFromAlias(s:crr_statement, parts[0], a:base)
+        " check for an alias
+        let columns = s:ResolveAlias(s:context.statement, prefix_components[0])
+        if len(columns) > 0
+        	call extend(result, columns)
+        else
+        	" maybe it's an object
+          let object_properties = voraxlib#utils#ResolveDbObject(prefix_components[0])
+          if !empty(object_properties) && (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
+            call extend(columns, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:base)))
+          endif
+        endif
+      endif
       "if len(result) == 0
         "" no alias could be resolved... go on
         "let info = s:db.ResolveDbObject(parts[0])
@@ -77,54 +88,129 @@ function! voraxlib#omni#Complete(findstart, base)
         "endif
       "endif
     endif
+    if exists('s:context')
+    	unlet s:context
+    endif
     return result
   endif  
 endfunction
 
-" This function is used only if autocompli plugin is used.
+" This function is used only if autocomplpop plugin is used.
 function! voraxlib#omni#Meets(text)
-  if len(a:text) >= 2
-    return 1
+  call s:ComputeCompletionContext()
+  if s:context.type != ''
+  	return 1
   else
+  	unlet s:context
   	return 0
   endif
 endfunction
 
 " Compute the current completion context.
 function! s:ComputeCompletionContext()
-  let line     = getline('.')
-  let start    = col('.') - 1
+  " The omni completion context. This dictionary helps to decide what kind of
+  " completion should be performed.
+  let s:context = { 'statement' : '', 
+                  \ 'head' : '', 
+                  \ 'relpos' : 0, 
+                  \ 'prefix' : '', 
+                  \ 'type' : '', 
+                  \ 'line' : '',
+                  \ 'col' : -1,
+                  \ 'complete_from' : -1}
+  let s:context.col    = col('.') - 1
+  let s:context.line     = strpart(getline('.'), 0, s:context.col)
   let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
   let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
   let tail = end_c - start_c
   let lines = end_l - start_l
   let s:context.statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
   let s:context.relpos = voraxlib#utils#GetRelativePosition(start_l, start_c)
-  let s:context.head = strpart(s:context.statement, 0, s:context.relpos)
+  let s:context.head = strpart(s:context.statement, 0, s:context.relpos - 1)
   let s:context.complete_from = -1
-  if s:context.head =~ '[(,]\_s*[a-zA-Z0-9_#$]*$'
-    " parameters completion
-    let s:context.type = 'args'
-    let s:context.complete_from = match(line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
-    let s:context.prefix = strpart(line, s:context.complete_from)
-  elseif s:context.head =~ '\.[0-9a-zA-Z#$_]*$'
+  "if s:context.head =~ '[(,]\_s*[a-zA-Z0-9_#$]*$'
+    "" parameters completion
+    ""let s:context.type = 'args'
+    "let s:context.complete_from = match(s:context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
+    "let s:context.prefix = strpart(s:context.line, s:context.complete_from)
+  if s:context.line =~ '\.[0-9a-zA-Z#$_]*$'
     " completion involving a dot (e.g. owner. or table.)
     let s:context.type = 'dot'
-    let s:context.complete_from = match(line, '\(\.\)\@<=\([0-9a-zA-z#$_]*$\)')
-    let s:context.prefix = matchstr(line, '\(\s*\)\@<=\([0-9a-zA-z#$_.]*$\)')
-  elseif s:context.head =~ '\s*[0-9a-zA-Z#$_]*$'
+    let s:context.complete_from = match(s:context.line, '\(\.\)\@<=\([0-9a-zA-z#$_]*$\)')
+    let s:context.prefix = matchstr(s:context.line, '[0-9a-zA-z#$_.]*$')
+  elseif s:context.line =~ '\<[0-9a-zA-z#$_]\{2,\}\>$'
     " completion involving a word (e.g. dbms_sta)
     let s:context.type = 'word'
-    let s:context.complete_from = match(line, '\(\s*\)\@<=\([0-9a-zA-z#$_]*$\)')
-    let s:context.prefix = strpart(line, s:context.complete_from)
+    let s:context.complete_from = match(s:context.line, '\(\s*\)\@<=\([0-9a-zA-z#$_]\{2,\}$\)')
+    let s:context.prefix = strpart(s:context.line, s:context.complete_from)
   endif
 endfunction
 
+" Get a list of columns for the provided owner.object. 
+function! s:GetColumns(owner, object, lowercase)
+  let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "'"
+  if a:lowercase
+    let column_name = 'lower(column_name)'
+  else
+    let column_name = 'column_name'
+  endif
+  let query = 'select ' . column_name . ' alias_column from all_tab_columns where ' . where . ' order by column_id;' 
+  let sqlplus = vorax#GetSqlplusHandler()
+  let params = {'executing_msg' : 'Querying for database objects...',
+        \  'throbber' : vorax#GetDefaultThrobber(),
+        \  'done_msg' : 'Done.'}
+  let result = sqlplus.Query(query, params)
+  let columns = []
+  if empty(result.errors)
+    for col in result.resultset
+      call add(columns, col['ALIAS_COLUMN'])
+    endfor
+  endif
+  return columns
+endfunction
+
+" Get a list of columns which correspond to the provided alias.
+function! s:ResolveAlias(statement, alias)
+  let statement = toupper(a:statement)
+  let raw_columns = []
+  ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Alias::Lexer.columns_for(VIM::evaluate('statement'), VIM::evaluate('a:alias')))}"
+  let columns = []
+  for column in raw_columns
+    if column =~ '\.\*$'
+      " expand please
+      let prefix = substitute(column, '\.\*$', '', 'g')
+      let object_properties = voraxlib#utils#ResolveDbObject(prefix)
+      if !empty(object_properties) && (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
+        call extend(columns, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:alias)))
+      endif
+    else
+    	call add(columns, (s:HasLowerHead(a:alias) ? tolower(column) : toupper(column)))
+    endif
+  endfor
+  return columns
+endfunction
+
+" Returns a list of words from the VoraX output window having the provided
+" prefix. No more than 300 items are returned and every search should not
+" exceed 500ms per item.
 function! s:WordsFromOutput(prefix)
   let output_win = vorax#GetOutputWindowHandler()
-  let output = join(getbufline(output_win.name, 0, '$'))
+  call output_win.Focus()
+  let state = winsaveview()
+  normal G
   let result = []
-  call substitute(output, '\(\<' . a:prefix .'.\{-\}\>\)', '\=add(result, {"word" : submatch(1), "kind" : "output"})', 'g')
+  let crr_ignorecase = &ignorecase
+  let &ignorecase = 1
+  for i in range(300)
+    if search('\<' . a:prefix .'.\{-\}\>', 'bW', 0, 500)
+      call voraxlib#utils#AddUnique(result, {"word" : expand("<cword>"), "kind" : "output", "icase" : 1})
+    else
+    	break
+    endif
+  endfor
+  let &ignorecase = crr_ignorecase
+  call winrestview(state)
+  wincmd p
   return result
 endfunction
 
@@ -153,7 +239,8 @@ function! s:SchemaObjects(objects_in, prefix)
         \ "from all_objects " .
         \ "where owner in (" . a:objects_in . ") ".
         \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION') " .
-        \ "and object_name like upper('" . prefix . "%');"
+        \ "and object_name like upper('" . prefix . "%') " .
+        \ "order by 1;"
   let sqlplus = vorax#GetSqlplusHandler()
   let params = {'executing_msg' : 'Querying for database objects...',
         \  'throbber' : vorax#GetDefaultThrobber(),
@@ -168,7 +255,7 @@ endfunction
 
 " Whenever or not the provided text starts with a lowercase char.
 function! s:HasLowerHead(text)
-  return a:text[0] == tolower(a:text[0])
+  return strpart(a:text, 0, 1) ==# tolower(strpart(a:text, 0, 1))
 endfunction
 
 " Returns a list of keywords starting with the provided parameter

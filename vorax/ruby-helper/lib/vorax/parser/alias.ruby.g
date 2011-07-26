@@ -11,9 +11,8 @@ options {
  
   attr_accessor :aliases, :cpos
 
-  def self.columns_for(stmt, cpos, prefix)
+  def self.columns_for(stmt, prefix)
       cols = []
-      #text = stmt[cpos..-1]
       text = stmt.upcase
       prefix.upcase!
       sources = self.gather_for(text, 0)

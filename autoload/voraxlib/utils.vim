@@ -180,6 +180,10 @@ endfunction
 
 " Get the text within the provided range from the current buffer.
 function! voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)"{{{
+  if a:start_l > a:end_l
+  	" sanity check
+  	return ''
+  endif
   if a:start_l == a:end_l
     " one single line
     let text = strpart(getline(a:start_l), a:start_c - 1, (a:end_c - a:start_c + 1))
