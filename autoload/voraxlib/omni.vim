@@ -14,8 +14,11 @@ set cpo&vim
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
 function! voraxlib#omni#OnPopupClose()
-  if getline('.') =~ '\.$'
-  	call feedkeys("\<C-x>\<C-o>")
+  let prefix = strpart(getline('.'), 0, col('.'))
+  if prefix =~ '\.$'
+    if g:vorax_omni_skip_prefixes == '' || prefix !~ g:vorax_omni_skip_prefixes 
+      call feedkeys("\<C-x>\<C-o>")
+    endif
   endif
 endfunction
 
@@ -34,28 +37,43 @@ function! voraxlib#omni#Complete(findstart, base)
     let result = [] " here we'll put the items to be shown in the completion list
     if s:context.type == 'word'
       " completion for a local object
+      
+      " let user choose a keyword
       let result = s:SyntaxItems(a:base)
+      " let user choose a schema name
+      call extend(result, s:Schemas(a:base))
+      " let user choose an oracle object
       call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:base))
+      " let user choose a word from the output window
       call extend(result, s:WordsFromOutput(a:base))
     "elseif s:params == 1
       "complete procedure parameters
       "let result = s:CurrentArguments()
     elseif s:context.type == 'dot'
       " we have a prefix which involves dot
-      let prefix_components = split(s:context.prefix, '\.')
-      if len(prefix_components) == 1
+      let prefix_components = split(s:context.prefix, '\.', 1)
+      if len(prefix_components) == 2
         " we have a prefix which can be: an alias or an object... we can't tell
         " for sure therefore we'll try in this order
 
         " check for an alias
-        let columns = s:ResolveAlias(s:context.statement, prefix_components[0])
-        if len(columns) > 0
-        	call extend(result, columns)
+        let items = s:ResolveAlias(s:context.statement, prefix_components[0], toupper(a:base))
+        if len(items) > 0
+        	call extend(result, items)
         else
         	" maybe it's an object
           let object_properties = voraxlib#utils#ResolveDbObject(prefix_components[0])
-          if !empty(object_properties) && (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
-            call extend(columns, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:base)))
+          if !empty(object_properties) 
+          	if (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
+              " a regular table or view
+              call extend(result, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
+            elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE')
+              " a package or a type
+              call extend(result, s:GetSubmodules(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
+            endif
+          else
+          	" maybe it's a schema name (e.g. SYS.)
+            call extend(result, s:SchemaObjects("'" . toupper(prefix_components[0]) . "'", a:base))
           endif
         endif
       endif
@@ -133,22 +151,49 @@ function! s:ComputeCompletionContext()
     ""let s:context.type = 'args'
     "let s:context.complete_from = match(s:context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
     "let s:context.prefix = strpart(s:context.line, s:context.complete_from)
-  if s:context.line =~ '\.[0-9a-zA-Z#$_]*$'
+  if s:context.line =~ '\([0-9a-zA-Z#$_]\)\@<=\(\.[0-9a-zA-Z#$_]*$\)'
     " completion involving a dot (e.g. owner. or table.)
-    let s:context.type = 'dot'
-    let s:context.complete_from = match(s:context.line, '\(\.\)\@<=\([0-9a-zA-z#$_]*$\)')
     let s:context.prefix = matchstr(s:context.line, '[0-9a-zA-z#$_.]*$')
-  elseif s:context.line =~ '\<[0-9a-zA-z#$_]\{2,\}\>$'
+    if g:vorax_omni_skip_prefixes == '' || s:context.prefix !~ g:vorax_omni_skip_prefixes 
+      let s:context.type = 'dot'
+      let s:context.complete_from = match(s:context.line, '\(\.\)\@<=\([0-9a-zA-z#$_]*$\)')
+    endif
+  elseif s:context.line =~ '\<[0-9a-zA-z#$_]\{'. g:vorax_omni_word_prefix_length . ',\}\>$'
     " completion involving a word (e.g. dbms_sta)
-    let s:context.type = 'word'
-    let s:context.complete_from = match(s:context.line, '\(\s*\)\@<=\([0-9a-zA-z#$_]\{2,\}$\)')
+    let s:context.complete_from = match(s:context.line, '\(\s*\)\@<=\([0-9a-zA-z#$_]\{'.g:vorax_omni_word_prefix_length.',\}$\)')
     let s:context.prefix = strpart(s:context.line, s:context.complete_from)
+    if g:vorax_omni_skip_prefixes == '' || s:context.prefix !~ g:vorax_omni_skip_prefixes 
+      let s:context.type = 'word'
+    endif
   endif
 endfunction
 
+" Get a list of all procedure/functions within the provided package or type.
+function! s:GetSubmodules(owner, object, lowercase, prefix)
+  let where = "owner = '" . a:owner . "' and object_name = '" . a:object . "' and procedure_name like '" . a:prefix . "%'"
+  if a:lowercase
+    let procedure_name = 'lower(procedure_name)'
+  else
+    let procedure_name = 'procedure_name'
+  endif
+  let query = 'select distinct ' . procedure_name . ' procedure_name from all_procedures where ' . where . ' order by procedure_name;' 
+  let procs = []
+  let sqlplus = vorax#GetSqlplusHandler()
+  let params = {'executing_msg' : 'Querying for database objects...',
+        \  'throbber' : vorax#GetDefaultThrobber(),
+        \  'done_msg' : 'Done.'}
+  let result = sqlplus.Query(query, params)
+  if empty(result.errors)
+    for proc in result.resultset
+      call add(procs, proc['PROCEDURE_NAME'])
+    endfor
+  endif
+  return procs
+endfunction
+
 " Get a list of columns for the provided owner.object. 
-function! s:GetColumns(owner, object, lowercase)
-  let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "'"
+function! s:GetColumns(owner, object, lowercase, prefix)
+  let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and column_name like '" . a:prefix . "%'"
   if a:lowercase
     let column_name = 'lower(column_name)'
   else
@@ -170,7 +215,7 @@ function! s:GetColumns(owner, object, lowercase)
 endfunction
 
 " Get a list of columns which correspond to the provided alias.
-function! s:ResolveAlias(statement, alias)
+function! s:ResolveAlias(statement, alias, prefix)
   let statement = toupper(a:statement)
   let raw_columns = []
   ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Alias::Lexer.columns_for(VIM::evaluate('statement'), VIM::evaluate('a:alias')))}"
@@ -181,10 +226,12 @@ function! s:ResolveAlias(statement, alias)
       let prefix = substitute(column, '\.\*$', '', 'g')
       let object_properties = voraxlib#utils#ResolveDbObject(prefix)
       if !empty(object_properties) && (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
-        call extend(columns, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:alias)))
+        call extend(columns, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:alias), a:prefix))
       endif
     else
-    	call add(columns, (s:HasLowerHead(a:alias) ? tolower(column) : toupper(column)))
+    	if column =~ '^' . a:prefix
+        call add(columns, (s:HasLowerHead(a:alias) ? tolower(column) : toupper(column)))
+      endif
     endif
   endfor
   return columns
@@ -194,24 +241,69 @@ endfunction
 " prefix. No more than 300 items are returned and every search should not
 " exceed 500ms per item.
 function! s:WordsFromOutput(prefix)
-  let output_win = vorax#GetOutputWindowHandler()
-  call output_win.Focus()
-  let state = winsaveview()
-  normal G
   let result = []
-  let crr_ignorecase = &ignorecase
-  let &ignorecase = 1
-  for i in range(300)
-    if search('\<' . a:prefix .'.\{-\}\>', 'bW', 0, 500)
-      call voraxlib#utils#AddUnique(result, {"word" : expand("<cword>"), "kind" : "output", "icase" : 1})
-    else
-    	break
-    endif
-  endfor
-  let &ignorecase = crr_ignorecase
-  call winrestview(state)
-  wincmd p
+  let output_win = vorax#GetOutputWindowHandler()
+  if bufwinnr(output_win.name) != -1
+    " only if the output window is visible
+    call output_win.Focus()
+    let state = winsaveview()
+    normal G
+    let crr_ignorecase = &ignorecase
+    let &ignorecase = 1
+    for i in range(300)
+      if search('\<' . a:prefix .'.\{-\}\>', 'bW', 0, 500)
+        call voraxlib#utils#AddUnique(result, {"word" : expand("<cword>"), "kind" : "output", "icase" : 1})
+      else
+        break
+      endif
+    endfor
+    let &ignorecase = crr_ignorecase
+    call winrestview(state)
+    wincmd p
+  endif
   return result
+endfunction
+
+" Whenever or not the number of schema objects exceeds the provided limit.
+function! s:IsNumberOfObjectsExceeded(objects_in, prefix, limit)
+  let query = 'select count(*) limit ' .
+        \ "from all_objects " .
+        \ "where owner in (" . a:objects_in . ") ".
+        \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION') " .
+        \ "and object_name like upper('" . a:prefix . "%') " .
+        \ "and rownum <= " . (a:limit + 1) . ";"
+  let sqlplus = vorax#GetSqlplusHandler()
+  let result = sqlplus.Query(query)
+  if empty(result.errors)
+    if str2nr(result.resultset[0]['LIMIT']) == a:limit + 1
+    	return 1
+    endif
+  endif
+  return 0
+endfunction
+
+" Get all oracle schemas with the provided prefix.
+function! s:Schemas(prefix)
+  if s:HasLowerHead(a:prefix)
+  	let column = 'lower(username)'
+  else
+  	let column = 'username'
+  endif
+  let query = "column kind format a10\n" .
+        \ "select " . column . ' "word", ' .
+        \ "'schema' \"kind\" ".
+        \ "from all_users " .
+        \ "where ".
+        \ "username like upper('" . a:prefix . "%') " .
+        \ "order by 1;"
+  let sqlplus = vorax#GetSqlplusHandler()
+  let result = sqlplus.Query(query)
+  if empty(result.errors)
+    call map(result.resultset, 'extend(v:val, {"icase" : 1, "dup" : 1})')
+    return result.resultset
+  else
+    return []
+  endif
 endfunction
 
 " Get the objects from the provided schemas starting with the given prefix.
@@ -247,6 +339,7 @@ function! s:SchemaObjects(objects_in, prefix)
         \  'done_msg' : 'Done.'}
   let result = sqlplus.Query(query, params)
   if empty(result.errors)
+    call map(result.resultset, 'extend(v:val, {"icase" : 1})')
     return result.resultset
   else
     return []

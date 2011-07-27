@@ -297,6 +297,19 @@ TLet g:vorax_explorer_file_extensions =     {'PACKAGE' : 'pkg',
                                       \     'VIEW' : 'viw',}
 
 "}}}
+" g:vorax_omni_word_prefix_length"{{{
+
+" How many chars to type before suggesting completion items
+TLet g:vorax_omni_word_prefix_length = 2
+
+"}}}
+" g:vorax_omni_skip_prefixes"{{{
+
+" If the completion prefix matches the following regexp just skip it.
+TLet g:vorax_omni_skip_prefixes = '^sys\.$'
+
+"}}}
+
 " g:vorax_test_constr"{{{
 
 " This global variable is used by vorax unit tests. Ignore it if you do not

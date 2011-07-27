@@ -220,9 +220,7 @@ endfunction"}}}
 " current buffer is not 'sql' then the execution is aborted and an exception
 " is raised.
 function! voraxlib#utils#GetStartOfCurrentSql(move)"{{{
-  if !exists('b:current_syntax') || b:current_syntax != 'sql'
-    throw 'A sql syntax must be enabled for the current buffer.'
-  endif
+  call s:CheckSyntax()
   if !a:move
     " if not move requested then save state
     let state = winsaveview()
@@ -233,7 +231,7 @@ function! voraxlib#utils#GetStartOfCurrentSql(move)"{{{
   let [l, c] = [0, 0]
   while 1
     let [l, c] = searchpos(s:sql_delimitator_pattern, 'beW')  
-    if [l, c] == [0, 0] || synIDattr(synIDtrans(synID(l, c, 1)), "name") == ''
+    if [l, c] == [0, 0] || s:IsMarkedAsDelimitator()
       " exit if the delimitator is not within a special highlight group
       break
     endif
@@ -268,9 +266,7 @@ endfunction"}}}
 " current buffer is not 'sql' then the execution is aborted and an exception
 " is raised.
 function! voraxlib#utils#GetEndOfCurrentSql(move)"{{{
-  if !exists('b:current_syntax') || b:current_syntax != 'sql'
-    throw 'A sql syntax must be enabled for the current buffer.'
-  endif
+  call s:CheckSyntax()
   if !a:move
     " if not move requested then save state
     let state = winsaveview()
@@ -283,7 +279,7 @@ function! voraxlib#utils#GetEndOfCurrentSql(move)"{{{
   while 1
     let [l, c] = searchpos(s:sql_delimitator_pattern, 'W'. (first ? 'c' : ''))  
     let first = 0
-    if [l, c] == [0, 0] || synIDattr(synIDtrans(synID(l, c, 1)), "name") == ''
+    if [l, c] == [0, 0] || s:IsMarkedAsDelimitator()
       " exit if the delimitator is not within a special highlight group
       break
     endif
@@ -784,6 +780,26 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#utils#ResolveDbObject(object). returned value='.string(info)) | endif
   return info
 endfunction"}}}
+
+" Check if the buffer has the proper syntax.
+function! s:CheckSyntax()
+  if !exists('b:current_syntax') || (b:current_syntax != 'sql' && b:current_syntax != 'plsql')
+    throw 'A sql/plsql syntax must be enabled for the current buffer.'
+  endif
+endfunction
+
+" Whenever or not the current cursor position points out to a real sql
+" delimitator (according to the syntax file).
+function! s:IsMarkedAsDelimitator()
+  let l = line('.')
+  let c = col('.')
+  if (b:current_syntax == 'sql' && synIDattr(synIDtrans(synID(l, c, 1)), "name") == '') ||
+        \ (b:current_syntax == 'plsql' && synIDattr(synIDtrans(synID(l, c, 1)), "name") == 'Normal')
+    return 1
+  else
+  	return 0
+  endif
+endfunction
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
