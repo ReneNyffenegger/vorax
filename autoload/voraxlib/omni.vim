@@ -13,159 +13,143 @@ set cpo&vim
 " Initialize logger
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
-function! voraxlib#omni#OnPopupClose()
-  let prefix = strpart(getline('.'), 0, col('.'))
-  if prefix =~ '\.$'
-    if g:vorax_omni_skip_prefixes == '' || prefix !~ g:vorax_omni_skip_prefixes 
-      call feedkeys("\<C-x>\<C-o>")
-    endif
-  endif
-endfunction
-
 " The VoraX omni function.
 function! voraxlib#omni#Complete(findstart, base)
   " First pass through this function determines how much of the line should
   " be replaced by whatever is chosen from the completion list
   if a:findstart
     " compute the completion context
-    if !exists('s:context')
-      " only if not already computed as part of voraxlib#omni#Meets
-      call s:ComputeCompletionContext()
-    endif
+    call s:ComputeCompletionContext()
     return s:context.complete_from
   else
     let result = [] " here we'll put the items to be shown in the completion list
     if s:context.type == 'word'
       " completion for a local object
-      
-      " let user choose a keyword
-      let result = s:SyntaxItems(a:base)
-      " let user choose a schema name
-      call extend(result, s:Schemas(a:base))
-      " let user choose an oracle object
-      call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:base))
-      " let user choose a word from the output window
-      call extend(result, s:WordsFromOutput(a:base))
-    "elseif s:params == 1
-      "complete procedure parameters
-      "let result = s:CurrentArguments()
+      call extend(result, s:GetWords(a:base))
     elseif s:context.type == 'dot'
       " we have a prefix which involves dot
-      let prefix_components = split(s:context.prefix, '\.', 1)
-      if len(prefix_components) == 2
-        " we have a prefix which can be: an alias or an object... we can't tell
-        " for sure therefore we'll try in this order
+      let leader = get(matchlist(s:context.prefix, '\(.*\)\(\.[0-9a-zA-Z#$_]*$\)'), 1)
+      " we have a prefix which can be: an alias or an object... we can't tell
+      " for sure therefore we'll try in this order
 
-        " check for an alias
-        let items = s:ResolveAlias(s:context.statement, prefix_components[0], toupper(a:base))
-        if len(items) > 0
-        	call extend(result, items)
-        else
-        	" maybe it's an object
-          let object_properties = voraxlib#utils#ResolveDbObject(prefix_components[0])
-          if !empty(object_properties) 
-          	if (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
-              " a regular table or view
-              call extend(result, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
-            elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE')
-              " a package or a type
-              call extend(result, s:GetSubmodules(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
-            endif
-          else
-          	" maybe it's a schema name (e.g. SYS.)
-            call extend(result, s:SchemaObjects("'" . toupper(prefix_components[0]) . "'", a:base))
+      " check for an alias
+      echom leader
+      let items = s:ResolveAlias(s:context.statement, leader, a:base)
+      if len(items) > 0
+        call extend(result, items)
+      else
+        " maybe it's an object
+        let object_properties = voraxlib#utils#ResolveDbObject(leader)
+        if !empty(object_properties) 
+          if (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
+            " a regular table or view
+            call extend(result, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
+          elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE')
+            " a package or a type
+            call extend(result, s:GetSubmodules(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
           endif
+        elseif leader !~ '\.'
+          " maybe it's a schema name (e.g. SYS.)
+          call extend(result, s:SchemaObjects("'" . toupper(leader) . "'", a:base))
         endif
       endif
-      "if len(result) == 0
-        "" no alias could be resolved... go on
-        "let info = s:db.ResolveDbObject(parts[0])
-        "if has_key(info, 'schema') 
-          "if info.type == 2 || info.type == 4
-            "" complete columns
-            "let result = s:Columns(info.schema, info.object, a:base, s:prefix)
-          "elseif info.type == 9 || info.type == 13
-            "" complete proc/func from the package/type
-            "let result = s:Submodules(info.schema, info.object, a:base)
-          "endif
-        "else
-          "" it may be a schema name
-          "let result = s:SchemaObjects(toupper(parts[0]), a:base)
-        "endif
-      "endif
-    "elseif len(parts) == 2
-      "" we can have here someting like owner.object
-      "let info = s:db.ResolveDbObject(parts[0] . '.' . parts[1])
-      "if has_key(info, 'schema') 
-        "if info.type == 2 || info.type == 4
-          "" complete columns
-          "let result = s:Columns(info.schema, info.object, a:base, s:prefix)
-        "elseif info.type == 9 || info.type == 13
-          "" complete proc/func from the package/type
-          "let result = s:Submodules(info.schema, info.object, a:base)
-        "endif
-      "endif
-    endif
-    if exists('s:context')
-    	unlet s:context
     endif
     return result
   endif  
 endfunction
 
+" This function is called only if autocomplpop plugin is used
+function! voraxlib#omni#OnPopupClose()
+  let prefix = matchstr(strpart(getline('.'), 0, col('.')), '[0-9a-zA-z#$_.]*$')
+  echom prefix
+  if prefix =~ '\.$'
+    if s:IsPrefixValid(prefix)
+      call feedkeys("\<C-x>\<C-o>")
+    endif
+  endif
+endfunction
+
 " This function is used only if autocomplpop plugin is used.
 function! voraxlib#omni#Meets(text)
-  call s:ComputeCompletionContext()
-  if s:context.type != ''
-  	return 1
-  else
-  	unlet s:context
-  	return 0
-  endif
+  return s:IsWordCompletion(a:text) || s:IsDotCompletion(a:text)
+endfunction
+
+" Get all items for a WORD completion
+function! s:GetWords(prefix)
+  let result = []
+  " let user choose a keyword
+  let result = s:SyntaxItems(a:prefix)
+  " let user choose a schema name
+  call extend(result, s:Schemas(a:prefix))
+  " let user choose an oracle object
+  call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:prefix))
+  " let user choose a word from the output window
+  call extend(result, s:WordsFromOutput(a:prefix))
+  return result
+endfunction
+
+" Whenever or not the provided prefix is a valid one (not matched by the
+" g:vorax_omni_skip_prefixes)
+function! s:IsPrefixValid(prefix)
+  return g:vorax_omni_skip_prefixes == '' || a:prefix !~ g:vorax_omni_skip_prefixes 
+endfunction
+
+" Return true if the provided text is candidate for a DOT completion.
+function! s:IsDotCompletion(text)
+  return a:text =~ '[0-9a-zA-Z#$_]\.[0-9a-zA-Z#$_]*$'
+endfunction,w
+
+" Return true if the provided text is candidate for a WORD completion.
+function! s:IsWordCompletion(text)
+  let matches = matchlist(a:text, '\([0-9a-zA-Z#$_]\{' . g:vorax_omni_word_prefix_length . ',}\)$')
+  return !empty(matches)
 endfunction
 
 " Compute the current completion context.
 function! s:ComputeCompletionContext()
   " The omni completion context. This dictionary helps to decide what kind of
   " completion should be performed.
-  let s:context = { 'statement' : '', 
-                  \ 'head' : '', 
-                  \ 'relpos' : 0, 
-                  \ 'prefix' : '', 
-                  \ 'type' : '', 
-                  \ 'line' : '',
-                  \ 'col' : -1,
-                  \ 'complete_from' : -1}
-  let s:context.col    = col('.') - 1
-  let s:context.line     = strpart(getline('.'), 0, s:context.col)
+  let context = { 'statement' : '', 
+                \ 'head' : '', 
+                \ 'relpos' : 0, 
+                \ 'prefix' : '', 
+                \ 'type' : '', 
+                \ 'line' : '',
+                \ 'col' : -1,
+                \ 'complete_from' : -1}
+  let context.col = col('.') - 1
+  let context.line = strpart(getline('.'), 0, context.col)
   let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
   let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
-  let tail = end_c - start_c
-  let lines = end_l - start_l
-  let s:context.statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
-  let s:context.relpos = voraxlib#utils#GetRelativePosition(start_l, start_c)
-  let s:context.head = strpart(s:context.statement, 0, s:context.relpos - 1)
-  let s:context.complete_from = -1
-  "if s:context.head =~ '[(,]\_s*[a-zA-Z0-9_#$]*$'
+  let context.statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
+  " compute the current relative position
+  let context.relpos = voraxlib#utils#GetRelativePosition(start_l, start_c)
+  " the leading part of the statement
+  let context.head = strpart(context.statement, 0, context.relpos)
+  " from where to replace with the selected omni item
+  let context.complete_from = -1
+  "if context.head =~ '[(,]\_s*[a-zA-Z0-9_#$]*$'
     "" parameters completion
-    ""let s:context.type = 'args'
-    "let s:context.complete_from = match(s:context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
-    "let s:context.prefix = strpart(s:context.line, s:context.complete_from)
-  if s:context.line =~ '\([0-9a-zA-Z#$_]\)\@<=\(\.[0-9a-zA-Z#$_]*$\)'
+    ""let context.type = 'args'
+    "let context.complete_from = match(context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
+    "let context.prefix = strpart(context.line, context.complete_from)
+  if s:IsDotCompletion(context.line)
     " completion involving a dot (e.g. owner. or table.)
-    let s:context.prefix = matchstr(s:context.line, '[0-9a-zA-z#$_.]*$')
-    if g:vorax_omni_skip_prefixes == '' || s:context.prefix !~ g:vorax_omni_skip_prefixes 
-      let s:context.type = 'dot'
-      let s:context.complete_from = match(s:context.line, '\(\.\)\@<=\([0-9a-zA-z#$_]*$\)')
-    endif
-  elseif s:context.line =~ '\<[0-9a-zA-z#$_]\{'. g:vorax_omni_word_prefix_length . ',\}\>$'
+    let context.prefix = matchstr(context.line, '[0-9a-zA-z#$_.]*$')
+    let context.type = 'dot'
+    let context.complete_from = match(context.line, '\(\.\)\@<=\([0-9a-zA-z#$_]*$\)')
+  elseif s:IsWordCompletion(context.line)
     " completion involving a word (e.g. dbms_sta)
-    let s:context.complete_from = match(s:context.line, '\(\s*\)\@<=\([0-9a-zA-z#$_]\{'.g:vorax_omni_word_prefix_length.',\}$\)')
-    let s:context.prefix = strpart(s:context.line, s:context.complete_from)
-    if g:vorax_omni_skip_prefixes == '' || s:context.prefix !~ g:vorax_omni_skip_prefixes 
-      let s:context.type = 'word'
+    let context.complete_from = match(context.line, '\(\s*\)\@<=\([0-9a-zA-z#$_]\{'.g:vorax_omni_word_prefix_length.',\}$\)')
+    let context.prefix = strpart(context.line, context.complete_from)
+    if s:IsPrefixValid(context.prefix)
+      let context.type = 'word'
     endif
   endif
+  if s:IsPrefixValid(context.prefix)
+    let s:context = context
+  endif
+  return s:context
 endfunction
 
 " Get a list of all procedure/functions within the provided package or type.
@@ -193,7 +177,7 @@ endfunction
 
 " Get a list of columns for the provided owner.object. 
 function! s:GetColumns(owner, object, lowercase, prefix)
-  let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and column_name like '" . a:prefix . "%'"
+  let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and column_name like '" . toupper(a:prefix) . "%'"
   if a:lowercase
     let column_name = 'lower(column_name)'
   else
@@ -216,6 +200,10 @@ endfunction
 
 " Get a list of columns which correspond to the provided alias.
 function! s:ResolveAlias(statement, alias, prefix)
+  if a:alias !~ '^[a-zA-Z0-9#$_]\+$'
+    " why bother? It's a bad alias
+    return []
+  endif
   let statement = toupper(a:statement)
   let raw_columns = []
   ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Alias::Lexer.columns_for(VIM::evaluate('statement'), VIM::evaluate('a:alias')))}"
