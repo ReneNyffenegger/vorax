@@ -28,31 +28,7 @@ function! voraxlib#omni#Complete(findstart, base)
       call extend(result, s:GetWords(a:base))
     elseif s:context.type == 'dot'
       " we have a prefix which involves dot
-      let leader = get(matchlist(s:context.prefix, '\(.*\)\(\.[0-9a-zA-Z#$_]*$\)'), 1)
-      " we have a prefix which can be: an alias or an object... we can't tell
-      " for sure therefore we'll try in this order
-
-      " check for an alias
-      echom leader
-      let items = s:ResolveAlias(s:context.statement, leader, a:base)
-      if len(items) > 0
-        call extend(result, items)
-      else
-        " maybe it's an object
-        let object_properties = voraxlib#utils#ResolveDbObject(leader)
-        if !empty(object_properties) 
-          if (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
-            " a regular table or view
-            call extend(result, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
-          elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE')
-            " a package or a type
-            call extend(result, s:GetSubmodules(object_properties.schema, object_properties.object, s:HasLowerHead(a:base), a:base))
-          endif
-        elseif leader !~ '\.'
-          " maybe it's a schema name (e.g. SYS.)
-          call extend(result, s:SchemaObjects("'" . toupper(leader) . "'", a:base))
-        endif
-      endif
+      call extend(result, s:GetDotItems(a:base))
     endif
     return result
   endif  
@@ -74,6 +50,11 @@ function! voraxlib#omni#Meets(text)
   return s:IsWordCompletion(a:text) || s:IsDotCompletion(a:text)
 endfunction
 
+function! voraxlib#omni#IsArgumentCompletion(statement, pos)
+  ruby VIM::command "let args = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('a:statement'), VIM::evaluate('a:pos')))}"
+  return args
+endfunction
+
 " Get all items for a WORD completion
 function! s:GetWords(prefix)
   let result = []
@@ -85,6 +66,35 @@ function! s:GetWords(prefix)
   call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:prefix))
   " let user choose a word from the output window
   call extend(result, s:WordsFromOutput(a:prefix))
+  return result
+endfunction
+
+" Get completion items involving a dot (e.g table. or owner.package.).
+function! s:GetDotItems(prefix)
+  let result = []
+  let leader = get(matchlist(s:context.prefix, '\(.*\)\(\.[0-9a-zA-Z#$_]*$\)'), 1)
+  " we have a prefix which can be: an alias or an object... we can't tell
+  " for sure therefore we'll try in this order
+  " check for an alias
+  let items = s:ResolveAlias(s:context.statement, leader, a:prefix)
+  if len(items) > 0
+    call extend(result, items)
+  else
+    " maybe it's an object
+    let object_properties = voraxlib#utils#ResolveDbObject(leader)
+    if !empty(object_properties) 
+      if (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
+        " a regular table or view
+        call extend(result, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:prefix), a:prefix))
+      elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE')
+        " a package or a type
+        call extend(result, s:GetSubmodules(object_properties.schema, object_properties.object, s:HasLowerHead(a:prefix), a:prefix))
+      endif
+    elseif leader !~ '\.'
+      " maybe it's a schema name (e.g. SYS.)
+      call extend(result, s:SchemaObjects("'" . toupper(leader) . "'", a:prefix))
+    endif
+  endif
   return result
 endfunction
 

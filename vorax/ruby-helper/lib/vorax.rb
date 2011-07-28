@@ -41,4 +41,5 @@ Vorax::source('vorax/parser/SqlSplitter.rb')
 Vorax::source('vorax/parser/PlsqlLexer.rb')
 Vorax::source('vorax/parser/PlsqlParser.rb')
 Vorax::source('vorax/parser/Alias.rb')
+Vorax::source('vorax/parser/Argument.rb')
 
