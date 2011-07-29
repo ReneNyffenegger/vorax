@@ -25,10 +25,13 @@ function! voraxlib#omni#Complete(findstart, base)
     let result = [] " here we'll put the items to be shown in the completion list
     if s:context.type == 'word'
       " completion for a local object
-      call extend(result, s:GetWords(a:base))
+      call extend(result, s:GetWordItems(a:base))
     elseif s:context.type == 'dot'
       " we have a prefix which involves dot
       call extend(result, s:GetDotItems(a:base))
+    elseif s:context.type == 'args'
+      " argument completion
+      call extend(result, s:GetArgItems(a:base))
     endif
     return result
   endif  
@@ -36,9 +39,8 @@ endfunction
 
 " This function is called only if autocomplpop plugin is used
 function! voraxlib#omni#OnPopupClose()
-  let prefix = matchstr(strpart(getline('.'), 0, col('.')), '[0-9a-zA-z#$_.]*$')
-  echom prefix
-  if prefix =~ '\.$'
+  let prefix = matchstr(strpart(getline('.'), 0, col('.')-1), '[0-9a-zA-z#$_.]*\s*[,(]\?\s*$')
+  if prefix =~ '\(\.\)\|\(,\s*\)\|\((\s*\)$'
     if s:IsPrefixValid(prefix)
       call feedkeys("\<C-x>\<C-o>")
     endif
@@ -47,16 +49,13 @@ endfunction
 
 " This function is used only if autocomplpop plugin is used.
 function! voraxlib#omni#Meets(text)
-  return s:IsWordCompletion(a:text) || s:IsDotCompletion(a:text)
-endfunction
-
-function! voraxlib#omni#IsArgumentCompletion(statement, pos)
-  ruby VIM::command "let args = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('a:statement'), VIM::evaluate('a:pos')))}"
-  return args
+  return  s:IsWordCompletion(a:text) || 
+        \ s:IsDotCompletion(a:text) || 
+        \ s:IsArgumentCompletion(a:text)
 endfunction
 
 " Get all items for a WORD completion
-function! s:GetWords(prefix)
+function! s:GetWordItems(prefix)
   let result = []
   " let user choose a keyword
   let result = s:SyntaxItems(a:prefix)
@@ -86,7 +85,7 @@ function! s:GetDotItems(prefix)
       if (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
         " a regular table or view
         call extend(result, s:GetColumns(object_properties.schema, object_properties.object, s:HasLowerHead(a:prefix), a:prefix))
-      elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE')
+      elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE') && empty(object_properties.submodule)
         " a package or a type
         call extend(result, s:GetSubmodules(object_properties.schema, object_properties.object, s:HasLowerHead(a:prefix), a:prefix))
       endif
@@ -97,6 +96,36 @@ function! s:GetDotItems(prefix)
   endif
   return result
 endfunction
+
+" Get all parameters for the provided plsql procedure.
+function! s:GetArgItems(prefix)
+  let params = []
+  if s:context.module != ''
+    let object_properties = voraxlib#utils#ResolveDbObject(s:context.module)
+    if !empty(object_properties) 
+      let argument = s:HasLowerHead(a:prefix) ? 'lower(argument_name)' : 'argument_name'
+      let query =   "column kind format a100\n" .
+                  \ "column menu format a100\n" .
+                  \ 'select ' . argument . '|| '' => '' "word", DATA_TYPE "kind", decode(overload, null, '''' ,''o'' || OVERLOAD) "menu" ' .
+                  \ 'from all_arguments ' .
+                  \ "where owner='" . toupper(object_properties.schema) . "' " .
+                  \ "and package_name = '" . toupper(object_properties.object) . "' " .
+                  \ "and object_name ='" . toupper(object_properties.submodule) . "' " .
+                  \ "and argument_name is not null " .
+                  \ "and argument_name like '" . toupper(a:prefix) . "%' " .
+                  \ "and data_level = 0 " .
+                  \ "order by overload, position; "
+      let sqlplus = vorax#GetSqlplusHandler()
+      let result = sqlplus.Query(query)
+      if empty(result.errors)
+        call map(result.resultset, 'extend(v:val, {"icase" : 1, "dup" : 1})')
+        let params = result.resultset
+      endif
+    endif
+  endif
+  return params
+endfunction
+
 
 " Whenever or not the provided prefix is a valid one (not matched by the
 " g:vorax_omni_skip_prefixes)
@@ -115,6 +144,33 @@ function! s:IsWordCompletion(text)
   return !empty(matches)
 endfunction
 
+" Whenever or not argument completion should be tried.
+function! s:IsArgumentCompletion(what)
+  if type(a:what) == 1
+    " context provided as a string
+    let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
+    let [end_l, end_c] = voraxlib#utils#GetEndOfCurrentSql(0)
+    let statement = voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)
+    " compute the current relative position
+    let relpos = voraxlib#utils#GetRelativePosition(start_l, start_c)
+    let head = strpart(statement, 0, relpos)
+  elseif type(a:what) == 4
+    " context provided as a dictionary
+    " the leading part of the statement
+    let head = a:what.head
+    let relpos = a:what.relpos
+  else
+  	" not valid
+  	return 0
+  endif
+  ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('head'), VIM::evaluate('relpos')))}"
+  if exists('module') && !empty(module)
+    return 1
+  else
+  	return 0
+  endif
+endfunction
+
 " Compute the current completion context.
 function! s:ComputeCompletionContext()
   " The omni completion context. This dictionary helps to decide what kind of
@@ -123,6 +179,7 @@ function! s:ComputeCompletionContext()
                 \ 'head' : '', 
                 \ 'relpos' : 0, 
                 \ 'prefix' : '', 
+                \ 'module' : '',
                 \ 'type' : '', 
                 \ 'line' : '',
                 \ 'col' : -1,
@@ -135,15 +192,19 @@ function! s:ComputeCompletionContext()
   " compute the current relative position
   let context.relpos = voraxlib#utils#GetRelativePosition(start_l, start_c)
   " the leading part of the statement
-  let context.head = strpart(context.statement, 0, context.relpos)
+  let context.head = strpart(context.statement, 0, context.relpos - 1)
   " from where to replace with the selected omni item
   let context.complete_from = -1
-  "if context.head =~ '[(,]\_s*[a-zA-Z0-9_#$]*$'
-    "" parameters completion
-    ""let context.type = 'args'
-    "let context.complete_from = match(context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
-    "let context.prefix = strpart(context.line, context.complete_from)
-  if s:IsDotCompletion(context.line)
+  if s:IsArgumentCompletion(context)
+    " parameters completion
+    ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('context.head'), VIM::evaluate('context.relpos')))}"
+    if exists('module') && !empty(module)
+      let context.type = 'args'
+      let context.module = module
+      let context.complete_from = match(context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
+      let context.prefix = strpart(context.line, context.complete_from)
+    endif
+  elseif s:IsDotCompletion(context.line)
     " completion involving a dot (e.g. owner. or table.)
     let context.prefix = matchstr(context.line, '[0-9a-zA-z#$_.]*$')
     let context.type = 'dot'
@@ -159,12 +220,13 @@ function! s:ComputeCompletionContext()
   if s:IsPrefixValid(context.prefix)
     let s:context = context
   endif
+  echom string(s:context)
   return s:context
 endfunction
 
 " Get a list of all procedure/functions within the provided package or type.
 function! s:GetSubmodules(owner, object, lowercase, prefix)
-  let where = "owner = '" . a:owner . "' and object_name = '" . a:object . "' and procedure_name like '" . a:prefix . "%'"
+  let where = "owner = '" . a:owner . "' and object_name = '" . a:object . "' and procedure_name like '" . toupper(a:prefix) . "%'"
   if a:lowercase
     let procedure_name = 'lower(procedure_name)'
   else
@@ -179,7 +241,7 @@ function! s:GetSubmodules(owner, object, lowercase, prefix)
   let result = sqlplus.Query(query, params)
   if empty(result.errors)
     for proc in result.resultset
-      call add(procs, proc['PROCEDURE_NAME'])
+      call add(procs, {'word' : proc['PROCEDURE_NAME'], 'icase' : 1})
     endfor
   endif
   return procs

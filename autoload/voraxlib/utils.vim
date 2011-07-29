@@ -682,6 +682,7 @@ endfunction"}}}
 " context. It returnes a dictionary with the following keys:
 "   'schema' => the schema of the object
 "   'object' => the actual object
+"   'submodule' => proc/func within a package or type
 "   'dblink' => the name of the dblink if any
 "   'type'   => the type of the object:
 "                 2  = tables
@@ -735,7 +736,7 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
         \ "       elsif part1 is null and part2 is not null then\n" .
         \ "          l_obj := part2;\n" .
         \ "       end if;\n" .
-        \ "       dbms_output.put_line(schema || '\"' || l_obj || '\"' || dblink || '\"' || part1_type);\n" .
+        \ "       dbms_output.put_line(schema || '\"' || l_obj || '\"' || dblink || '\"' || part1_type || '\"' || part2);\n" .
         \ "       return;\n" .
         \ "     end if;\n" .
         \ "   end loop;\n" .
@@ -753,11 +754,12 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
   let info = {}
   if len(result) > 0
     " we have results
-    let fields = split(result, '"')
-    if len(fields) == 4
+    let fields = split(result, '"', 1)
+    if len(fields) >= 4
       let info['schema'] = fields[0]
       let info['object'] = fields[1]
       let info['dblink'] = fields[2]
+      let info['submodule'] = fields[4]
       if fields[3] == '2'
         let info['type'] = 'TABLE'
       elseif fields[3] == '4'

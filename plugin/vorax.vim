@@ -27,14 +27,14 @@ set cpo&vim
 " ==============================================================================
 " Check Vim version
 if v:version < 703
-  call voraxlib#utils#Warn("***warning*** this version of VoraX needs vim 7.3")
+  echo "***warning*** this version of VoraX needs vim 7.3"
   finish
 endif
 
 " Basic ruby prerequisites check
 if !has('ruby')
   " check for ruby support
-  call voraxlib#utils#Warn("***warning*** VoraX needs ruby support")
+  echo "***warning*** VoraX needs ruby support"
   finish
 else
   " is it ruby 1.8?
@@ -46,13 +46,13 @@ else
           \ (rver_parts[0] == '1' && rver_parts[1] == '9')
       " good to go
     else
-      call voraxlib#utils#Warn("***warning*** VoraX needs ruby 1.8.7 " .
-            \ "or ruby 1.9 support. Found " . rver)
+      echo "***warning*** VoraX needs ruby 1.8.7 " .
+            \ "or ruby 1.9 support. Found " . rver
       finish
     endif
   else
-    call voraxlib#utils#Warn("***warning*** Could not detect the version " .
-          \ "of your ruby support.")
+    echo "***warning*** Could not detect the version " .
+          \ "of your ruby support."
     finish
   endif
 endif
@@ -309,7 +309,6 @@ TLet g:vorax_omni_word_prefix_length = 2
 TLet g:vorax_omni_skip_prefixes = '^sys\.$'
 
 "}}}
-
 " g:vorax_test_constr"{{{
 
 " This global variable is used by vorax unit tests. Ignore it if you do not
