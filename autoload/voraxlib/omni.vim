@@ -146,6 +146,8 @@ endfunction
 
 " Whenever or not argument completion should be tried.
 function! s:IsArgumentCompletion(what)
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#omni#IsArgumentCompletion(' . string(a:what) . ')') | endif
+  let status = 0
   if type(a:what) == 1
     " context provided as a string
     let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
@@ -161,18 +163,19 @@ function! s:IsArgumentCompletion(what)
     let relpos = a:what.relpos
   else
   	" not valid
+    if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#omni#IsArgumentCompletion() => 0 (not a valid arg type)') | endif
   	return 0
   endif
-  ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('head'), VIM::evaluate('relpos')))}"
-  if exists('module') && !empty(module)
-    return 1
-  else
-  	return 0
+  if !empty(s:ArgumentSpotBelongsTo(head, relpos))
+    let status = 1
   endif
+  if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#omni#IsArgumentCompletion() => ' . status) | endif
+  return status
 endfunction
 
 " Compute the current completion context.
 function! s:ComputeCompletionContext()
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#omni#ComputeCompletionContext()') | endif
   " The omni completion context. This dictionary helps to decide what kind of
   " completion should be performed.
   let context = { 'statement' : '', 
@@ -192,18 +195,15 @@ function! s:ComputeCompletionContext()
   " compute the current relative position
   let context.relpos = voraxlib#utils#GetRelativePosition(start_l, start_c)
   " the leading part of the statement
-  let context.head = strpart(context.statement, 0, context.relpos - 1)
+  let context.head = strpart(context.statement, 0, context.relpos)
   " from where to replace with the selected omni item
   let context.complete_from = -1
-  if s:IsArgumentCompletion(context)
+  let context.module = s:ArgumentSpotBelongsTo(context.head, context.relpos)
+  if context.module != ''
     " parameters completion
-    ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('context.head'), VIM::evaluate('context.relpos')))}"
-    if exists('module') && !empty(module)
-      let context.type = 'args'
-      let context.module = module
-      let context.complete_from = match(context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
-      let context.prefix = strpart(context.line, context.complete_from)
-    endif
+    let context.type = 'args'
+    let context.complete_from = match(context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
+    let context.prefix = strpart(context.line, context.complete_from)
   elseif s:IsDotCompletion(context.line)
     " completion involving a dot (e.g. owner. or table.)
     let context.prefix = matchstr(context.line, '[0-9a-zA-z#$_.]*$')
@@ -220,8 +220,17 @@ function! s:ComputeCompletionContext()
   if s:IsPrefixValid(context.prefix)
     let s:context = context
   endif
-  echom string(s:context)
+  if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#omni#ComputeCompletionContext() => ' . string(s:context)) | endif
   return s:context
+endfunction
+
+" Get the inner module which correspond to the provided argument completion spot.
+function! s:ArgumentSpotBelongsTo(statement, relpos)
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:ArgumentSpotBelongsTo(' .string(a:statement) . ', ' . a:relpos . ')') | endif
+  let module = ''
+  ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('a:statement'), VIM::evaluate('a:relpos')))}"
+  if s:log.isTraceEnabled() | call s:log.trace('END s:ArgumentSpotBelongsTo() => ' . string(module)) | endif
+  return module
 endfunction
 
 " Get a list of all procedure/functions within the provided package or type.

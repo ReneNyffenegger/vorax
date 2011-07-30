@@ -169,7 +169,7 @@ endfunction"}}}
 " line, col which, if provided, the relative position is computed based on
 " these values.
 function! voraxlib#utils#GetRelativePosition(...)
-  let [crr_l, crr_c] = [line('.'), col('.')]
+  let [crr_l, crr_c] = [line('.'), col('.') - 1]
   if a:0 != 2
     let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
   else
