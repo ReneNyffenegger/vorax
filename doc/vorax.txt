@@ -1,0 +1,37 @@
+*vorax.txt*   Plugin for working with Oracle databases.
+            For vim version 7.x
+
+			       By Alexandru Tică
+		     alexandru.tica email-at-sign gmail.com
+
+                                                        *vorax* *vorax-plugin*
+
+VoraX is a minimalist Oracle IDE based on the well known Vim editor. The main
+reasons which motivate us to develop this plugin are:
+
+	- the power of Vim editor. When applied to Oracle development or 
+	  for database administration it brings a lot of efficiency and fun.
+
+	- the need for a cross platform tool. Vim editor is available on many
+	  platforms which means you're free to use whatever OS you like.
+
+	- availability as a console IDE. Having a shiny IDE on a slow SSH
+	  connection doesn't sound so good, does it? A DBA will be pleased 
+	  running VoraX in a console because, usually, is so used running OS 
+	  commands, scripts etc. and, of course, the terminal is his/her best 
+	  friend. With VoraX in place you don't need to leave your beloved 
+	  console anymore.
+
+	- having an IDE with a very small footprint. VoraX is nothing but a 
+	  collection of VimL and Ruby scripts provided as a Vim plugin. We 
+	  hope VoraX will consume as less resources as possible.
+
+	- the dream of an improved SqlPLUS environment. I know a lot of guys
+	  (including me) who intensivelly use SqlPLUS, even for complex tasks. 
+	  On the other hand its limitations are quite annoying: we want good 
+	  code completion, pretty print output and so on. We cannot get rid of 
+	  SqlPLUS because we still think it is a great tool but we can make it 
+	  better. This is another goal of VoraX.
+
+
+vim:ts=8 sw=8 noexpandtab tw=78 ft=help:
