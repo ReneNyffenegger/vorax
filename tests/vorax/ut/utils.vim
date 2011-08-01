@@ -87,7 +87,7 @@ function! TestVoraxUtilsGetStartOfCurrentSql()
   try
     let [l, c] = voraxlib#utils#GetStartOfCurrentSql(0)
     call VUAsserFail('voraxlib#utils#Get...OfCurrentSql should not work without a syntax file.')
-  catch /^A sql syntax must be enabled for the current buffer.$/
+  catch /^A sql\/plsql syntax must be enabled for the current buffer.$/
   endtry
 
   bwipe!
@@ -125,7 +125,7 @@ function! TestVoraxUtilsGetEndOfCurrentSql()
   try
     let [l, c] = voraxlib#utils#GetEndOfCurrentSql(0)
     call VUAsserFail('voraxlib#utils#Get...OfCurrentSql should not work without a syntax file.')
-  catch /^A sql syntax must be enabled for the current buffer.$/
+  catch /^A sql\/plsql syntax must be enabled for the current buffer.$/
   endtry
 
   bwipe!
@@ -165,16 +165,18 @@ function! TestVoraxUtilsCountMatch()
   call VUAssertEquals(voraxlib#utils#CountMatch("line1\nline2\nline3\nline4", 'l'), 4, "Test 2")
 endfunction
 
-function! TestVoraxUtilsHasSqlDelimitator()
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator('select * from cat;'), 1, 'Simple stmt with ; at the end')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("select ';' from cat\n\n;"), 1, 'Delim on a new line')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator('select * from cat'), 0, 'Simple stmt without delim at the end')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin dbms_output.put_line('muci'); end;"), 0, 'Incomplete plsql block.')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin dbms_output.put_line('muci'); end/*muci*/muci;"), 0, 'Incomplete plsql block 2.')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;"), 0, 'Incomplete plsql block 3.')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;\n/"), 1, 'Complete plsql block 1.')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("begin\ndbms_output.put_line('muci');\nend \"muci\"\n;"), 0, 'InComplete plsql block 3.')
-  call VUAssertEquals(voraxlib#utils#HasSqlDelimitator("select * from cat --muci\n/\n"), 1, 'Statement with comment at the end')
+function! TestVoraxUtilsGetSqlDelimitator()
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator('select * from cat;'), '', 'Simple stmt with ; at the end')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("select ';' from cat\n\n;"), '', 'Delim on a new line')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator('select * from cat'), ';', 'Simple stmt without delim at the end')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("begin dbms_output.put_line('muci'); end;"), "\n/\n", 'Incomplete plsql block.')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("begin dbms_output.put_line('muci'); end/*muci*/muci;"), "\n/\n", 'Incomplete plsql block 2.')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;"), "\n/\n", 'Incomplete plsql block 3.')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;\n/"), "", 'Complete plsql block 1.')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("begin\ndbms_output.put_line('muci');\nend \"muci\"\n;"), "\n/\n", 'Incomplete plsql block 4.')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("select * from cat --muci\n/\n"), "", 'Statement with comment at the end')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("create or replace type muci is table of varchar2(100);"), "\n/\n", 'a type statement')
+  call VUAssertEquals(voraxlib#utils#GetSqlDelimitator("create /*muci*/ type muci is table of varchar2(100);"), "\n/\n", 'a type statement 2')
 endfunction
 
 function! TestVoraxUtilsRemoveSqlDelimitator()
@@ -288,11 +290,14 @@ endfunction
 function! TestVoraxUtilsResolveDbObject()
   call vorax#GetSqlplusHandler().Exec('connect ' . g:vorax_test_constr)
 
-  let expected = {'schema' : 'SYS', 'object' : 'USER_CATALOG', 'dblink' : '', 'type' : 'VIEW'}
+  let expected = {'schema' : 'SYS', 'object' : 'USER_CATALOG', 'dblink' : '', 'type' : 'VIEW', 'submodule' : ''}
   call VUAssertEquals(expected, voraxlib#utils#ResolveDbObject('cat'), 'Test 1')
 
-  let expected = {'schema' : 'SYS', 'object' : 'DBMS_STATS', 'dblink' : '', 'type' : 'PACKAGE'}
+  let expected = {'schema' : 'SYS', 'object' : 'DBMS_STATS', 'dblink' : '', 'type' : 'PACKAGE', 'submodule' : ''}
   call VUAssertEquals(expected, voraxlib#utils#ResolveDbObject('dbms_stats'), 'Test 2')
+
+  let expected = {'schema' : 'SYS', 'object' : 'DBMS_STATS', 'dblink' : '', 'type' : 'PACKAGE', 'submodule' : 'GATHER_SCHEMA_STATS'}
+  call VUAssertEquals(expected, voraxlib#utils#ResolveDbObject('dbms_stats.gather_schema_stats'), 'Test 3')
 endfunction
 
 function! TestVoraxUtilsGetCurrentStatement()
@@ -306,19 +311,18 @@ function! TestVoraxUtilsGetCurrentStatement()
 endfunction
 
 function! TestVoraxUtilsGetRelativePosition()
-  call VoraxReloadEnvironment()
   silent exe 'split ' . s:ut_dir . '/../sql/under_cursor.sql'
 
   call setpos('.', [bufnr('%'), 6, 3, 0])
   let pos = voraxlib#utils#GetRelativePosition()
-  call VUAssertEquals(pos, 12, 'voraxlib#utils#GetRelativePosition test 1')
+  call VUAssertEquals(pos, 11, 'voraxlib#utils#GetRelativePosition test 1')
 
   call setpos('.', [bufnr('%'), 6, 48, 0])
   let pos = voraxlib#utils#GetRelativePosition()
-  call VUAssertEquals(pos, 5, 'voraxlib#utils#GetRelativePosition test 2')
+  call VUAssertEquals(pos, 4, 'voraxlib#utils#GetRelativePosition test 2')
 
   let pos = voraxlib#utils#GetRelativePosition(6, 44)
-  call VUAssertEquals(pos, 5, 'voraxlib#utils#GetRelativePosition test 2')
+  call VUAssertEquals(pos, 4, 'voraxlib#utils#GetRelativePosition test 2')
 
   bwipe!
 endfunction

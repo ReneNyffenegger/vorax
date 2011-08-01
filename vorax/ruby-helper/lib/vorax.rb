@@ -17,11 +17,11 @@ end
 module Vorax
 
   def Vorax.source(file, force = (defined?($vorax_testing) && $vorax_testing))
-    if force
-      load file
-    else
+    #if force
+      #load file
+    #else
       require file
-    end
+    #end
   end
 
 end

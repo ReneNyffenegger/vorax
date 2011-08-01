@@ -391,27 +391,39 @@ function! voraxlib#utils#CountMatch(text, pattern)"{{{
   return c
 endfunction"}}}
 
+" Check if this kind of statement require a slash to end it. It's the case of
+" plsql modules, including types.
+function! voraxlib#utils#IsSlashRequiredAsEnd(statement)
+  " check for a type
+  if a:statement !~ '\v\n\s*/\s*\n*$'
+    let pattern = '\_s*create\_s\+\(or\_s\+replace\_s\+\)\?type\_s\+'
+    return a:statement =~? pattern || a:statement =~? s:plsql_end_marker
+  endif
+  return 0
+endfunction
+
 " Whenever or not the provided statement has the sql delimitator at the end.
-function! voraxlib#utils#HasSqlDelimitator(statement)"{{{
+function! voraxlib#utils#GetSqlDelimitator(statement)"{{{
   let statement = voraxlib#utils#RemoveAllSqlComments(a:statement)
   if statement =~ '\v\n\s*/\s*\n*$'
     " the statement has an ending /
-  	return 1
-  elseif statement =~ s:plsql_end_marker
+  	return ''
+  elseif voraxlib#utils#IsSlashRequiredAsEnd(statement)
     " the statement is a PL/SQL block but it doesn't have the ending /
-    return 0
+    return "\n/\n"
   elseif statement =~ '\v\_s*;\_s*\_$'
     " a regular statement with ; at the end
-    return 1
+    return ''
   else
-  	return 0
+  	return ';'
   endif
 endfunction"}}}
 
 " Remove the end delimitator, if any
 function! voraxlib#utils#RemoveSqlDelimitator(statement)"{{{
-  if voraxlib#utils#HasSqlDelimitator(a:statement)
-  	return substitute(a:statement, '\v(\n+\s*/\s*\n*$)|(\_s*;\_s*\_$)', '', '')
+  if voraxlib#utils#GetSqlDelimitator(a:statement) == ''
+    " only if a delimitator is there
+    return substitute(a:statement, '\v(\n+\s*/\s*\n*$)|(\_s*;\_s*\_$)', '', '')
   else
   	return a:statement
   endif
@@ -419,22 +431,14 @@ endfunction"}}}
 
 " Adds a sql delimitator at the end of the statement.
 function! voraxlib#utils#AddSqlDelimitator(statement)"{{{
-  if !voraxlib#utils#HasSqlDelimitator(a:statement)
-    if a:statement =~ s:plsql_end_marker
-      " that's a plsql end marker add a /
-      return a:statement . "\n/\n"
-    else
-    	" add the delimitator on the same line. This is needed because VoraX
-    	" doesn't know if it's an sqlplus command or an SQL command. For
-    	" example: 'SET AUTOTRACE ON;' is not the same as 'SET AUTOTRACE ON\n;'.
-    	" The second is dangerous because it excutes also the previous SQL
-    	" command. Likewise, take care about the trailing comment. Something
-    	" like 'SELECT * FROM CAT -- my comment;' is useless.
-    	return voraxlib#utils#RTrimSqlComments(a:statement) . ";"
-    endif
-  else
-  	return a:statement
-  endif
+  let end_delimitator = voraxlib#utils#GetSqlDelimitator(a:statement)
+  " add the delimitator on the same line. This is needed because VoraX
+  " doesn't know if it's an sqlplus command or an SQL command. For
+  " example: 'SET AUTOTRACE ON;' is not the same as 'SET AUTOTRACE ON\n;'.
+  " The second is dangerous because it excutes also the previous SQL
+  " command. Likewise, take care about the trailing comment. Something
+  " like 'SELECT * FROM CAT -- my comment;' is useless.
+  return substitute(voraxlib#utils#RTrimSqlComments(a:statement), '\_s*$', '', '') . end_delimitator
 endfunction"}}}
 
 " Whenever or not the provided statement is an oracle query.
@@ -784,15 +788,15 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
 endfunction"}}}
 
 " Check if the buffer has the proper syntax.
-function! s:CheckSyntax()
+function! s:CheckSyntax()"{{{
   if !exists('b:current_syntax') || (b:current_syntax != 'sql' && b:current_syntax != 'plsql')
     throw 'A sql/plsql syntax must be enabled for the current buffer.'
   endif
-endfunction
+endfunction"}}}
 
 " Whenever or not the current cursor position points out to a real sql
 " delimitator (according to the syntax file).
-function! s:IsMarkedAsDelimitator()
+function! s:IsMarkedAsDelimitator()"{{{
   let l = line('.')
   let c = col('.')
   if (b:current_syntax == 'sql' && synIDattr(synIDtrans(synID(l, c, 1)), "name") == '') ||
@@ -801,7 +805,7 @@ function! s:IsMarkedAsDelimitator()
   else
   	return 0
   endif
-endfunction
+endfunction"}}}
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

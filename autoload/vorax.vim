@@ -208,8 +208,9 @@ function! vorax#CompileBuffer()"{{{
       let qerr = voraxlib#utils#GetQuickFixCompilationErrors(b:vorax_module['owner'], 
                                                  \ b:vorax_module['object'], 
                                                  \ b:vorax_module['type'])
-      let after_valid = 1
       if len(qerr) > 0
+        " set cursor on the first error
+        call setpos('.', [qerr[0]["bufnr"], qerr[0]["lnum"], qerr[0]["col"], 0])
         " if we have errors to show
         call setqflist(qerr, 'r')
         botright cwindow
@@ -221,6 +222,7 @@ function! vorax#CompileBuffer()"{{{
       call vorax#GetOutputWindowHandler().AppendText(output)
       " refresh db explorer
       if exists('initial_valid') &&
+            \ exists('after_valid') &&
             \ initial_valid != after_valid
         if g:vorax_explorer.window.IsOpen()
           call g:vorax_explorer.Refresh()
@@ -271,25 +273,29 @@ endfunction"}}}
 " with the following structure {'executing_msg' : '', 'throbber': ,
 " 'done_msg': ''}. (for details see the sqlplus.Query method).
 function! vorax#GetDDL(schema, object_name, type, ...)"{{{
-  let query = "set long 1000000000 longc 60000\n" .
-            \ "set wrap on\n" .
-            \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', TRUE );\n" .
+  let statement = "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', TRUE );\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'BODY', TRUE );\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'PRETTY', TRUE );\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'CONSTRAINTS_AS_ALTER', TRUE );\n" .
-            \ "select dbms_metadata.get_ddl('" . a:type . "', '" . a:object_name . "', '" . a:schema . "') src from dual;"
+            \ "exec dbms_output.put_line(dbms_metadata.get_ddl('" . a:type . "', '" . a:object_name . "', '" . a:schema . "'));"
   let sqlplus = vorax#GetSqlplusHandler()
   let params = {}
   if exists('a:1')
   	let params = a:1
   endif
-  let output = sqlplus.Query(query, params)
-  if empty(output.errors)
-    if !empty(output.resultset)
-      return split(output.resultset[0]['SRC'], '\r\?\n')
-    endif
+  let params['sqlplus_options'] = extend(sqlplus.GetSafeOptions(), 
+                            \ [{'option' : 'serveroutput', 'value' : 'on'},
+                            \  {'option' : 'pagesize', 'value' : '0'},
+                            \  {'option' : 'feedback', 'value' : 'off'},
+                            \  {'option' : 'echo', 'value' : 'off'}, 
+                            \  {'option' : 'markup', 'value' : 'html off'},
+                            \ ])
+  let output = sqlplus.Exec(sqlplus.Pack(statement, {'include_eor' : 1}), params)
+  let output = substitute(output, '\%(\_s\|[\r]\)*$', '', 'g')
+  if !voraxlib#utils#HasErrors(output)
+    return split(output, '\r\?\n')
   else
-    call voraxlib#utils#Warn("WTF? What's with this error?\n" . join(output.errors, "\n"))
+    call voraxlib#utils#Warn("Cannot load object definition.\n"))
     return []
   endif
 endfunction"}}}
