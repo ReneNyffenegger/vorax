@@ -13,6 +13,7 @@
 	   Installation Guide ..................... |vorax-install|
 	   Connecting to a database ............... |vorax-connect|
 	   Executing statements ................... |vorax-exec|
+	   The output window  ..................... |vorax-output|
 
 
 ==============================================================================
@@ -71,8 +72,7 @@ VoraX comes with the following features:
 	
 	- An output window where the results of running various statements are
 	  displayed. Within this window logging may be started in order to
-	  save everything is written there into a file on disk for future
-	  inspection.
+	  save everything is output into a file on disk for future inspection.
 	
 	- Support for editing and compiling PL/SQL modules like packages,
 	  types, procedure and functions.
@@ -107,9 +107,13 @@ still written in Ruby.
 ==============================================================================
 INSTALLATION GUIDE                                               *vorax-install* 
 
-VoraX follows the standard procedure of installing a Vim plugin. You may use
-Pathogen, vim-addon-manager or the manual installation. It's completely up to 
-you!
+VoraX follows the standard procedure of installing a Vim plugin: uncompress
+the vorax archive into $HOME/.vim if you are on a *NIX platform or into
+$HOME/vimfiles if you are on Windows. If you want VoraX to be available for
+all users then you may consider installing VoraX in your Vim HOME location. 
+
+You may also use Pathogen, vim-addon-manager or other similar addons management
+plugins if you want. It's completely up to you!
 
 However, you need to take care of some dependencies VoraX relies on: 
 
@@ -170,13 +174,13 @@ to memorize it: "pr" stands for PRofiles.
 Of course, at the very beginning, no profiles are configured. To add a new
 profile, while you are in this window, you must display the contextual menu by
 pressing <Tab>. This key is the default one, but you're free to choose another
-one if you don't like it. From this menu you may choose to create a new
-connection profile by specifying the following:
+one if you don't like it. From this menu you may select the option to create a 
+new connection profile and then to enter the following:
 
 	1. A connection string (e.g. scott@testdb).
 	2. A category (e.g. Development or Production etc.).
 	3. An importance flag. This is used to display this profile with a
-	distinct color in order to underling that it's about a powerful user.
+	distinct color in order to underline that it's about a powerful user.
 	For example, a connection profile with SYS might be a good candidate
 	for this kind of flag.
 
@@ -186,7 +190,7 @@ create a secured repository for you. You'll be prompted for a master password
 and then all Oracle passwords will be securely stored in this repository.
 Thus, you don't need to remember a lot of passwords but just the master one.
 
-Having these profiles configured is quite handy because the VoraxConnect
+Having these profiles configured is quite handy because VoraxConnect
 command is aware of them and you can use completion instead of typing the
 entire connection string.
 
@@ -200,5 +204,57 @@ bang version except for:
 	case you may change the current folder in Vim and then force a
 	reconnect so that the newly created SqlPLUS process to be started
 	from the current location.
+
+==============================================================================
+EXECUTING STATEMENTS    				            *vorax-exec* 
+
+In SqlPLUS you just write the statement on the SQL> prompt, press ENTER and
+you have the results back with the SQL> prompt waiting for you to provide
+another statement. In VoraX is a bit different. You don't have an SQL> prompt
+but an entire Vim sql buffer where you can write various statements and run
+them from there. It's more like in a PL/SQL Developer or Toad SQL window.
+
+Executing SQL statements is allowed just in sql buffers. This is important in
+order to avoid any further frustrations or misunderstandings. Don't expect to
+have VoraX functionality in the [No Name] buffer or in a python one.
+
+If you want to start executing sql statements right away and need an sql
+buffer, VoraX provides a so called "sql scratch buffer". To open a scratch press
+<Leader>ss. It's easy: ss stands for "Sql Scratch". Changing this buffer will
+not ask you to save its content so it's important to realize that this scratch
+is just a playground. If you care about your SQL statements and want them 
+stored in a file then you must use a real sql buffer. For example:
+
+			       :e my_script.sql
+
+Being an sql buffer VoraX will work without a problem.
+
+To execute a statement, VoraX provides a standard keymap: <Leader>e. If you
+want to easily remember this keymap just think of "exec". Yes, "e" stands for
+"exec". Now, you may execute the current statement or the current selection.
+In the first case the current statement is assumed to be the one between two
+SQL separators. For example, supposing we have the following:
+
+		select * from cat;
+		select count(1) from (select * from v$session)
+		/
+		exec dbms_output.put_line('abc');
+
+and the cursor is located on the second line. When the user press <Leader>e
+then VoraX will know that it must execute the current statement and will try
+to detect it using a simple algorithm: find the previous SQL separator (in
+this case ";"), find the next SQL separator (in this case /) and execute
+everything in between. 
+
+However, as I already mentioned, it's also possible to execute a selection.
+For example, if we were to come back to the previous sql buffer and want to
+execute just "select * from v$session" then we can visually select that part
+and press <Leader>e. Only the selected text will be executed. VoraX will also
+take care to add the proper SQL separator at the end of the statement.
+
+==============================================================================
+THE OUTPUT WINDOW    				                  *vorax-output* 
+
+TBD.
 
 vim:ts=8 sw=8 noexpandtab tw=78 ft=help:
