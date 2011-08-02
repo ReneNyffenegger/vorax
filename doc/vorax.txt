@@ -9,9 +9,14 @@
 	Contents:
 	   What is VoraX .......................... |vorax-whatis|
 	   Features ............................... |vorax-features|
+	   Architecture ........................... |vorax-architecture|
+	   Installation Guide ..................... |vorax-install|
+	   Connecting to a database ............... |vorax-connect|
+	   Executing statements ................... |vorax-exec|
+
 
 ==============================================================================
-WHAT IS VORAX                                                   *vorax-whatis*
+WHAT IS VORAX                                                     *vorax-whatis*
 
 VoraX is a minimalist Oracle IDE based on the well known Vim editor. The main
 reasons which motivate us to develop this plugin are:
@@ -25,7 +30,7 @@ reasons which motivate us to develop this plugin are:
 	- availability as a console IDE. Having a shiny IDE on a slow SSH
 	  connection doesn't sound so good, does it? A DBA will be pleased 
 	  running VoraX in a console because, usually, is so used running OS 
-	  commands, scripts etc. and, of course, the terminal is his/her best 
+	  commands, scripts etc. and, of course, the terminal is his best 
 	  friend. With VoraX in place you don't need to leave your beloved 
 	  console anymore.
 
@@ -49,7 +54,7 @@ with all the limitations of the SqlPLUS (formatting output, syntax highlight
 etc.) To fill this gap is the whole idea of VoraX.
 
 ==============================================================================
-FEATURES                                                      *vorax-features*
+FEATURES                                                        *vorax-features*
 
 VoraX comes with the following features:
 
@@ -78,5 +83,122 @@ VoraX comes with the following features:
 	- Pretty print output. You may switch to a vertical columns output or
 	  to a compressed format. In a compressed output all columns width are
 	  resized according to the length of the contained data.
+
+==============================================================================
+ARCHITECTURE                                                *vorax-architecture*
+
+VoraX is based on SqlPLUS to interact with the database. Every statement you
+execute using VoraX is actually run by SqlPLUS behind. When VoraX is
+initialized a SqlPLUS process is started in background. Then VoraX
+communicates with this process by sending commands and grabbing the
+corresponding output.
+
+Maintaining this SqlPLUS process is done differently based on the current OS
+platform. On *NIX, VoraX communicates with SqlPLUS using PTYs, on Windows
+this communication is done with Windows PIPEs.
+
+In order to be able to implement this kind of interaction, VoraX uses Ruby
+language. Even we'd like to have a pure VimL implementation that isn't yet
+possible. However, we tried to limit developing VoraX features in Ruby as much
+as possible and use VimL instead. Nevertheless, parsing html output, writing
+and parsing Oracle grammars for code completion and other complex tasks are
+still written in Ruby.
+
+==============================================================================
+INSTALLATION GUIDE                                               *vorax-install* 
+
+VoraX follows the standard procedure of installing a Vim plugin. You may use
+Pathogen, vim-addon-manager or the manual installation. It's completely up to 
+you!
+
+However, you need to take care of some dependencies VoraX relies on: 
+
+   1. Vim 7.3 or above is required.
+
+   2. Your Vim must have ruby support enabled. In order to check this you may 
+      execute :version and look for +ruby. The supported Ruby is 1.8.7. To 
+      check this you may run the following command within your Vim editor:
+      
+      :ruby puts RUBY_VERSION
+      
+      CREAM configurations are not supported therefore a plain Vim should be 
+      used.
+
+   3. Ruby 1.8.7
+
+   4. Rubygems. On Debian systems is as simple as: 
+   
+      sudo apt-get install rubygems
+
+   5. The following gems:
+
+	- gem install antlr3 -r
+	- gem install activesupport -r
+	- gem install nokogiri -r
+
+   6. A working Oracle client with SqlPLUS, which has to be available in the 
+      environment $PATH variable. The instant client with SqlPLUS should be 
+      just fine.
+
+   7. Optionally, if you want to securely store passwords for your Oracle 
+      connections then the openssl ruby extension must be available. 
+      On Ubuntu/Debian systems you may use the following command to install it: 
+      
+      sudo apt-get install libopenssl-ruby1.8 
+
+==============================================================================
+CONNECTING TO A DATABASE				         *vorax-install* 
+
+The simplest method to connect to a new database is to use the VoraxConnect
+command. For example, the following command is used to connect to an imaginary
+TESTDB database with SCOTT user:
+
+		       :VoraxConnect scott/tiger@testdb
+
+On a successful connect you'll be welcomed with the usual Oracle SqlPLUS
+banner, otherwise the corresponding error will be displayed.
+
+Sometimes you want to organize all these connection strings in some kind of a
+repository for further reference. For this kind of functionality VoraX
+provides a connection profile window. To activate it just execute:
+
+			  :VoraxProfilesWindowToggle
+
+There's also a default mapping for toggling this window: <Leader>pr. It's easy
+to memorize it: "pr" stands for PRofiles.
+
+Of course, at the very beginning, no profiles are configured. To add a new
+profile, while you are in this window, you must display the contextual menu by
+pressing <Tab>. This key is the default one, but you're free to choose another
+one if you don't like it. From this menu you may choose to create a new
+connection profile by specifying the following:
+
+	1. A connection string (e.g. scott@testdb).
+	2. A category (e.g. Development or Production etc.).
+	3. An importance flag. This is used to display this profile with a
+	distinct color in order to underling that it's about a powerful user.
+	For example, a connection profile with SYS might be a good candidate
+	for this kind of flag.
+
+If the provided connection string contains also the password (e.g.
+scott/tiger@testdb) then VoraX will automatically figure out that it must
+create a secured repository for you. You'll be prompted for a master password
+and then all Oracle passwords will be securely stored in this repository.
+Thus, you don't need to remember a lot of passwords but just the master one.
+
+Having these profiles configured is quite handy because the VoraxConnect
+command is aware of them and you can use completion instead of typing the
+entire connection string.
+
+VoraxConnect command accepts also a bang (!). When used like this (e.g.
+VoraxConnect! scott/tiger@testdb) the SqlPLUS shadow process is recreated.
+Without a bang, the same SqlPLUS process is reused. Usually you don't use this
+bang version except for:
+
+	1. The SqlPLUS process is unresponsive and must be recreated.
+	2. You want to change the current directory seen by SqlPLUS. In this
+	case you may change the current folder in Vim and then force a
+	reconnect so that the newly created SqlPLUS process to be started
+	from the current location.
 
 vim:ts=8 sw=8 noexpandtab tw=78 ft=help:
