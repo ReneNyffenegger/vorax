@@ -239,6 +239,13 @@ TLet g:vorax_output_window_default_spool_file = 'g:vorax_home_dir."/".strftime("
 TLet g:vorax_output_window_statusline = "%!voraxlib#panel#output#StatusLine()"
 
 "}}}
+" g:vorax_output_window_clear_before_exec"{{{
+
+" Whenever or not the output window shoul be cleared before executing
+" anything.
+TLet g:vorax_output_window_clear_before_exec = 0
+
+"}}}
 " g:vorax_profiles_window_anchor"{{{
 
 " The anchor of the profile window. The allowed values are: topleft or

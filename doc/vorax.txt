@@ -150,6 +150,12 @@ However, you need to take care of some dependencies VoraX relies on:
       
       sudo apt-get install libopenssl-ruby1.8 
 
+In addition the following Vim script must be also installed:
+
+   - TLib: http://www.vim.org/scripts/script.php?script_id=1863
+
+Also, it's best to have "filetype plugin on" in your .vimrc file.
+
 ==============================================================================
 CONNECTING TO A DATABASE				         *vorax-install* 
 
@@ -219,8 +225,8 @@ order to avoid any further frustrations or misunderstandings. Don't expect to
 have VoraX functionality in the [No Name] buffer or in a python one.
 
 If you want to start executing sql statements right away and need an sql
-buffer, VoraX provides a so called "sql scratch buffer". To open a scratch press
-<Leader>ss. It's easy: ss stands for "Sql Scratch". Changing this buffer will
+buffer, VoraX provides a so called "SQL scratch buffer". To open a scratch press
+<Leader>ss. It's easy: ss stands for "SQL Scratch". Changing this buffer will
 not ask you to save its content so it's important to realize that this scratch
 is just a playground. If you care about your SQL statements and want them 
 stored in a file then you must use a real sql buffer. For example:
@@ -255,6 +261,70 @@ take care to add the proper SQL separator at the end of the statement.
 ==============================================================================
 THE OUTPUT WINDOW    				                  *vorax-output* 
 
-TBD.
+The result returned by the commands you execute is displayed into the output
+window. This window is automatically opened whenever something need to be
+shown (typically after an exec).
+
+You can choose between two modes:
+
+	1. Clear the output window before executing something. This means
+	you'll always have the results from the last command only.
+
+	2. Append the output of the next SQL command to the already existing
+	content (this is the default).
+
+You can use the |g:vorax_output_window_clear_before_exec| to control how the
+output window should behave.
+
+The output window has its own status line which, by default, displays the
+database you're currently logged on, output formatting options and other
+useful information. If you don't like the default configuration of this status
+line you're free to override it using the |g:vorax_output_window_statusline|
+variable.
+
+You can always clear the output window using "cle" keymap. This is a buffer
+mapping and, in order to work, you have to be within that window. "cle" stands
+for CLEar.
+
+Sometimes the default SqlPLUS columns formatting is not suitable even for
+large lines. For example, querying the DBA_DATA_FILE view will display a very
+long FILE_NAME column. Of course you can always use COLUMN FORMAT command but
+if you have to deal with many such columns this task becomes pretty annoying.
+That's why VoraX provides some standard output formats:
+
+	- The compressed output.
+	- The vertical output layout.
+
+The compressed output may be activated using <Leader>co. "co" stands for
+"Compressed Output". Pressing <Leader>co once again will deactivate this format. 
+In a compressed layout, the column width is automatically adjusted according to 
+its content. Unlike the default output, in a compressed layout you don't get
+immediate feedback because, in order to compress, all records must be
+fetched. So, a query on a big table without a filter using the compressed
+output is not a good idea.
+
+The vertical output displays each record like a card:
+
+	Column 1: <value>
+	Column 2: <value>
+	----------------------------
+	Column 1: <value>
+	Column 2: <value>
+
+Sometimes is better to scroll vertically. This output format may be activated
+using <Leader>vo. "vo" stands for "Vertical Output". This mapping acts like a
+toggle.
+
+The output window can be also paginated. This is useful when you want to
+inspect the output page by page. When paginating is in place after every page
+the output flow is interrupted and resumed on user confirmation. To activate
+pagination use <Leader>pa. "pa" stands for "PAginating".
+
+If you want to quickly inspect the content of a table but don't want to fetch 
+all records then you may enforce a "limiting rows" filter. You may configure
+this filter using the <Leader>lr. "lr" stands for "Limit Rows". This filter
+applies for all queries interactively executed from VoraX. This doesn't apply
+to queries from scripts. When executing a query and such a filter is in place
+VoraX will automatically add a "ROWNUM <= <number_of_rows>" clause.
 
 vim:ts=8 sw=8 noexpandtab tw=78 ft=help:

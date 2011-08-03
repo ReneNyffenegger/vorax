@@ -106,6 +106,10 @@ function! vorax#Exec(command)"{{{
     " This is important especially in connection with set echo on. With CRs
     " the sqlprompt will be echoed
     call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\_$', '', 'g'), {'include_eor' : 1}), 0)
+    if g:vorax_output_window_clear_before_exec
+    	" clear window before spit the result
+    	call outputwin.Clear()
+    endif
     call outputwin.StartMonitor()
   else
     if s:log.isDebugEnabled() | call s:log.debug('User decided to cancel the exec because of the pause on.') | endif
@@ -145,7 +149,6 @@ function! vorax#Describe(identifier, verbose)"{{{
                   \ {'option' : 'linesize', 'value' : '180'},
                   \ {'option' : 'markup', 'value' : 'html off'},
                 \ ])})
-        call outputwin.AppendText(output)
       endif
     else
       " simple desc
@@ -162,11 +165,13 @@ function! vorax#Describe(identifier, verbose)"{{{
               \ {'option' : 'linesize', 'value' : '120'},
               \ {'option' : 'markup', 'value' : 'html off'},
               \ ])})
-      call outputwin.AppendText(output)
     endif
-      if !g:vorax_output_window_keep_focus_after_exec
-      	exec crr_win . 'wincmd w'
-      endif
+    if exists('output')
+      call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
+    endif
+    if !g:vorax_output_window_keep_focus_after_exec
+      exec crr_win . 'wincmd w'
+    endif
   endif
 endfunction"}}}
 
@@ -219,7 +224,7 @@ function! vorax#CompileBuffer()"{{{
         " just close the cwindow
         cclose
       endif
-      call vorax#GetOutputWindowHandler().AppendText(output)
+      call vorax#GetOutputWindowHandler().AppendText(output, g:vorax_output_window_clear_before_exec)
       " refresh db explorer
       if exists('initial_valid') &&
             \ exists('after_valid') &&

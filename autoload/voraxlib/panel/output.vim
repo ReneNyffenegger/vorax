@@ -89,10 +89,14 @@ function! s:ExtendWindow()"{{{
   " Write the provided text at the end of the output window. If 
   " multiple lines has to be appended then provide the
   " a:text parameter as an array.
-  function! s:output_window.AppendText(text) "{{{
+  function! s:output_window.AppendText(text, ...) "{{{
     if !self.HasFocus()
       " focus the window if not active
       call self.Focus()
+    endif
+    if exists('a:1') && a:1 == 1
+      echom 'a intrat'
+      call self.Clear()
     endif
     let lines_no = line('$')
     let last_line = getline(lines_no)
