@@ -118,7 +118,9 @@ function! s:GetArgItems(prefix)
       let sqlplus = vorax#GetSqlplusHandler()
       let result = sqlplus.Query(query)
       if empty(result.errors)
-        call map(result.resultset, 'extend(v:val, {"icase" : 1, "dup" : 1})')
+        " process the results because sqlplus.Query cannot handle integers and
+        " strips the trailing whitespaces
+        call map(result.resultset, 'extend(v:val, {"word" : v:val["word"] . " ", "icase" : 1, "dup" : 1})')
         let params = result.resultset
       endif
     endif

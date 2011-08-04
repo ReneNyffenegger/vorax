@@ -14,6 +14,8 @@
 	   Connecting to a database ............... |vorax-connect|
 	   Executing statements ................... |vorax-exec|
 	   The output window  ..................... |vorax-output|
+	   The code completion system ............. |vorax-omni|
+	   The database explorer .................. |vorax-expolorer|
 
 
 ==============================================================================
@@ -215,10 +217,11 @@ bang version except for:
 EXECUTING STATEMENTS    				            *vorax-exec* 
 
 In SqlPLUS you just write the statement on the SQL> prompt, press ENTER and
-you have the results back with the SQL> prompt waiting for you to provide
-another statement. In VoraX is a bit different. You don't have an SQL> prompt
-but an entire Vim sql buffer where you can write various statements and run
-them from there. It's more like in a PL/SQL Developer or Toad SQL window.
+you have the results back with the SQL> prompt waiting for you, again, to 
+provide another statement. In VoraX is a bit different. You don't have an 
+SQL> prompt but an entire Vim sql buffer where you can write various statements 
+and run them from there. It's more like in a PL/SQL Developer or Toad SQL 
+window.
 
 Executing SQL statements is allowed just in sql buffers. This is important in
 order to avoid any further frustrations or misunderstandings. Don't expect to
@@ -257,6 +260,50 @@ For example, if we were to come back to the previous sql buffer and want to
 execute just "select * from v$session" then we can visually select that part
 and press <Leader>e. Only the selected text will be executed. VoraX will also
 take care to add the proper SQL separator at the end of the statement.
+
+In SqlPLUS, a statement may contain substitution variables. The user will be
+asked to provide the corresponding values at the execution time. From VoraX 
+point of view this is tricky because it sends the statement to SqlPLUS
+to be executed and then waits for the results, but in this case it will wait
+indefinitely because SqlPLUS also waits for the substitution variables values
+to be provided. Unfortunately, VoraX cannot figure out if a statement takes a
+lot of time simply because it's a long running command or the execution is
+stuck because SqlPLUS asks the user to enter some data. However, it's easy to
+figure out if something must be provided by the user by simply looking at the
+output.
+
+Suppose you have the following script:
+
+		accept x prompt "Enter x: "
+		prompt &x
+
+When you run it the output window will be updated with:
+
+Enter x:
+
+and the "Executing..." indicator will spin continuously at the bottom,
+indicating that the statement is still running. The output is self explanatory
+and it's pretty clear that we have to provide a value for "x". To provide this
+value you have to press <Enter>. VoraX will display a prompt at the bottom
+where you can enter this value, which is further sent to SqlPLUS and the
+execution will continue with the next statements from the script.
+
+By default VoraX spits the output as soon as it is available into the SqlPLUS
+buffer. Yet, as you'll see reading into the next section, VoraX may collect
+all output, process it, and at the end the final formatted result will be shown 
+(it's the case of the compressed/vertical output). In this case you cannot 
+figure out if you wait in an actual execution time or something is required to 
+be entered, simply because there is no output available yet. That's why VoraX 
+will always peek into the output spit by SqlPLUS and will display the last read
+chunk of data as part of the "Executing..." indicator spinner. For example,
+running the above script will show the following status:
+
+(Waiting in prompt or slow fetch). <CR> to input at prompt = [...Enter x: ] 
+
+Thus the possible prompt is displayed even no output was written yet into the
+output window. This means you still can figure out if SqlPLUS is waiting for
+some data to be entered or it is waiting for a long running statement to
+complete.
 
 ==============================================================================
 THE OUTPUT WINDOW    				                  *vorax-output* 
@@ -326,5 +373,77 @@ this filter using the <Leader>lr. "lr" stands for "Limit Rows". This filter
 applies for all queries interactively executed from VoraX. This doesn't apply
 to queries from scripts. When executing a query and such a filter is in place
 VoraX will automatically add a "ROWNUM <= <number_of_rows>" clause.
+
+==============================================================================
+THE CODE COMPLETION SYSTEM                                        *vorax-output* 
+
+We strongly believe that a good code completion system brings a lot of
+efficiency in coding activities. This is a common sense feature every IDE
+should have.
+
+VoraX provides code completion for the following editing spots (contexts):
+
+	1. In the middle of a word: VoraX will suggest: 
+	
+		- oracle keywords (e.g.  SELECT, SET etc.) 
+
+		- object names (e.g. packages, tables, views etc.),
+
+		- schema names (e.g. SYS, SYSTEM) 
+
+		- words from the output window which match the prefix from the 
+		  current word.
+
+	2. After a dot (e.g. DBMS_STATS., MYTABLE.): the "dot" completion
+	applies to: 
+	
+		- packages or types in order to suggest the containing
+		  function and procedure names.
+
+		- tables or views to suggest column names
+
+		- aliases to suggest column names for the referencing table,
+		  view or sub-querying
+
+		- schemas to suggest names for the containing database objects
+
+	3. After a "(" or a "," within a function or procedure in order to
+	suggest argument names.
+
+Invoking code completion may be done by pressing <C-x><C-o> in one of the
+above editing spots but, of course, you can install the following additional
+plugins which help quite a bit in this area:
+
+	- SuperTab: http://www.vim.org/scripts/script.php?script_id=1643
+	- AutocomplPop: http://www.vim.org/scripts/script.php?script_id=1879
+
+You may tweak some aspects of the completion system using the following global
+variables:
+
+	- |g:vorax_omni_word_prefix_length| => the minimum number of chars
+	  from within a word needed in order to suggest completion items. The
+	  default value is 2 which means you need at least 2 characters at the
+	  beginning of the word. For example, writing "D" and invoking
+	  completion will not show anything, but with "DB" a lot of completion
+	  items will be provided ("DBA_*, DBMS_* etc.).
+
+	- |g:vorax_omni_skip_prefixes| => a regular expression which may be
+	  used to exclude those completion prefixes which returns a lot of
+	  items slowing down the system. By default is '^sys\.$' which
+	  prohibits the completion system to provide a lot of items consisting
+	  of all SYS objects.
+
+Some IDEs don't let you choose how the completion items should be provided:
+uppercase or lowercase. As far as I'm concerned I don't like all these items
+to be in uppercase simply because they are stored like this in the Oracle
+dictionary. On the other hand, I'm sure there are a lot of DBAs who may
+prefer the uppercase style. To please everyone VoraX is trying to be clever:
+will provide these completion items taking into consideration the first
+character of the prefix. If the alias is written like "T." the columns
+corresponding to this alias are given in uppercase, but the "t." alias will
+provide the columns in lowercase.
+
+==============================================================================
+THE DATABASE EXPLORER                                           *vorax-explorer* 
 
 vim:ts=8 sw=8 noexpandtab tw=78 ft=help:

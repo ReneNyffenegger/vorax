@@ -276,7 +276,7 @@ function! s:SetStatusFeedback(chunk)"{{{
     let s:output_window['status'] .= voraxlib#utils#ExtractLines(a:chunk, last_line + 1)
     let s:output_window['status'] = strpart(substitute(s:output_window['status'], '\(\r\n\)\|\r\|\n', " ... ", "g"), len(s:output_window['status'])-20)
     if s:output_window.buffer.html
-      let s:output_window.status = voraxlib#parser#output#Compress(s:output_window.status, 0)
+      let s:output_window.status = substitute(voraxlib#parser#output#Compress(s:output_window.status, 0), '\(\r\n\)\|\r\|\n', "", "g")
     endif
   endif
   if s:pause
@@ -432,7 +432,7 @@ function! s:ProcessUserInput()"{{{
   if s:log.isDebugEnabled() | call s:log.debug('s:ProcessUserInput(): val=' .string(val)) | endif
   if sqlplus.html
     " compressed output is active, postpone to the output buffer
-    call s:output_window.PushToBuffer(val . "\n", 1)
+    call s:output_window.PushToBuffer(val . "\n<br>", 1)
   else
     " normal output. just put the inputed value to the output window
     call s:output_window.AppendText(val . "\n")
