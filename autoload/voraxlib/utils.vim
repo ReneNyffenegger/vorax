@@ -692,6 +692,7 @@ endfunction"}}}
 "                 2  = tables
 "                 4  = views
 "                 5  = synonym
+"                 6  = sequence
 "                 7  = procedure
 "                 8  = function
 "                 9  = packages
@@ -770,6 +771,8 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
         let info['type'] = 'VIEW'
       elseif fields[3] == '5'
         let info['type'] = 'SYNONYM'
+      elseif fields[3] == '6'
+        let info['type'] = 'SEQUENCE'
       elseif fields[3] == '7'
         let info['type'] = 'PROCEDURE'
       elseif fields[3] == '8'

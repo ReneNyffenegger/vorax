@@ -462,7 +462,7 @@ endif"}}}
 TLet g:vorax_profiles_window_menu_key = "<Tab>"
 "}}}
 " g:vorax_explorer_window_toggle_key"{{{
-TLet g:vorax_explorer_window_toggle_key = "<Leader>xo"
+TLet g:vorax_explorer_window_toggle_key = "<Leader>ve"
 if g:vorax_explorer_window_toggle_key != '' 
       \ && !hasmapto('<Plug>VoraxExplorerWindowToggle') 
       \ && !hasmapto(g:vorax_explorer_window_toggle_key, 'n')

@@ -374,8 +374,13 @@ applies for all queries interactively executed from VoraX. This doesn't apply
 to queries from scripts. When executing a query and such a filter is in place
 VoraX will automatically add a "ROWNUM <= <number_of_rows>" clause.
 
+The output window is also endowed with a built-in spooling feature. To
+activate it you can use <Leader>sp. "sp" stands for "SPooling". As soon as
+this feature is active, everything is written into the output window will be
+also appended to the configured spool file. 
+
 ==============================================================================
-THE CODE COMPLETION SYSTEM                                        *vorax-output* 
+THE CODE COMPLETION SYSTEM                                          *vorax-omni* 
 
 We strongly believe that a good code completion system brings a lot of
 efficiency in coding activities. This is a common sense feature every IDE
@@ -404,6 +409,8 @@ VoraX provides code completion for the following editing spots (contexts):
 
 		- aliases to suggest column names for the referencing table,
 		  view or sub-querying
+
+		- sequences to suggest "nextval" and "currval"
 
 		- schemas to suggest names for the containing database objects
 
@@ -445,5 +452,66 @@ provide the columns in lowercase.
 
 ==============================================================================
 THE DATABASE EXPLORER                                           *vorax-explorer* 
+
+Any decent database IDE has a database explorer/browser. Usually it is a tree
+with database objects grouped according to their types: tables, views,
+packages and so on.
+
+VoraX is coming with the same approach: a Vim window/buffer showing all
+database objects in a hierarchy. To toggle the database browser you may use
+the <Leader>ve keymap. "ve" stands for "Vorax Explorer".
+
+To expand, collapse or open a node you may press <Enter> or "o". To refresh a 
+node you may press "R". To invoke the contextual menu for a particular database 
+object you may press <Tab>.
+
+The database explorer may be extended using custom plugins. A database
+explorer plugin is a VimL script which must be located under 
+vorax/plugin/explorer folder. These scripts are automatically loaded by VoraX
+when the database explorer is invoked for the first time.
+
+A database explorer plugin allows to inject a new action into the contextual
+menu. For example, one might want to collect statistics for tables directly 
+from the database explorer. In order to achieve that a custom explorer plugin 
+can be written.
+
+A custom plugin must implement a pre-defined interface:
+
+		plugin = {'label' : '', 
+			  'shortcut' : '', 
+			  'description' : ''}
+
+		function plugin.IsActive(path)
+
+		function plugin.Configure()
+
+		function plugin.Callback()
+
+You can use g:vorax_explorer.GetPluginSkeleton() function to get a dummy
+explorer plugin skeleton.
+
+The "label" and "description" attributes are displayed into the contextual
+menu. The "shortcut" is the keymap which may be used to directly invoke the
+action without showing the contextual menu.
+
+The "IsActive" function is called with the path corresponding to the current
+explorer node. It must return 1 if the plugin should be active for that node
+or 0 otherwise. For example, a plugin which gathers statistics should not be
+active for packages, synonyms etc.
+
+The "Configure" function is invoked once at the plugin loading time. Using
+this hook the plugin can do some initializing/setup stuff.
+
+The action, that is what the plugin is supposed to do, is coded in the 
+"Callback" function. 
+
+As soon as the plugin definition/object is created it has to be registered
+using the following call:
+
+     call g:vorax_explorer.RegisterPlugin(<unique_name>, <plugin_object>)
+
+The unique name is typically the plugin filename script.
+You can find some real examples of explorer plugins into the vorax/plugin/explorer/
+folder.
 
 vim:ts=8 sw=8 noexpandtab tw=78 ft=help:

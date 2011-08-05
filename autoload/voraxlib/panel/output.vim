@@ -95,7 +95,6 @@ function! s:ExtendWindow()"{{{
       call self.Focus()
     endif
     if exists('a:1') && a:1 == 1
-      echom 'a intrat'
       call self.Clear()
     endif
     let lines_no = line('$')

@@ -22,9 +22,9 @@ let s:plugin.shortcut = g:vorax_explorer_plugin_body_edit_key
 
 " the functions which tells for what nodes the plugin should be available.
 function! s:plugin.IsActive(path)
-  let info = g:vorax_explorer.DescribePath(a:path)
+  let s:info = g:vorax_explorer.DescribePath(a:path)
   " Only for packages and types please
-  if info.type == 'PACKAGE' || info.type == 'TYPE'
+  if s:info.type == 'PACKAGE' || s:info.type == 'TYPE'
     return 1
   else
   	return 0
@@ -33,14 +33,16 @@ endfunction
 
 " What to do when the plugin is invoked
 function! s:plugin.Callback()
-  let info = g:vorax_explorer.DescribePath(g:vorax_explorer.GetCurrentNode())
-  if info.type == 'PACKAGE'
-    let type = 'PACKAGE_BODY'
-  elseif info.type == 'TYPE'
-    let type = 'TYPE_BODY'
-  endif
-  if exists('type')
-    call vorax#LoadDbObject(info.owner, info.object, type)
+  let crr_node = g:vorax_explorer.GetCurrentNode()
+  if self.IsActive(crr_node)
+    if s:info.type == 'PACKAGE'
+      let type = 'PACKAGE_BODY'
+    elseif s:info.type == 'TYPE'
+      let type = 'TYPE_BODY'
+    endif
+    if exists('type')
+      call vorax#LoadDbObject(s:info.owner, s:info.object, type)
+    endif
   endif
 endfunction
 

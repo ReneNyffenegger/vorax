@@ -88,11 +88,25 @@ function! s:GetDotItems(prefix)
       elseif (object_properties.type == 'PACKAGE' || object_properties.type == 'TYPE') && empty(object_properties.submodule)
         " a package or a type
         call extend(result, s:GetSubmodules(object_properties.schema, object_properties.object, s:HasLowerHead(a:prefix), a:prefix))
+      elseif (object_properties.type == 'SEQUENCE')
+        " a sequence
+        call extend(result, s:GetSequenceItems(a:prefix))
       endif
     elseif leader !~ '\.'
       " maybe it's a schema name (e.g. SYS.)
       call extend(result, s:SchemaObjects("'" . toupper(leader) . "'", a:prefix))
     endif
+  endif
+  return result
+endfunction
+
+" Get the items for a sequence object.
+function! s:GetSequenceItems(prefix)
+  let result = [ {"word" : 'nextval', 'icase' : 1}, {"word" : 'currval', 'icase' : 1} ]
+  let pattern = '^' . a:prefix
+  call filter(result, 'v:val.word =~? pattern')
+  if s:HasLowerHead(a:prefix)
+    let result = map(result, "{ 'word':tolower(v:val.word), 'icase' : v:val.icase }")
   endif
   return result
 endfunction
@@ -398,10 +412,11 @@ function! s:SchemaObjects(objects_in, prefix)
         \ "when object_type = 'PACKAGE' then 'pkg' " .
         \ "when object_type = 'SYNONYM' then 'syn' " .
         \ "when object_type = 'PROCEDURE' then 'prc' " .
+        \ "when object_type = 'SEQUENCE' then 'seq' " .
         \ "when object_type = 'FUNCTION' then 'fnc' end \"kind\" ".
         \ "from all_objects " .
         \ "where owner in (" . a:objects_in . ") ".
-        \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION') " .
+        \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION', 'SEQUENCE') " .
         \ "and object_name like upper('" . prefix . "%') " .
         \ "order by 1;"
   let sqlplus = vorax#GetSqlplusHandler()
