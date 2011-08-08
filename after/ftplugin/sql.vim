@@ -11,7 +11,9 @@ if voraxlib#utils#IsSqlOracleBuffer()
 
   " code completion
   setlocal omnifunc=voraxlib#omni#Complete
-  let g:acp_behavior['sql'] = [ {'command' : "\<C-x>\<C-o>", 'meets' : 'voraxlib#omni#Meets', 'repeat' : 0, 'onPopupClose' : 'voraxlib#omni#OnPopupClose'} ]
+  if exists('g:acp_behavior')
+    let g:acp_behavior['sql'] = [ {'command' : "\<C-x>\<C-o>", 'meets' : 'voraxlib#omni#Meets', 'repeat' : 0, 'onPopupClose' : 'voraxlib#omni#OnPopupClose'} ]
+  endif
 
   " init sql buffer mappings
   " Mappings for exec statement"{{{

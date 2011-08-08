@@ -160,7 +160,7 @@ module Vorax
             end
           end
         end
-        login_file_content << "host echo  > #{@process.convert_path(@tmp_dir + '/' + @conn_changed_file)}" 
+        login_file_content << "host echo>#{@process.convert_path(@tmp_dir + '/' + @conn_changed_file)}" 
         File.open("#@tmp_dir/login.sql", 'w') { |f| f.puts(login_file_content) }
       elsif @session_owner_monitor == :never || @session_owner_monitor == :always
         @connected_to = '@' if @session_owner_monitor == :never

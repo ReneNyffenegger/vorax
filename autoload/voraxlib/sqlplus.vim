@@ -33,7 +33,10 @@ function! voraxlib#sqlplus#New() " {{{
   let s:oc += 1
   " define sqlplus tmp directory. Every new sqlplus instance gets a new temp
   " dir.
-  let tmp_dir = substitute(fnamemodify(tempname(), ':p:h:8'), '\\', '/', 'g')
+  let tmp_dir = substitute(fnamemodify(tempname(), ':p:8'), '\\', '/', 'g')
+  if finddir(tmp_dir, '') == ''
+    call mkdir(tmp_dir, '')
+  endif  
   " create the sqlplus process and put it into the oracle factory under the
   " ruby_key
   if has('unix')

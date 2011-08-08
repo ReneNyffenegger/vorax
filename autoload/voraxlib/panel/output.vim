@@ -61,7 +61,7 @@ function! s:ExtendWindow()"{{{
   " Overwrite the configure method
   function! s:output_window.Configure() dict"{{{
     setlocal hidden
-    setlocal updatetime=50
+    set ut=50
     "setlocal winfixheight
     setlocal noswapfile
     setlocal buftype=nofile
@@ -158,6 +158,7 @@ function! s:ExtendWindow()"{{{
 
   " Start the monitor for the output window.
   function! s:output_window.StartMonitor()"{{{
+    if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:output_window.StartMonitor()') | endif
     call s:ResetWork()
     let s:originating_window = winnr()
     call self.Focus()
@@ -165,6 +166,7 @@ function! s:ExtendWindow()"{{{
     call s:SetupInteractivity()
     let s:old_showcmd = &showcmd
     let &showcmd = 0
+    if s:log.isTraceEnabled() | call s:log.trace('END s:output_window.StartMonitor()') | endif
   endfunction"}}}
 
   " Whenever or not the monitor is running
