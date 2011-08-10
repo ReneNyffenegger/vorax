@@ -159,7 +159,7 @@ In addition the following Vim script must be also installed:
 Also, it's best to have "filetype plugin on" in your .vimrc file.
 
 ==============================================================================
-CONNECTING TO A DATABASE				         *vorax-install* 
+CONNECTING TO A DATABASE				         *vorax-connect* 
 
 The simplest method to connect to a new database is to use the VoraxConnect
 command. For example, the following command is used to connect to an imaginary
