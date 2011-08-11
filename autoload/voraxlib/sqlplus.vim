@@ -39,7 +39,10 @@ function! voraxlib#sqlplus#New() " {{{
   endif  
   " create the sqlplus process and put it into the oracle factory under the
   " ruby_key
-  if has('unix')
+  if has('win32unix')
+    " cygwin interface
+    ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::CygwinProcess.new, VIM::evaluate('insert(copy(g:vorax_sqlplus_default_options), "host stty -echo", 0)'), VIM::evaluate('tmp_dir'))
+  elseif has('unix')
     " unix interface
     ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::UnixProcess.new, VIM::evaluate('insert(copy(g:vorax_sqlplus_default_options), "host stty -echo", 0)'), VIM::evaluate('tmp_dir'))
   elseif has('win32') || has('win64')
@@ -131,6 +134,14 @@ endfunction "}}}
 function! s:sqlplus.GetTempDir() dict "{{{
   ruby VIM::command(%!return '#{$sqlplus_factory[VIM::evaluate("self.ruby_key")].tmp_dir}'!)
 endfunction "}}}
+
+" Convert the provided path to a format which has meaning for the shadow
+" sqlplus process. This is important especially for Cygwin where all paths are
+" exposed using the Unix format but the sqlplus is a Windows tool which has no
+" idea about those paths.
+function! s:sqlplus.ConvertPath(path)
+  ruby VIM::command(%!return '#{$sqlplus_factory[VIM::evaluate("self.ruby_key")].process.convert_path(VIM::evaluate("a:path"))}'!)
+endfunction
 
 " Send text to the sqlplus process. May be used for interactive stuff (e.g.
 " respond to an sqlplus ACCEPT command). The text is sent as it is therefore

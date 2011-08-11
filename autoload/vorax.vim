@@ -134,7 +134,7 @@ function! vorax#Describe(identifier, verbose)"{{{
       if object_data.type =~ '^\(TABLE\)\|\(VIEW\)$'
         " verbose desc is availablre for tables and views only
         let desc_script = fnamemodify(s:script_dir . '/../vorax/scripts/desc_table.sql', ':p:8')
-        let desc_script = substitute(desc_script, '\\\\\|\\', '/', 'g')
+        let desc_script = sqlplus.ConvertPath(substitute(desc_script, '\\\\\|\\', '/', 'g'))
         let output = sqlplus.Exec("@" . desc_script . ' "' . object_data.schema . '" "' . object_data.object . '"' , 
               \ {'executing_msg' : 'Fetching describe info for ' . object_data.schema . "." . object_data.object . '...',
               \  'throbber' : vorax#GetDefaultThrobber(),

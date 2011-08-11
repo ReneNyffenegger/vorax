@@ -7,7 +7,8 @@ module Vorax
                 :startup_msg,           # sqlplus initialization message (banner)
                 :session_owner_monitor, # monitoring mode
                 :tmp_dir,               # the sqlplus tmp directory
-                :local_login_warning    # whenever or not the current directory already have a login.sql file
+                :local_login_warning,   # whenever or not the current directory already have a login.sql file
+                :process                # the buddy sqlplus process
 
     attr_reader :read_buffer_size     # the default read chunk size
 
@@ -30,7 +31,8 @@ module Vorax
           # env path separator
           separator = ':'
           if RUBY_PLATFORM.downcase.include?("mswin") ||
-              RUBY_PLATFORM.downcase.include?("mingw")
+              RUBY_PLATFORM.downcase.include?("mingw") ||
+              RUBY_PLATFORM.downcase.include?("cygwin")
             # on windows is ';'
             separator = ';' 
           end
@@ -40,10 +42,10 @@ module Vorax
             # put the tmp_dir first on SQLPATH so that, the vorax generated login.sql to be found first in case the
             # session_owner_monitor is set to :on_login. This has to be set here in order the sqlplus process to inherit
             # this setting.
-            ENV['SQLPATH'] = "#{tmp_dir}#{separator}#{ENV['SQLPATH']}"
+            ENV['SQLPATH'] = "#{@process.convert_path(tmp_dir)}#{separator}#{ENV['SQLPATH']}"
             @local_login_warning = false
           end
-          @process.create("sqlplus #{sqlplus_params} /nolog #{pack(bootstrap_commands, '_vorax_bootstrap.sql', true)}" + 
+          @process.create("sqlplus #{sqlplus_params} /nolog '#{pack(bootstrap_commands, '_vorax_bootstrap.sql', true)}'" + 
                           (debug ? " | tee sqlplus.log" : ""))
           # contain the current connected user@db, but
           # only if connection monitor is activated
@@ -302,7 +304,8 @@ module Vorax
       file_content << "\nprompt #{END_OF_REQUEST}\n" if include_eor
       filename = DEFAULT_PACK_FILE if filename.nil?
       File.open(@process.convert_path("#@tmp_dir/#{filename}"), 'w') {|f| f.write(file_content) }
-      "@#@tmp_dir/#{filename}"
+      file = @process.convert_path("#@tmp_dir/#{filename}")
+      return "@#{file}"
     end
 
     # Get the user@db for the current sqlplus session.
