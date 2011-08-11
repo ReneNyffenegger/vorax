@@ -191,6 +191,8 @@ module Vorax
         buf = @process.read(bytes)
         chunk << buf if buf
         if chunk != ""
+          # get rid of \r
+          chunk.gsub!(/\r/, '')
           @tail.push(buf) if buf
           tail_str = @tail.join
           # check the tail for the END_OF_REQUEST marker

@@ -7,7 +7,7 @@ module Vorax
       errors = []
       record = {}
       columns = []
-      body = Nokogiri::HTML(html.gsub(/\r/, ''), nil, 'utf-8').xpath('/html/body')
+      body = Nokogiri::HTML(html, nil, 'utf-8').xpath('/html/body')
       # search for errors
       body.children.each do |child|
         if child.name == 'text'

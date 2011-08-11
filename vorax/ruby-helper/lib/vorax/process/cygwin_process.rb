@@ -7,6 +7,11 @@ module Vorax
       return win_path.gsub(/\r?\n/, '')
     end
 
+    def cancel
+      # On Windows cancelling the currently executing statement is not supported.
+      raise NotImplementedError.new
+    end
+
     private
 
     def shellescape(str)
