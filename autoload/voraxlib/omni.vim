@@ -330,6 +330,7 @@ function! s:WordsFromOutput(prefix)
   let output_win = vorax#GetOutputWindowHandler()
   if bufwinnr(output_win.name) != -1
     " only if the output window is visible
+    let current_window = winnr()
     call output_win.Focus()
     let state = winsaveview()
     normal G
@@ -344,7 +345,7 @@ function! s:WordsFromOutput(prefix)
     endfor
     let &ignorecase = crr_ignorecase
     call winrestview(state)
-    wincmd p
+    exe current_window . 'wincmd w'
   endif
   return result
 endfunction

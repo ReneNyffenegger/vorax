@@ -296,6 +296,8 @@ function! vorax#GetDDL(schema, object_name, type, ...)"{{{
                             \  {'option' : 'markup', 'value' : 'html off'},
                             \ ])
   let output = sqlplus.Exec(sqlplus.Pack(statement, {'include_eor' : 1}), params)
+  " get rid of \r stuff
+  let output = substitute(output, '\r', '', 'g')
   let output = substitute(output, '\%(\_s\|[\r]\)*$', '', 'g')
   if !voraxlib#utils#HasErrors(output)
     return split(output, '\r\?\n')

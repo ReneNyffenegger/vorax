@@ -33,6 +33,8 @@ module Vorax
       # the output buffer.
     rescue Errno::EIO => msg
       @pid = nil
+    rescue EOFError => msg
+      @pid = nil
     end
 
     def destroy
