@@ -38,11 +38,14 @@ function! s:plugin.Callback()
     let sqlplus = vorax#GetSqlplusHandler()
     let output_window = vorax#GetOutputWindowHandler()
     let cmd = 'ALTER ' . info.type . ' "' . info.owner . '"."' . info.object . '" COMPILE;' 
-    let output = sqlplus.Exec(cmd, {'sqlplus_options' : sqlplus.GetSafeOptions()})
+    let output = sqlplus.Exec(cmd, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), [{'option' : 'markup', 'value' : 'html off'}])})
     " sqlplus show errors command doesn't work correctly for OWNER. prefixed
     " objects therefore just use the ALL_ERRORS table.
     let cmd = "select line || '/' ||  position \"LINE/COL\", text ERROR from all_errors where owner = '" . info.owner . "' and name='". info.object . "';\n"
-    let output .= sqlplus.Exec(cmd, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), [{'option' : 'feedback', 'value' : 'off'}])})
+    let output .= sqlplus.Exec(cmd, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+          \ [{'option' : 'feedback', 'value' : 'off'},
+          \  {'option' : 'markup', 'value' : 'html off'},
+          \ ])})
     call output_window.AppendText(output)
     if output =~ 'LINE/COL\s\+ERROR'
       " this means we have compilation errors
