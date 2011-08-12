@@ -263,6 +263,7 @@ function! vorax#CompileBuffer()"{{{
         let after_valid = 0
       else
         " just close the cwindow
+        let after_valid = 1
         cclose
       endif
       call vorax#GetOutputWindowHandler().AppendText(output, g:vorax_output_window_clear_before_exec)
@@ -563,7 +564,7 @@ function! vorax#CreateCommonKeyMappings()"{{{
         \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
     exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer> " . g:vorax_explain_key . " <Plug>VoraxExplain"
   endif
-  let mapdesc = maparg(g:vorax_explain_only, 'n', 0, 1)
+  let mapdesc = maparg(g:vorax_explain_only_key, 'n', 0, 1)
   if g:vorax_explain_only_key!= '' 
         \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
     exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " <Plug>VoraxExplainOnly"

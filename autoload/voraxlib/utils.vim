@@ -168,7 +168,7 @@ endfunction"}}}
 " an absolute index number. This function also accept two optional parameters:
 " line, col which, if provided, the relative position is computed based on
 " these values.
-function! voraxlib#utils#GetRelativePosition(...)
+function! voraxlib#utils#GetRelativePosition(...)"{{{
   let [crr_l, crr_c] = [line('.'), col('.') - 1]
   if a:0 != 2
     let [start_l, start_c] = voraxlib#utils#GetStartOfCurrentSql(0)
@@ -176,7 +176,7 @@ function! voraxlib#utils#GetRelativePosition(...)
   	let [start_l, start_c] = [a:1, a:2]
   endif
   return len(voraxlib#utils#GetTextFromRange(start_l, start_c, crr_l, crr_c))
-endfunction
+endfunction"}}}
 
 " Get the text within the provided range from the current buffer.
 function! voraxlib#utils#GetTextFromRange(start_l, start_c, end_l, end_c)"{{{
@@ -393,14 +393,14 @@ endfunction"}}}
 
 " Check if this kind of statement require a slash to end it. It's the case of
 " plsql modules, including types.
-function! voraxlib#utils#IsSlashRequiredAsEnd(statement)
+function! voraxlib#utils#IsSlashRequiredAsEnd(statement)"{{{
   " check for a type
   if a:statement !~ '\v\n\s*/\s*\n*$'
     let pattern = '\_s*create\_s\+\(or\_s\+replace\_s\+\)\?type\_s\+'
     return a:statement =~? pattern || a:statement =~? s:plsql_end_marker
   endif
   return 0
-endfunction
+endfunction"}}}
 
 " Whenever or not the provided statement has the sql delimitator at the end.
 function! voraxlib#utils#GetSqlDelimitator(statement)"{{{
@@ -585,12 +585,22 @@ function! voraxlib#utils#GetQuickFixCompilationErrors(owner, object, type)"{{{
       let offset = 0
     endif
     let filter_clause = "('" . a:type . "', '" . a:type . " BODY')"
-  else
+  elseif a:type == 'PACKAGE_SPEC' || a:type == 'TYPE_SPEC'
     let offset = voraxlib#utils#GetStartLineOfPlsqlObject(a:type) - 1
     if offset > 0
       let offset -= 1
     endif
-    let filter_clause = "('" . a:type . "')"
+    let filter_clause = "('" . substitute(a:type, '_SPEC', '', '') . "')"
+  elseif a:type == 'PACKAGE_BODY' || a:type == 'TYPE_BODY'
+    let offset = voraxlib#utils#GetStartLineOfPlsqlObject(a:type) - 1
+    if offset > 0
+      let offset -= 1
+    endif
+    let filter_clause = "('" . substitute(a:type, '_', ' ', '') . "')"
+  else
+    let offset = 0
+    "let offset = voraxlib#utils#GetStartLineOfPlsqlObject(a:type)
+    let filter_clause = "('" . substitute(a:type, '_', ' ', 'g') . "')"
   endif
   let query = "select  line + " . offset . " line, " .
                     \ "position, " . 
