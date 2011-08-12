@@ -316,6 +316,13 @@ TLet g:vorax_omni_word_prefix_length = 2
 TLet g:vorax_omni_skip_prefixes = '^sys\.$'
 
 "}}}
+" g:vorax_force_keymappings"{{{
+
+" Whenever or not a VoraX defined mapping to overwrite an already defined
+" mapping by another plugin.
+TLet g:vorax_force_keymappings = 1
+
+"}}}
 " g:vorax_test_constr"{{{
 
 " This global variable is used by vorax unit tests. Ignore it if you do not
@@ -347,6 +354,16 @@ endif"}}}
 if exists(':VoraxDescribeVerbose') != 2
   command! -nargs=? VoraxDescribeVerbose :call vorax#Describe(<q-args>, 1)
   nmap <unique> <script> <Plug>VoraxDescribeVerbose :VoraxDescribeVerbose<CR>
+endif"}}}
+" :VoraxExplain"{{{
+if exists(':VoraxExplain') != 2
+  command! -nargs=? VoraxExplain :call vorax#Explain(<q-args>, 0)
+  nmap <unique> <script> <Plug>VoraxExplain :VoraxExplain<CR>
+endif"}}}
+" :VoraxExplainOnly"{{{
+if exists(':VoraxExplainOnly') != 2
+  command! -nargs=? VoraxExplainOnly :call vorax#Explain(<q-args>, 1)
+  nmap <unique> <script> <Plug>VoraxExplainOnly :VoraxExplainOnly<CR>
 endif"}}}
 " :VoraxScratch"{{{
 if exists(':VoraxScratch') != 2
@@ -420,29 +437,35 @@ TLet g:vorax_describe_key = "<Leader>d"
 " g:vorax_describe_verbose_key"{{{
 TLet g:vorax_describe_verbose_key = "<Leader>D"
 "}}}
+" g:vorax_explain_key"{{{
+TLet g:vorax_explain_key = "<Leader>x"
+"}}}
+" g:vorax_explain_only_key"{{{
+TLet g:vorax_explain_only_key = "<Leader>X"
+"}}}
 " g:vorax_scratch_key"{{{
 TLet g:vorax_scratch_key = "<Leader>ss"
-exe "nmap <silent> <unique> " . g:vorax_scratch_key . " <Plug>VoraxScratch"
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_scratch_key . " <Plug>VoraxScratch"
 "}}}
 " g:vorax_spooling_toggle_key"{{{
 TLet g:vorax_spooling_toggle_key = "<Leader>sp"
-exe "nmap <silent> <unique> " . g:vorax_spooling_toggle_key . " <Plug>VoraxSpoolingToggle"
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_spooling_toggle_key . " <Plug>VoraxSpoolingToggle"
 "}}}
 " g:vorax_compressed_output_toggle_key"{{{
 TLet g:vorax_compressed_output_toggle_key = "<Leader>co"
-exe "nmap <silent> <unique> " . g:vorax_compressed_output_toggle_key . " <Plug>VoraxCompressedOutputToggle"
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_compressed_output_toggle_key . " <Plug>VoraxCompressedOutputToggle"
 "}}}
 " g:vorax_vertical_output_toggle_key"{{{
 TLet g:vorax_vertical_output_toggle_key = "<Leader>vo"
-exe "nmap <silent> <unique> " . g:vorax_vertical_output_toggle_key . " <Plug>VoraxVerticalOutputToggle"
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_vertical_output_toggle_key . " <Plug>VoraxVerticalOutputToggle"
 "}}}
 " g:vorax_limit_rows_toggle_key"{{{
 TLet g:vorax_limit_rows_toggle_key = "<Leader>lr"
-exe "nmap <silent> <unique> " . g:vorax_limit_rows_toggle_key . " <Plug>VoraxLimitRowsToggle"
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_limit_rows_toggle_key . " <Plug>VoraxLimitRowsToggle"
 "}}}
 " g:vorax_paginating_toggle_key"{{{
 TLet g:vorax_paginating_toggle_key = "<Leader>pa"
-exe "nmap <silent> <unique> " . g:vorax_paginating_toggle_key . " <Plug>VoraxPaginatingToggle"
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_paginating_toggle_key . " <Plug>VoraxPaginatingToggle"
 "}}}
 " g:vorax_output_window_clear_key"{{{
 TLet g:vorax_output_window_clear_key = "cle"
@@ -452,23 +475,15 @@ TLet g:vorax_output_window_pause_key = "<Space>"
 "}}}
 " g:vorax_profiles_window_toggle_key"{{{
 TLet g:vorax_profiles_window_toggle_key = "<Leader>pr"
-if g:vorax_profiles_window_toggle_key != '' 
-      \ && !hasmapto('<Plug>VoraxProfilesWindowToggle') 
-      \ && !hasmapto(g:vorax_profiles_window_toggle_key, 'n')
-  exe "nmap <unique> " . g:vorax_profiles_window_toggle_key . 
-        \ " <Plug>VoraxProfilesWindowToggle"
-endif"}}}
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_profiles_window_toggle_key . " <Plug>VoraxProfilesWindowToggle"
+"}}}
 " g:vorax_profiles_window_menu_key"{{{
 TLet g:vorax_profiles_window_menu_key = "<Tab>"
 "}}}
 " g:vorax_explorer_window_toggle_key"{{{
 TLet g:vorax_explorer_window_toggle_key = "<Leader>ve"
-if g:vorax_explorer_window_toggle_key != '' 
-      \ && !hasmapto('<Plug>VoraxExplorerWindowToggle') 
-      \ && !hasmapto(g:vorax_explorer_window_toggle_key, 'n')
-  exe "nmap <unique> " . g:vorax_explorer_window_toggle_key . 
-        \ " <Plug>VoraxExplorerWindowToggle"
-endif"}}}
+exe "nmap <unique> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_explorer_window_toggle_key . " <Plug>VoraxExplorerWindowToggle"
+"}}}
 " g:vorax_explorer_window_menu_key"{{{
 TLet g:vorax_explorer_window_menu_key = "<Tab>"
 "}}}

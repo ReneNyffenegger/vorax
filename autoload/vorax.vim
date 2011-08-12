@@ -175,6 +175,47 @@ function! vorax#Describe(identifier, verbose)"{{{
   endif
 endfunction"}}}
 
+" Explain plan for the provided a:sql. If a:only is 1 then just an explain
+" only is issued without executing the statement.
+function! vorax#Explain(sql, only)
+  let statement = a:sql
+  if empty(statement)
+    " assume the current statement
+    let statement = voraxlib#utils#GetCurrentStatement()
+  endif
+  let sqlplus = vorax#GetSqlplusHandler()
+  let outputwin = vorax#GetOutputWindowHandler()
+  let crr_win = winnr()
+  let sql_file = substitute(sqlplus.Pack(statement), '^@', '', '')
+  if a:only
+    let explain_script = fnamemodify(s:script_dir . '/../vorax/scripts/explain_only.sql', ':p:8')
+  else
+    let explain_script = fnamemodify(s:script_dir . '/../vorax/scripts/explain.sql', ':p:8')
+  endif
+  let explain_script = sqlplus.ConvertPath(substitute(explain_script, '\\\\\|\\', '/', 'g'))
+  let explain_command = '@' . explain_script . ' ' . shellescape(sqlplus.ConvertPath(sql_file))
+  call sqlplus.SaveState()
+  let output = sqlplus.Exec(explain_command,
+              \ {'executing_msg' : 'Gathering the explain plan...',
+              \  'throbber' : vorax#GetDefaultThrobber(),
+              \  'done_msg' : 'Done.',
+              \  'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+                  \ [
+                  \ {'option' : 'echo', 'value' : 'off'}, 
+                  \ {'option' : 'feedback', 'value' : 'off'},
+                  \ {'option' : 'verify', 'value' : 'off'},
+                  \ {'option' : 'define', 'value' : 'on'},
+                  \ {'option' : 'sqlprompt', 'value' : "''"},
+                  \ {'option' : 'linesize', 'value' : '180'},
+                  \ {'option' : 'markup', 'value' : 'html off'},
+                \ ])})
+  call sqlplus.RestoreState()
+  call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
+  if !g:vorax_output_window_keep_focus_after_exec
+    exec crr_win . 'wincmd w'
+  endif
+endfunction
+
 " Send the whole current buffer content to sqlplus for execution.
 function! vorax#CompileBuffer()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#CompileBuffer()') | endif
@@ -514,6 +555,28 @@ function! vorax#CreateCommonKeyMappings()"{{{
   if g:vorax_describe_verbose_key != '' 
         \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
     exe "xmap <silent> <unique> <buffer>" . g:vorax_describe_verbose_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 1)<cr>"
+  endif
+
+  " explain plan mappings
+  let mapdesc = maparg(g:vorax_explain_key, 'n', 0, 1)
+  if g:vorax_explain_key != '' 
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer> " . g:vorax_explain_key . " <Plug>VoraxExplain"
+  endif
+  let mapdesc = maparg(g:vorax_explain_only, 'n', 0, 1)
+  if g:vorax_explain_only_key!= '' 
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " <Plug>VoraxExplainOnly"
+  endif
+  let mapdesc = maparg(g:vorax_explain_key, 'v', 0, 1)
+  if g:vorax_explain_key != '' 
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_key . " :call vorax#Explain(voraxlib#utils#SelectedBlock(), 0)<cr>"
+  endif
+  let mapdesc = maparg(g:vorax_explain_only_key, 'v', 0, 1)
+  if g:vorax_explain_only_key != '' 
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " :call vorax#Explain(voraxlib#utils#SelectedBlock(), 1)<cr>"
   endif
 endfunction"}}}
 

@@ -41,12 +41,15 @@ function! voraxlib#sqlplus#New() " {{{
   " ruby_key
   if has('win32unix')
     " cygwin interface
+    if s:log.isDebugEnabled() | call s:log.debug("sqlplus initialized with cygwin interface") | endif
     ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::CygwinProcess.new, VIM::evaluate('insert(copy(g:vorax_sqlplus_default_options), "host stty -echo", 0)'), VIM::evaluate('tmp_dir'))
   elseif has('unix')
     " unix interface
+    if s:log.isDebugEnabled() | call s:log.debug("sqlplus initialized with unix interface") | endif
     ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::UnixProcess.new, VIM::evaluate('insert(copy(g:vorax_sqlplus_default_options), "host stty -echo", 0)'), VIM::evaluate('tmp_dir'))
   elseif has('win32') || has('win64')
     " windows interface
+    if s:log.isDebugEnabled() | call s:log.debug("sqlplus initialized with windows interface") | endif
     ruby $sqlplus_factory[VIM::evaluate('sqlplus.ruby_key')] = Vorax::Sqlplus.new(Vorax::WindowsProcess.new, VIM::evaluate('g:vorax_sqlplus_default_options'), VIM::evaluate('tmp_dir'))
   endif
   if g:vorax_session_owner_monitor == 1
@@ -139,9 +142,9 @@ endfunction "}}}
 " sqlplus process. This is important especially for Cygwin where all paths are
 " exposed using the Unix format but the sqlplus is a Windows tool which has no
 " idea about those paths.
-function! s:sqlplus.ConvertPath(path)
+function! s:sqlplus.ConvertPath(path)"{{{
   ruby VIM::command(%!return '#{$sqlplus_factory[VIM::evaluate("self.ruby_key")].process.convert_path(VIM::evaluate("a:path"))}'!)
-endfunction
+endfunction"}}}
 
 " Send text to the sqlplus process. May be used for interactive stuff (e.g.
 " respond to an sqlplus ACCEPT command). The text is sent as it is therefore
@@ -397,6 +400,24 @@ function! s:sqlplus.IsPauseOn()"{{{
     endif
   endfor
   return 0
+endfunction"}}}
+
+" Get the name of a temporary file to be used to store/restore the sqlplus settings.
+function! s:sqlplus.GetStagingSqlplusSettingsFile()"{{{
+  let temp_dir = self.GetTempDir()
+  let settings_file = self.ConvertPath(temp_dir . "/_vorax_stage_settings." . self.GetPid())
+endfunction"}}}
+
+" Save all sqlplus settings
+function! s:sqlplus.SaveState()"{{{
+  let output = self.Exec("store set " . self.GetStagingSqlplusSettingsFile() . " replace")
+  if s:log.isDebugEnabled() | call s:log.debug("SaveState output: " . string(output)) | endif
+endfunction"}}}
+
+" Restore all previous saved settings
+function! s:sqlplus.RestoreState()"{{{
+  let output = self.Exec("@" . self.GetStagingSqlplusSettingsFile())
+  if s:log.isDebugEnabled() | call s:log.debug("RestoreState output: " . string(output)) | endif
 endfunction"}}}
 
 " Destroy the sqlplus process
