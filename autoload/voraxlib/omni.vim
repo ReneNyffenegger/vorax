@@ -14,7 +14,7 @@ set cpo&vim
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
 " The VoraX omni function.
-function! voraxlib#omni#Complete(findstart, base)
+function! voraxlib#omni#Complete(findstart, base)"{{{
   " First pass through this function determines how much of the line should
   " be replaced by whatever is chosen from the completion list
   if a:findstart
@@ -35,41 +35,41 @@ function! voraxlib#omni#Complete(findstart, base)
     endif
     return result
   endif  
-endfunction
+endfunction"}}}
 
 " This function is called only if autocomplpop plugin is used
-function! voraxlib#omni#OnPopupClose()
+function! voraxlib#omni#OnPopupClose()"{{{
   let prefix = matchstr(strpart(getline('.'), 0, col('.')-1), '[0-9a-zA-z#$_.]*\s*[,(]\?\s*$')
   if prefix =~ '\(\.\)\|\(,\s*\)\|\((\s*\)$'
     if s:IsPrefixValid(prefix)
       call feedkeys("\<C-x>\<C-o>")
     endif
   endif
-endfunction
+endfunction"}}}
 
 " This function is used only if autocomplpop plugin is used.
-function! voraxlib#omni#Meets(text)
+function! voraxlib#omni#Meets(text)"{{{
   return  s:IsWordCompletion(a:text) || 
         \ s:IsDotCompletion(a:text) || 
         \ s:IsArgumentCompletion(a:text)
-endfunction
+endfunction"}}}
 
 " Get all items for a WORD completion
-function! s:GetWordItems(prefix)
+function! s:GetWordItems(prefix)"{{{
   let result = []
   " let user choose a keyword
   let result = s:SyntaxItems(a:prefix)
   " let user choose a schema name
-  call extend(result, s:Schemas(a:prefix))
+  "call extend(result, s:Schemas(a:prefix))
   " let user choose an oracle object
-  call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:prefix))
+  call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:prefix, 1))
   " let user choose a word from the output window
   call extend(result, s:WordsFromOutput(a:prefix))
   return result
-endfunction
+endfunction"}}}
 
 " Get completion items involving a dot (e.g table. or owner.package.).
-function! s:GetDotItems(prefix)
+function! s:GetDotItems(prefix)"{{{
   let result = []
   let leader = get(matchlist(s:context.prefix, '\(.*\)\(\.[0-9a-zA-Z#$_]*$\)'), 1)
   " we have a prefix which can be: an alias or an object... we can't tell
@@ -98,10 +98,10 @@ function! s:GetDotItems(prefix)
     endif
   endif
   return result
-endfunction
+endfunction"}}}
 
 " Get the items for a sequence object.
-function! s:GetSequenceItems(prefix)
+function! s:GetSequenceItems(prefix)"{{{
   let result = [ {"word" : 'nextval', 'icase' : 1}, {"word" : 'currval', 'icase' : 1} ]
   let pattern = '^' . a:prefix
   call filter(result, 'v:val.word =~? pattern')
@@ -109,10 +109,10 @@ function! s:GetSequenceItems(prefix)
     let result = map(result, "{ 'word':tolower(v:val.word), 'icase' : v:val.icase }")
   endif
   return result
-endfunction
+endfunction"}}}
 
 " Get all parameters for the provided plsql procedure.
-function! s:GetArgItems(prefix)
+function! s:GetArgItems(prefix)"{{{
   let params = []
   if s:context.module != ''
     let object_properties = voraxlib#utils#ResolveDbObject(s:context.module)
@@ -140,28 +140,27 @@ function! s:GetArgItems(prefix)
     endif
   endif
   return params
-endfunction
-
+endfunction"}}}
 
 " Whenever or not the provided prefix is a valid one (not matched by the
 " g:vorax_omni_skip_prefixes)
-function! s:IsPrefixValid(prefix)
+function! s:IsPrefixValid(prefix)"{{{
   return g:vorax_omni_skip_prefixes == '' || a:prefix !~ g:vorax_omni_skip_prefixes 
-endfunction
+endfunction"}}}
 
 " Return true if the provided text is candidate for a DOT completion.
-function! s:IsDotCompletion(text)
+function! s:IsDotCompletion(text)"{{{
   return a:text =~ '[0-9a-zA-Z#$_]\.[0-9a-zA-Z#$_]*$'
-endfunction,w
+endfunction"}}}
 
 " Return true if the provided text is candidate for a WORD completion.
-function! s:IsWordCompletion(text)
+function! s:IsWordCompletion(text)"{{{
   let matches = matchlist(a:text, '\([0-9a-zA-Z#$_]\{' . g:vorax_omni_word_prefix_length . ',}\)$')
   return !empty(matches)
-endfunction
+endfunction"}}}
 
 " Whenever or not argument completion should be tried.
-function! s:IsArgumentCompletion(what)
+function! s:IsArgumentCompletion(what)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#omni#IsArgumentCompletion(' . string(a:what) . ')') | endif
   let status = 0
   if type(a:what) == 1
@@ -187,10 +186,10 @@ function! s:IsArgumentCompletion(what)
   endif
   if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#omni#IsArgumentCompletion() => ' . status) | endif
   return status
-endfunction
+endfunction"}}}
 
 " Compute the current completion context.
-function! s:ComputeCompletionContext()
+function! s:ComputeCompletionContext()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#omni#ComputeCompletionContext()') | endif
   " The omni completion context. This dictionary helps to decide what kind of
   " completion should be performed.
@@ -238,19 +237,19 @@ function! s:ComputeCompletionContext()
   endif
   if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#omni#ComputeCompletionContext() => ' . string(s:context)) | endif
   return s:context
-endfunction
+endfunction"}}}
 
 " Get the inner module which correspond to the provided argument completion spot.
-function! s:ArgumentSpotBelongsTo(statement, relpos)
+function! s:ArgumentSpotBelongsTo(statement, relpos)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:ArgumentSpotBelongsTo(' .string(a:statement) . ', ' . a:relpos . ')') | endif
   let module = ''
   ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('a:statement'), VIM::evaluate('a:relpos')))}"
   if s:log.isTraceEnabled() | call s:log.trace('END s:ArgumentSpotBelongsTo() => ' . string(module)) | endif
   return module
-endfunction
+endfunction"}}}
 
 " Get a list of all procedure/functions within the provided package or type.
-function! s:GetSubmodules(owner, object, lowercase, prefix)
+function! s:GetSubmodules(owner, object, lowercase, prefix)"{{{
   let where = "owner = '" . a:owner . "' and object_name = '" . a:object . "' and procedure_name like '" . toupper(a:prefix) . "%'"
   if a:lowercase
     let procedure_name = 'lower(procedure_name)'
@@ -270,10 +269,10 @@ function! s:GetSubmodules(owner, object, lowercase, prefix)
     endfor
   endif
   return procs
-endfunction
+endfunction"}}}
 
 " Get a list of columns for the provided owner.object. 
-function! s:GetColumns(owner, object, lowercase, prefix)
+function! s:GetColumns(owner, object, lowercase, prefix)"{{{
   let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and column_name like '" . toupper(a:prefix) . "%'"
   if a:lowercase
     let column_name = 'lower(column_name)'
@@ -293,10 +292,10 @@ function! s:GetColumns(owner, object, lowercase, prefix)
     endfor
   endif
   return columns
-endfunction
+endfunction"}}}
 
 " Get a list of columns which correspond to the provided alias.
-function! s:ResolveAlias(statement, alias, prefix)
+function! s:ResolveAlias(statement, alias, prefix)"{{{
   if a:alias !~ '^[a-zA-Z0-9#$_]\+$'
     " why bother? It's a bad alias
     return []
@@ -320,12 +319,12 @@ function! s:ResolveAlias(statement, alias, prefix)
     endif
   endfor
   return columns
-endfunction
+endfunction"}}}
 
 " Returns a list of words from the VoraX output window having the provided
 " prefix. No more than 300 items are returned and every search should not
 " exceed 500ms per item.
-function! s:WordsFromOutput(prefix)
+function! s:WordsFromOutput(prefix)"{{{
   let result = []
   let output_win = vorax#GetOutputWindowHandler()
   if bufwinnr(output_win.name) != -1
@@ -348,10 +347,10 @@ function! s:WordsFromOutput(prefix)
     exe current_window . 'wincmd w'
   endif
   return result
-endfunction
+endfunction"}}}
 
 " Whenever or not the number of schema objects exceeds the provided limit.
-function! s:IsNumberOfObjectsExceeded(objects_in, prefix, limit)
+function! s:IsNumberOfObjectsExceeded(objects_in, prefix, limit)"{{{
   let query = 'select count(*) limit ' .
         \ "from all_objects " .
         \ "where owner in (" . a:objects_in . ") ".
@@ -366,10 +365,10 @@ function! s:IsNumberOfObjectsExceeded(objects_in, prefix, limit)
     endif
   endif
   return 0
-endfunction
+endfunction"}}}
 
 " Get all oracle schemas with the provided prefix.
-function! s:Schemas(prefix)
+function! s:Schemas(prefix)"{{{
   if s:HasLowerHead(a:prefix)
   	let column = 'lower(username)'
   else
@@ -390,11 +389,13 @@ function! s:Schemas(prefix)
   else
     return []
   endif
-endfunction
+endfunction"}}}
 
 " Get the objects from the provided schemas starting with the given prefix.
-" a:objects_in is expected to be an oracle 'OWNER IN' filter.
-function! s:SchemaObjects(objects_in, prefix)
+" a:objects_in is expected to be an oracle 'OWNER IN' filter. The third
+" optional parameter indicates wherever or not a list of schemas should be
+" included.
+function! s:SchemaObjects(objects_in, prefix, ...)"{{{
   " try to be clever and return upercase/lowercase items taking into account
   " the prefix.
   if s:HasLowerHead(a:prefix)
@@ -405,7 +406,7 @@ function! s:SchemaObjects(objects_in, prefix)
   " double quoting any quote from prefix
   let prefix = substitute(a:prefix, "'", "''", 'g')
   " the query to return oracle objects
-  let query = "column kind format a4\n" .
+  let query = "column kind format a20\n" .
         \ "select distinct " . column . ' "word", ' .
         \ "case when object_type = 'TABLE' then 'tbl' " .
         \ "when object_type = 'VIEW' then 'viw' " .
@@ -418,8 +419,14 @@ function! s:SchemaObjects(objects_in, prefix)
         \ "from all_objects " .
         \ "where owner in (" . a:objects_in . ") ".
         \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION', 'SEQUENCE') " .
-        \ "and object_name like upper('" . prefix . "%') " .
-        \ "order by 1;"
+        \ "and object_name like upper('" . prefix . "%') "
+  if exists('a:1') && a:1 == 1
+    let query .= 'union all ' .
+        \ "select username, 'schema' " .
+        \ "from all_users " .
+        \ "where username like upper('" . prefix . "%') "
+  endif
+  let query .= ';'
   let sqlplus = vorax#GetSqlplusHandler()
   let params = {'executing_msg' : 'Querying for database objects...',
         \  'throbber' : vorax#GetDefaultThrobber(),
@@ -431,15 +438,15 @@ function! s:SchemaObjects(objects_in, prefix)
   else
     return []
   endif
-endfunction
+endfunction"}}}
 
 " Whenever or not the provided text starts with a lowercase char.
-function! s:HasLowerHead(text)
+function! s:HasLowerHead(text)"{{{
   return strpart(a:text, 0, 1) ==# tolower(strpart(a:text, 0, 1))
-endfunction
+endfunction"}}}
 
 " Returns a list of keywords starting with the provided parameter
-function! s:SyntaxItems(start_with)
+function! s:SyntaxItems(start_with)"{{{
   if !exists('s:keywords')
     " The list of oracle keywords
     let s:keywords = [ 
@@ -1750,7 +1757,7 @@ function! s:SyntaxItems(start_with)
     let result = map(result, "{'word':tolower(v:val.word), 'dup':v:val.dup, 'kind':v:val.kind}")
   endif
   return result
-endfunction
+endfunction"}}}
 
 
 let &cpo = s:cpo_save
