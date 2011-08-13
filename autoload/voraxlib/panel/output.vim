@@ -50,6 +50,7 @@ function! voraxlib#panel#output#StatusLine()"{{{
         \ (sqlplus.html && !s:output_window.buffer.vertical ? 'compressed ' : '') . 
         \ (sqlplus.html && s:output_window.buffer.vertical ? 'vertical ' : '') . 
         \ (s:output_window.spooling ? '[spool to: ' . simplify(s:output_window.spool_file) . '] ' : '') . 
+        \ (g:vorax_output_window_clear_before_exec ? '' : '[>>] ') . 
         \ (exists('g:vorax_monitor_end_exec') && g:vorax_monitor_end_exec ? 'bell ' : '' ) . 
         \ sqlplus.GetConnectedTo() . ' '
 endfunction"}}}
@@ -83,6 +84,9 @@ function! s:ExtendWindow()"{{{
     " define mappings
     if exists('g:vorax_output_window_clear_key') && g:vorax_output_window_clear_key != ''
       exe 'nnoremap <silent> <buffer> ' . g:vorax_output_window_clear_key . ' :call <SID>ClearOutputWindow()<cr>'
+    endif
+    if exists('g:vorax_output_window_toggle_append') && g:vorax_output_window_toggle_append != ''
+      exe 'nnoremap <silent> <buffer> ' . g:vorax_output_window_toggle_append . ' :call <SID>ToggleAppend()<cr>'
     endif
   endfunction"}}}
 
@@ -482,6 +486,16 @@ endfunction"}}}
 " This function is invoked by the clear window mapping.
 function! s:ClearOutputWindow()"{{{
   call s:output_window.Clear()
+endfunction"}}}
+
+" This function is invoked by the toggle append mappings
+function! s:ToggleAppend()"{{{
+  let g:vorax_output_window_clear_before_exec = !g:vorax_output_window_clear_before_exec
+  if g:vorax_output_window_clear_before_exec
+  	echo 'Append mode for the output window is disabled'
+  else
+  	echo 'Append mode for the output window is enabled'
+  endif
 endfunction"}}}
 
 let &cpo = s:cpo_save

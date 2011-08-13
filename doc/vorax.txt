@@ -309,7 +309,7 @@ complete.
 THE OUTPUT WINDOW    				                  *vorax-output* 
 
 The result returned by the commands you execute is displayed into the output
-window. This window is automatically opened whenever something need to be
+window. This window is automatically opened whenever something is needed to be
 shown (typically after an exec).
 
 You can choose between two modes:
@@ -321,7 +321,9 @@ You can choose between two modes:
 	content (this is the default).
 
 You can use the |g:vorax_output_window_clear_before_exec| to control how the
-output window should behave.
+output window should behave or simply use the <Leader>a mapping to toggle
+between append and clear mode. "a" stands for append so it's easy to memorize
+it.
 
 The output window has its own status line which, by default, displays the
 database you're currently logged on, output formatting options and other
@@ -438,7 +440,9 @@ variables:
 	  used to exclude those completion prefixes which returns a lot of
 	  items slowing down the system. By default is '^sys\.$' which
 	  prohibits the completion system to provide a lot of items consisting
-	  of all SYS objects.
+	  of all SYS objects. You may add other skip filters like dba_, user_,
+	  all_, dbms_, v$ in order to avoid completion for those common used
+	  prefixes.
 
 Some IDEs don't let you choose how the completion items should be provided:
 uppercase or lowercase. As far as I'm concerned I don't like all these items

@@ -473,6 +473,9 @@ TLet g:vorax_output_window_clear_key = "cle"
 " g:vorax_output_window_pause_key"{{{
 TLet g:vorax_output_window_pause_key = "<Space>"
 "}}}
+" g:vorax_output_window_toggle_append"{{{
+TLet g:vorax_output_window_toggle_append = "<Leader>a"
+"}}}
 " g:vorax_profiles_window_toggle_key"{{{
 TLet g:vorax_profiles_window_toggle_key = "<Leader>pr"
 exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_profiles_window_toggle_key . " <Plug>VoraxProfilesWindowToggle"
