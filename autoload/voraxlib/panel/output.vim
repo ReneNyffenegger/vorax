@@ -165,7 +165,12 @@ function! s:ExtendWindow()"{{{
     if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:output_window.StartMonitor()') | endif
     call s:ResetWork()
     let s:originating_window = winnr()
-    call self.Focus()
+    if g:vorax_output_window_clear_before_exec
+    	" clear window before spit the result
+    	call self.Clear()
+    else
+      call self.Focus()
+    endif
     au VoraX CursorHold <buffer> call s:FetchResults()
     call s:SetupInteractivity()
     let s:old_showcmd = &showcmd
