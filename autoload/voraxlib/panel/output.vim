@@ -80,6 +80,7 @@ function! s:ExtendWindow()"{{{
     setlocal isk+=$
     setlocal isk+=#
     exe 'setlocal statusline=' . g:vorax_output_window_statusline
+    setlocal filetype=voraxoutput
 
     " define mappings
     if exists('g:vorax_output_window_clear_key') && g:vorax_output_window_clear_key != ''
