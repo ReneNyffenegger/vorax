@@ -405,7 +405,7 @@ endfunction"}}}
 " Get the name of a temporary file to be used to store/restore the sqlplus settings.
 function! s:sqlplus.GetStagingSqlplusSettingsFile()"{{{
   let temp_dir = self.GetTempDir()
-  let settings_file = self.ConvertPath(temp_dir . "/_vorax_stage_settings." . self.GetPid())
+  return self.ConvertPath(temp_dir . "/_vorax_stage_settings." . self.GetPid())
 endfunction"}}}
 
 " Save all sqlplus settings
