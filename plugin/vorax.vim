@@ -243,7 +243,7 @@ TLet g:vorax_output_window_statusline = "%!voraxlib#panel#output#StatusLine()"
 
 " Whenever or not the output window shoul be cleared before executing
 " anything.
-TLet g:vorax_output_window_clear_before_exec = 0
+TLet g:vorax_output_window_clear_before_exec = 1
 
 "}}}
 " g:vorax_profiles_window_anchor"{{{
