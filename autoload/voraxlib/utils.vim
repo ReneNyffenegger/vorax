@@ -800,6 +800,21 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
   return info
 endfunction"}}}
 
+" whenever or not the provided file is a VoraX managed one.
+function! voraxlib#utils#IsVoraxManagedFile(file)
+  let ext = fnamemodify(a:file, ':e')
+  if ext ==? 'sql'
+  	return 1
+  else
+    for managed_ext in values(g:vorax_explorer_file_extensions)
+      if ext ==? managed_ext
+        return 1
+      endif
+    endfor
+    return 0
+  endif
+endfunction
+
 " Check if the buffer has the proper syntax.
 function! s:CheckSyntax()"{{{
   if !exists('b:current_syntax') || (b:current_syntax != 'sql' && b:current_syntax != 'plsql')
