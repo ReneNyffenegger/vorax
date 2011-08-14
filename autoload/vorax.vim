@@ -46,7 +46,8 @@ function! vorax#Connect(cstr, bang)"{{{
     call sqlplus.SetSessionOwnerMonitor(g:vorax_session_owner_monitor)
     let cstr = voraxlib#connection#Ask(a:cstr)
     if cstr != ''
-      let output = sqlplus.Exec("connect " . cstr, 
+      let output = sqlplus.GetBanner() . "\n\n"
+      let conn_output = sqlplus.Exec("connect " . cstr, 
             \ {'executing_msg' : 'Connecting...' , 
             \  'throbber' : vorax#GetDefaultThrobber(),
             \  'done_msg' : 'Done.',
@@ -60,19 +61,17 @@ function! vorax#Connect(cstr, bang)"{{{
             \ })
       if sqlplus.GetPid()
         " only if sqlplus process is still alive
-        call outputwin.AppendText(sqlplus.GetBanner() . "\n\n")
-        if !voraxlib#utils#HasErrors(output)
-          call outputwin.AppendText(sqlplus.Exec("prompt &_O_VERSION", 
+        if !voraxlib#utils#HasErrors(conn_output)
+          let output .= sqlplus.Exec("prompt &_O_VERSION", 
             \  {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
                                       \ [
                                       \ {'option' : 'echo', 'value' : 'off'}, 
                                       \ {'option' : 'feedback', 'value' : 'on'},
-                                      \ {'option' : 'sqlprompt', 'value' : "''"},
                                       \ {'option' : 'markup', 'value' : 'html off'},
                                       \ {'option' : 'define', 'value' : '"&"'}, 
-                                      \ {'option' : 'sqlprompt', 'value' : "''"}])}))
+                                      \ {'option' : 'sqlprompt', 'value' : "''"}])}) . "\n" . conn_output
         endif
-        call outputwin.AppendText("\n" . output)
+        call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
       endif
       " refresh the vorax db explorer window tree
       let explorer.expanded_nodes = []
@@ -173,7 +172,7 @@ endfunction"}}}
 
 " Explain plan for the provided a:sql. If a:only is 1 then just an explain
 " only is issued without executing the statement.
-function! vorax#Explain(sql, only)
+function! vorax#Explain(sql, only)"{{{
   let statement = a:sql
   if empty(statement)
     " assume the current statement
@@ -210,7 +209,7 @@ function! vorax#Explain(sql, only)
   if !g:vorax_output_window_keep_focus_after_exec
     exec crr_win . 'wincmd w'
   endif
-endfunction
+endfunction"}}}
 
 " Send the whole current buffer content to sqlplus for execution.
 function! vorax#CompileBuffer()"{{{
