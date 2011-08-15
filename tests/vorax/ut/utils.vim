@@ -326,3 +326,9 @@ function! TestVoraxUtilsGetRelativePosition()
 
   bwipe!
 endfunction
+
+function! TestVoraxUtilsIsVoraxManagedFile()
+  call VUAssertEquals(1, voraxlib#utils#IsVoraxManagedFile('muci.sql'))
+  call VUAssertEquals(1, voraxlib#utils#IsVoraxManagedFile('/home/muci.typ'))
+  call VUAssertEquals(0, voraxlib#utils#IsVoraxManagedFile('/home/muci.txt'))
+endfunction
