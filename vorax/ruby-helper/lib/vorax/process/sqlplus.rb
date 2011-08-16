@@ -45,7 +45,7 @@ module Vorax
             ENV['SQLPATH'] = "#{@process.convert_path(tmp_dir)}#{separator}#{ENV['SQLPATH']}"
             @local_login_warning = false
           end
-          @process.create("sqlplus #{sqlplus_params} /nolog '#{pack(bootstrap_commands, '_vorax_bootstrap.sql', true)}'" + 
+          @process.create("sqlplus #{sqlplus_params} /nolog \"#{pack(bootstrap_commands, '_vorax_bootstrap.sql', true)}\"" + 
                           (debug ? " | tee sqlplus.log" : ""))
           # contain the current connected user@db, but
           # only if connection monitor is activated
