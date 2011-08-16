@@ -20,6 +20,7 @@ if exists('s:profiles') | unlet s:profiles | endif
 if exists('s:sqlplus') | unlet s:sqlplus | endif
 if exists('g:vorax_explorer') | unlet g:vorax_explorer | endif
 if exists('s:output') | unlet s:output | endif
+if exists('s:docwin') | unlet s:docwin | endif
 if exists('s:default_throbber') | unlet s:default_throbber | endif
 
 " Connects to the provided database using the cstr
@@ -484,6 +485,15 @@ function! vorax#GetProfilesHandler()"{{{
     let s:profiles = voraxlib#panel#profiles#New()
   endif
   return s:profiles
+endfunction"}}}
+
+" Get the doc window object.
+function! vorax#GetDocwinHandler()"{{{
+  if !exists('s:docwin')
+    " Create the docwin
+    let s:docwin = voraxlib#panel#docwin#New()
+  endif
+  return s:docwin
 endfunction"}}}
 
 " Get the vorax explorer object.

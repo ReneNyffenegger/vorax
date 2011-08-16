@@ -246,6 +246,65 @@ TLet g:vorax_output_window_statusline = "%!voraxlib#panel#output#StatusLine()"
 TLet g:vorax_output_window_clear_before_exec = 1
 
 "}}}
+" g:vorax_oradoc_window_anchor"{{{
+
+" The anchor of the oradoc window. The allowed values are: topleft or
+" botright.
+TLet g:vorax_oradoc_window_anchor = 'botright'
+
+"}}}
+" g:vorax_oradoc_window_orientation"{{{
+
+" The orientation of the oradoc window. The allowed values are: 'v' for
+" vertical and 'h' for horizontal.
+TLet g:vorax_oradoc_window_orientation = 'h'
+
+"}}}
+" g:vorax_oradoc_window_size"{{{
+
+" The size of the oradoc window. 
+TLet g:vorax_oradoc_window_size = 10
+
+"}}}
+" g:vorax_oradoc_window_autoclose"{{{
+
+" Whenever or not to automatically close the oradoc window after opening a
+" help tag.
+TLet g:vorax_oradoc_window_autoclose = 0
+
+"}}}
+" g:vorax_oradoc_index_file"{{{
+
+" Where to store the oradoc index file
+TLet g:vorax_oradoc_index_file = g:vorax_home_dir . '/vorax_oradoc.idx'
+
+"}}}
+" g:vorax_oradoc_config_file"{{{
+
+" The oradoc config file (swish-e format).
+TLet g:vorax_oradoc_config_file = substitute(
+      \ fnamemodify(expand('<sfile>:p:h') . '/../vorax/oradoc/config/vorax_oradoc.conf', ':p:8'),
+      \ '\\\\\|\\', '/', 'g')
+
+"}}}
+" g:vorax_oradoc_target_folder"{{{
+
+" Where the Oracle HTML documentation is located by default.
+TLet g:vorax_oradoc_target_folder = substitute(
+      \ fnamemodify(expand('<sfile>:p:h') . '/../vorax/oradoc/public', ':p:8'),
+      \ '\\\\\|\\', '/', 'g')
+
+"}}}
+" g:vorax_oradoc_open_with "{{{
+
+if has('win32')
+  let g:vorax_oradoc_open_with = 'silent! !start C:\Program Files\Internet Explorer\iexplore.exe %u'
+elseif has('unix')
+  " asume firefox executable is in your $PATH
+  let g:vorax_oradoc_open_with = "silent! !firefox -remote 'ping()' && firefox -remote 'openURL(%u)' || firefox '%u' &"
+endif
+
+"}}}
 " g:vorax_profiles_window_anchor"{{{
 
 " The anchor of the profile window. The allowed values are: topleft or
