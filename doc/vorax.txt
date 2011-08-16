@@ -86,6 +86,8 @@ VoraX comes with the following features:
 	  to a compressed format. In a compressed output all columns width are
 	  resized according to the length of the contained data.
 
+	- Built-in HTML Oracle documentation search.
+
 ==============================================================================
 ARCHITECTURE                                                *vorax-architecture*
 
