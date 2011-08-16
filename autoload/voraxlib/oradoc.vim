@@ -45,13 +45,13 @@ function voraxlib#oradoc#Search(pattern)"{{{
   let sqlplus = vorax#GetSqlplusHandler()
   let swish_cmd = "swish-e -f " . shellescape(sqlplus.ConvertPath(g:vorax_oradoc_index_file)) . 
                 \ " -H0 " . 
-                \ " -x " . shellescape('|%t| in "<doctitle>" => %p\n') .
+                \ " -x " . shellescape('|%t| in [<doctitle>] => %p\n') .
                 \ " -w " . shellescape(pattern)
   let output = system(swish_cmd)
   if s:log.isDebugEnabled() | call s:log.debug(swish_cmd) | endif
   if v:shell_error == 0
     " remove the redundant Oracle(R)... shrink the line and the output is easier to read
-    let output = substitute(output, '\"\@<=\(Oracle. \)', '', 'g')
+    let output = substitute(output, '\[\@<=\(Oracle. \)', '', 'g')
     " remove \r, if any
     let output = substitute(output, '\r', '', 'g')
     let docwin = vorax#GetDocwinHandler()
