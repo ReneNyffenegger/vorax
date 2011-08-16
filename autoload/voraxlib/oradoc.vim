@@ -32,13 +32,21 @@ function! voraxlib#oradoc#CreateIndex(...)"{{{
 endfunction"}}}
 
 " search into the indexes oracledoc for the provided pattern
-function voraxlib#oradoc#Search(pattern)
+function voraxlib#oradoc#Search(pattern)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#oradoc#Search(' . string(a:pattern) . ')') | endif
+  let pattern = a:pattern
+  if empty(a:pattern)
+    let pattern = input('Oradoc Search: ')
+    if empty(pattern)
+    	" exit if no pattern was provided
+    	return
+    endif
+  endif
   let sqlplus = vorax#GetSqlplusHandler()
   let swish_cmd = "swish-e -f " . shellescape(sqlplus.ConvertPath(g:vorax_oradoc_index_file)) . 
                 \ " -H0 " . 
                 \ " -x " . shellescape('|%t| in "<doctitle>" => %p\n') .
-                \ " -w " . shellescape(a:pattern)
+                \ " -w " . shellescape(pattern)
   let output = system(swish_cmd)
   if s:log.isDebugEnabled() | call s:log.debug(swish_cmd) | endif
   if v:shell_error == 0
@@ -58,7 +66,7 @@ function voraxlib#oradoc#Search(pattern)
   else
     call voraxlib#utils#Warn('Search error. Please check the logs for additional details.')
   endif
-endfunction
+endfunction"}}}
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

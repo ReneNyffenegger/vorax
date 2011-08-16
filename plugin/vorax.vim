@@ -265,7 +265,6 @@ TLet g:vorax_output_window_feedback_hi_group = 'Directory'
 TLet g:vorax_output_window_error_hi_group = 'ErrorMsg'
 
 "}}}
-
 " g:vorax_oradoc_window_anchor"{{{
 
 " The anchor of the oradoc window. The allowed values are: topleft or
@@ -444,6 +443,16 @@ if exists(':VoraxExplainOnly') != 2
   command! -nargs=? VoraxExplainOnly :call vorax#Explain(<q-args>, 1)
   nmap <unique> <script> <Plug>VoraxExplainOnly :VoraxExplainOnly<CR>
 endif"}}}
+" :VoraxOradoc"{{{
+if exists(':VoraxOradocSearch') != 2
+  command! -nargs=? VoraxOradocSearch :call voraxlib#oradoc#Search(<q-args>)
+  nmap <unique> <script> <Plug>VoraxOradocSearch :VoraxOradocSearch<CR>
+endif"}}}
+" :VoraxOradoc"{{{
+if exists(':VoraxOradocCreateIndex') != 2
+  command! -nargs=? VoraxOradoc :call voraxlib#oradoc#CreateIndex(<q-args>)
+  nmap <unique> <script> <Plug>VoraxOradocCreateIndex :VoraxOradocCreateIndex<CR>
+endif"}}}
 " :VoraxScratch"{{{
 if exists(':VoraxScratch') != 2
   command! -nargs=0 VoraxScratch :call vorax#NewSqlScratch()
@@ -574,6 +583,13 @@ TLet g:vorax_explorer_window_refresh_key = "R"
 "}}}
 " g:vorax_compile_plsql_buffer_key {{{
 TLet g:vorax_compile_plsql_buffer_key = '<F9>'
+"}}}
+" g:vorax_oradoc_search_key {{{
+TLet g:vorax_oradoc_search_key = '<Leader>h'
+exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . g:vorax_oradoc_search_key . " <Plug>VoraxOradocSearch"
+"}}}
+" g:vorax_oradoc_undercursor_key {{{
+TLet g:vorax_oradoc_undercursor_key = 'K'
 "}}}
 " ==============================================================================
 

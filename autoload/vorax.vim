@@ -584,6 +584,19 @@ function! vorax#CreateCommonKeyMappings()"{{{
         \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
     exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " :call vorax#Explain(voraxlib#utils#SelectedBlock(), 1)<cr>"
   endif
+
+  " oradoc mappings
+  let mapdesc = maparg(g:vorax_oradoc_undercursor_key, 'n', 0, 1)
+  if g:vorax_oradoc_undercursor_key != '' 
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "noremap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer> " . g:vorax_oradoc_undercursor_key . " :call voraxlib#oradoc#Search(expand('<cword>'))<cr>"
+  endif
+  let mapdesc = maparg(g:vorax_oradoc_undercursor_key, 'v', 0, 1)
+  if g:vorax_oradoc_undercursor_key != '' 
+        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
+    exe "xnoremap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_oradoc_undercursor_key . " :call voraxlib#oradoc#Search(voraxlib#utils#SelectedBlock())<cr>"
+  endif
+
 endfunction"}}}
 
 " Create a new sql scratch buffer to try on various sql statements.
