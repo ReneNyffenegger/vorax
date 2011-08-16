@@ -47,8 +47,9 @@ function voraxlib#oradoc#Search(pattern)"{{{
                 \ " -H0 " . 
                 \ " -x " . shellescape('|%t| in [<doctitle>] => %p\n') .
                 \ " -w " . shellescape(pattern)
-  let output = system(swish_cmd)
   if s:log.isDebugEnabled() | call s:log.debug(swish_cmd) | endif
+  let output = system(swish_cmd)
+  if s:log.isDebugEnabled() | call s:log.debug(output) | endif
   if v:shell_error == 0
     " remove the redundant Oracle(R)... shrink the line and the output is easier to read
     let output = substitute(output, '\[\@<=\(Oracle. \)', '', 'g')
