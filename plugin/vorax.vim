@@ -246,6 +246,26 @@ TLet g:vorax_output_window_statusline = "%!voraxlib#panel#output#StatusLine()"
 TLet g:vorax_output_window_clear_before_exec = 1
 
 "}}}
+" g:vorax_output_window_column_underline_hi_group "{{{
+
+" The highlight group to use for displaying the underline after each column
+" when the result of a query is shown.
+TLet g:vorax_output_window_column_underline_hi_group = 'Error'
+
+"}}}
+" g:vorax_output_window_feedback_hi_group "{{{
+
+" The highlight group to use for displaying the feedback sqlplus message
+TLet g:vorax_output_window_feedback_hi_group = 'Directory'
+
+"}}}
+" g:vorax_output_window_error_hi_group "{{{
+
+" The highlight group to use for displaying errors
+TLet g:vorax_output_window_error_hi_group = 'ErrorMsg'
+
+"}}}
+
 " g:vorax_oradoc_window_anchor"{{{
 
 " The anchor of the oradoc window. The allowed values are: topleft or
