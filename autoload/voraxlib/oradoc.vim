@@ -16,7 +16,7 @@ let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 " Create the index for the HTML index.
 function! voraxlib#oradoc#CreateIndex(...)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#oradoc#CreateIndex()') | endif
-  if !exists('a:1')
+  if !exists('a:1') || (exists('a:1') && empty(a:1))
     " default location
     let oradoc_dir = g:vorax_oradoc_target_folder
   else

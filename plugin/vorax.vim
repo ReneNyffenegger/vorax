@@ -448,9 +448,9 @@ if exists(':VoraxOradocSearch') != 2
   command! -nargs=? VoraxOradocSearch :call voraxlib#oradoc#Search(<q-args>)
   nmap <unique> <script> <Plug>VoraxOradocSearch :VoraxOradocSearch<CR>
 endif"}}}
-" :VoraxOradoc"{{{
+" :VoraxOradocCreateIndex"{{{
 if exists(':VoraxOradocCreateIndex') != 2
-  command! -nargs=? VoraxOradoc :call voraxlib#oradoc#CreateIndex(<q-args>)
+  command! -nargs=? VoraxOradocCreateIndex :call voraxlib#oradoc#CreateIndex(<q-args>)
   nmap <unique> <script> <Plug>VoraxOradocCreateIndex :VoraxOradocCreateIndex<CR>
 endif"}}}
 " :VoraxScratch"{{{
