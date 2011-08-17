@@ -16,17 +16,17 @@ if voraxlib#utils#IsSqlOracleBuffer()
   endif
 
   " init sql buffer mappings
-  " Mappings for exec statement"{{{
+  " Mappings for exec statement
   if g:vorax_exec_key != '' 
         \ && !hasmapto('<Plug>VoraxExecCurrent') 
         \ && maparg(g:vorax_exec_key, 'n') == ""
-    exe "nmap <unique> " . g:vorax_exec_key . " <Plug>VoraxExecCurrent"
+    exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer> " . g:vorax_exec_key . " <Plug>VoraxExecCurrent"
   endif
   if g:vorax_exec_key != '' 
         \ && !hasmapto('<Plug>VoraxExecSelection') 
         \ && maparg(g:vorax_exec_key, 'v') == ""
-    exe "xmap <unique> " . g:vorax_exec_key . " <Plug>VoraxExecSelection"
-  endif"}}}
+    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer> " . g:vorax_exec_key . " <Plug>VoraxExecSelection"
+  endif
 
   " explain plan mappings
   let mapdesc = maparg(g:vorax_explain_key, 'n', 0, 1)
