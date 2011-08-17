@@ -1,31 +1,61 @@
-VoraX is a minimalist Oracle IDE based on the well known Vim editor. The main reasons which motivate us to develop this plugin are:
+VoraX is a minimalist Oracle IDE based on the well known Vim editor. The main
+reasons which motivate us to develop this plugin are:
 
-	- the power of Vim editor. When applied to Oracle development or database administration it brings a lot of efficiency and fun.
+	- the power of Vim editor. When applied to Oracle development or 
+	  database administration it brings a lot of efficiency and fun.
 
-	- the need for a cross platform tool. Vim editor is available on many platforms which means you're free to use whatever OS you like.
+	- the need for a cross platform tool. Vim editor is available on many
+	  platforms which means you're free to use whatever OS you like.
 
-	- availability as a console IDE. Having a shiny IDE on a slow SSH connection doesn't sound so good, does it? A DBA will be pleased running VoraX in a console because, usually, is so used running OS commands, scripts etc. With VoraX in place he doesn't need to leave his beloved console anymore.
+	- availability as a console IDE. Having a shiny IDE on a slow SSH
+	  connection doesn't sound so good, does it? A DBA will be pleased 
+	  running VoraX in a console because, usually, is so used running OS 
+	  commands, scripts etc. With VoraX in place he doesn't need to leave 
+	  his beloved console anymore.
 
-	- having an IDE with a very small footprint. VoraX is nothing but a collection of VimL and Ruby scripts provided as a Vim plugin. We hope VoraX will consume as less resources as possible.
+	- having an IDE with a very small footprint. VoraX is nothing but a 
+	  collection of VimL and Ruby scripts provided as a Vim plugin. We 
+	  hope VoraX will consume as less resources as possible.
 
-	- the dream of an improved SqlPLUS environment. I know a lot of guys (including me) who intensively use SqlPLUS, even for complex tasks.  On the other hand its limitations are quite annoying: we want good code completion, pretty print output and so on. We cannot get rid of SqlPLUS because we still think it is a great tool but we can make it better. This is another goal of VoraX.
+	- the dream of an improved SqlPLUS environment. I know a lot of guys
+	  (including me) who intensively use SqlPLUS, even for complex tasks. 
+	  On the other hand its limitations are quite annoying: we want good 
+	  code completion, pretty print output and so on. We cannot get rid of 
+	  SqlPLUS because we still think it is a great tool but we can make it 
+	  better. This is another goal of VoraX.
 
-VoraX stands for Vim ORAcle eXtension. It acts like a wrapper on the SqlPLUS environment. Every call to the database is made through SqlPLUS but in a hidden way so that the user is not aware of that. This approach has pros and cons. From one hand it inherits all those nice SqlPLUS features like explain plans, column computations and so on, but on the other hand it has to deal with all the limitations of the SqlPLUS (formatting output, syntax highlight etc.) To fill this gap is the whole idea of VoraX.
+VoraX stands for Vim ORAcle eXtension. It acts like a wrapper on the SqlPLUS
+environment. Every call to the database is made through SqlPLUS but in a
+hidden way so that the user is not aware of that. This approach has pros and
+cons. From one hand it inherits all those nice SqlPLUS features like explain
+plans, column computations and so on, but on the other hand it has to deal
+with all the limitations of the SqlPLUS (formatting output, syntax highlight
+etc.) To fill this gap is the whole idea of VoraX.
 
 The main features of VoraX are:
 
-	- Advanced code completion for database object names, columns, aliases and procedure/function parameters;
+	- Advanced code completion for database object names, columns, aliases
+	  and procedure/function parameters;
 
-	- A database objects browser. You may browse tables, views, packages and so on. The options available for every type of object may be extended through custom plugins;
+	- A database objects browser. You may browse tables, views, packages
+	  and so on. The options available for every type of object may be
+	  extended through custom plugins;
 
-	- Connection profiles. VoraX allows to store various connection strings, including the corresponding passwords. All these passwords are protected using a master password.
+	- Connection profiles. VoraX allows to store various connection
+	  strings, including the corresponding passwords. All these passwords
+	  are protected using a master password.
 	
-	- An output window where the results of running various statements are displayed. This window supports highlighting which makes the output nicer.  
-
-	- Support for editing and compiling PL/SQL modules like packages, types, procedure and functions.
-
-	- Convenient key mappings for: describe object under cursor, execute current statement etc. 
+	- An output window where the results of running various statements are
+	  displayed. This window supports highlighting which makes the output nicer.
 	
-	- Pretty print output. You may switch to a vertical columns output or to a compressed format. In a compressed output all columns width are resized according to the length of the contained data.
+	- Support for editing and compiling PL/SQL modules like packages,
+	  types, procedure and functions.
+
+	- Convenient key mappings for: describe object under cursor, execute
+	  current statement etc. 
+	
+	- Pretty print output. You may switch to a vertical columns output or
+	  to a compressed format. In a compressed output all columns width are
+	  resized according to the length of the contained data.
 
 	- Built-in HTML Oracle documentation search.
