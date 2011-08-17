@@ -16,10 +16,11 @@
 	   The output window  ..................... |vorax-output|
 	   The code completion system ............. |vorax-omni|
 	   The database explorer .................. |vorax-expolorer|
+	   Describing objects ..................... |vorax-describe|
 
 
 ==============================================================================
-WHAT IS VORAX                                                     *vorax-whatis*
+WHAT IS VORAX                                                   *vorax-whatis*
 
 VoraX is a minimalist Oracle IDE based on the well known Vim editor. The main
 reasons which motivate us to develop this plugin are:
@@ -33,9 +34,8 @@ reasons which motivate us to develop this plugin are:
 	- availability as a console IDE. Having a shiny IDE on a slow SSH
 	  connection doesn't sound so good, does it? A DBA will be pleased 
 	  running VoraX in a console because, usually, is so used running OS 
-	  commands, scripts etc. and, of course, the terminal is his best 
-	  friend. With VoraX in place you don't need to leave your beloved 
-	  console anymore.
+	  commands, scripts etc. With VoraX in place he doesn't need to leave 
+	  his beloved console anymore.
 
 	- having an IDE with a very small footprint. VoraX is nothing but a 
 	  collection of VimL and Ruby scripts provided as a Vim plugin. We 
@@ -57,7 +57,7 @@ with all the limitations of the SqlPLUS (formatting output, syntax highlight
 etc.) To fill this gap is the whole idea of VoraX.
 
 ==============================================================================
-FEATURES                                                        *vorax-features*
+FEATURES                                                      *vorax-features*
 
 VoraX comes with the following features:
 
@@ -73,11 +73,10 @@ VoraX comes with the following features:
 	  are protected using a master password.
 	
 	- An output window where the results of running various statements are
-	  displayed. Within this window logging may be started in order to
-	  save everything is output into a file on disk for future inspection.
+	  displayed. This window supports highlighting which makes the output nicer.
 	
 	- Support for editing and compiling PL/SQL modules like packages,
-	  types, procedure and functions.
+	  types, procedures and functions.
 
 	- Convenient key mappings for: describe object under cursor, execute
 	  current statement etc. 
@@ -89,7 +88,7 @@ VoraX comes with the following features:
 	- Built-in HTML Oracle documentation search.
 
 ==============================================================================
-ARCHITECTURE                                                *vorax-architecture*
+ARCHITECTURE                                              *vorax-architecture*
 
 VoraX is based on SqlPLUS to interact with the database. Every statement you
 execute using VoraX is actually run by SqlPLUS behind. When VoraX is
@@ -109,7 +108,7 @@ and parsing Oracle grammars for code completion and other complex tasks are
 still written in Ruby.
 
 ==============================================================================
-INSTALLATION GUIDE                                               *vorax-install* 
+INSTALLATION GUIDE                                             *vorax-install* 
 
 VoraX follows the standard procedure of installing a Vim plugin: uncompress
 the vorax archive into $HOME/.vim if you are on a *NIX platform or into
@@ -161,7 +160,7 @@ In addition the following Vim script must be also installed:
 Also, it's best to have "filetype plugin on" in your .vimrc file.
 
 ==============================================================================
-CONNECTING TO A DATABASE				         *vorax-connect* 
+CONNECTING TO A DATABASE			               *vorax-connect* 
 
 The simplest method to connect to a new database is to use the VoraxConnect
 command. For example, the following command is used to connect to an imaginary
@@ -216,7 +215,7 @@ bang version except for:
 	from the current location.
 
 ==============================================================================
-EXECUTING STATEMENTS    				            *vorax-exec* 
+EXECUTING STATEMENTS    			                  *vorax-exec* 
 
 In SqlPLUS you just write the statement on the SQL> prompt, press ENTER and
 you have the results back with the SQL> prompt waiting for you, again, to 
@@ -308,7 +307,7 @@ some data to be entered or it is waiting for a long running statement to
 complete.
 
 ==============================================================================
-THE OUTPUT WINDOW    				                  *vorax-output* 
+THE OUTPUT WINDOW    				                *vorax-output* 
 
 The result returned by the commands you execute is displayed into the output
 window. This window is automatically opened whenever something is needed to be
@@ -384,7 +383,7 @@ this feature is active, everything is written into the output window will be
 also appended to the configured spool file. 
 
 ==============================================================================
-THE CODE COMPLETION SYSTEM                                          *vorax-omni* 
+THE CODE COMPLETION SYSTEM                                        *vorax-omni* 
 
 We strongly believe that a good code completion system brings a lot of
 efficiency in coding activities. This is a common sense feature every IDE
@@ -457,7 +456,7 @@ corresponding to this alias are given in uppercase, but the "t." alias will
 provide the columns in lowercase.
 
 ==============================================================================
-THE DATABASE EXPLORER                                           *vorax-explorer* 
+THE DATABASE EXPLORER                                         *vorax-explorer* 
 
 Any decent database IDE has a database explorer/browser. Usually it is a tree
 with database objects grouped according to their types: tables, views,
@@ -519,5 +518,28 @@ using the following call:
 The unique name is typically the plugin filename script.
 You can find some real examples of explorer plugins into the vorax/plugin/explorer/
 folder.
+
+==============================================================================
+DESCRIBING OBJECTS                                            *vorax-describe* 
+
+In order to get the structure of a database object, VoraX provides two
+different ways to describe various objects:
+
+	- a BASIC describe (the output from the sqlplus DESC command):
+	  applies to tables, views, procedures, functions, packages and types.
+	
+	- a VERBOSE describe: applies just to tables and it gets a lot of
+	  information concerning: comments, constraints, indexes, parent-child
+	  relationships, the tablespace the table belongs to etc. You can
+	  tailor all these by modifying the following script:
+
+			vorax/scripts/desc_table.sql
+
+The default keymappings are:
+
+	- <Leader>d for a BASIC describe
+	- <Leader>D for a VERBOSE describe
+
+"D" stands for "Describe" therefore it shouldn't be a problem to memorize it.
 
 vim:ts=8 sw=8 noexpandtab tw=78 ft=help:
