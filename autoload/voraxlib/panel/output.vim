@@ -89,6 +89,9 @@ function! s:ExtendWindow()"{{{
     if exists('g:vorax_output_window_toggle_append') && g:vorax_output_window_toggle_append != ''
       exe 'nnoremap <silent> <buffer> ' . g:vorax_output_window_toggle_append . ' :call <SID>ToggleAppend()<cr>'
     endif
+
+    " allow oradoc/describe mappings
+    call vorax#CreateCommonKeyMappings()
   endfunction"}}}
 
   " Write the provided text at the end of the output window. If 

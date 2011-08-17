@@ -563,28 +563,6 @@ function! vorax#CreateCommonKeyMappings()"{{{
     exe "xmap <silent> <unique> <buffer>" . g:vorax_describe_verbose_key . " :call vorax#Describe(voraxlib#utils#SelectedBlock(), 1)<cr>"
   endif
 
-  " explain plan mappings
-  let mapdesc = maparg(g:vorax_explain_key, 'n', 0, 1)
-  if g:vorax_explain_key != '' 
-        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
-    exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer> " . g:vorax_explain_key . " <Plug>VoraxExplain"
-  endif
-  let mapdesc = maparg(g:vorax_explain_only_key, 'n', 0, 1)
-  if g:vorax_explain_only_key!= '' 
-        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
-    exe "nmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " <Plug>VoraxExplainOnly"
-  endif
-  let mapdesc = maparg(g:vorax_explain_key, 'v', 0, 1)
-  if g:vorax_explain_key != '' 
-        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
-    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_key . " :call vorax#Explain(voraxlib#utils#SelectedBlock(), 0)<cr>"
-  endif
-  let mapdesc = maparg(g:vorax_explain_only_key, 'v', 0, 1)
-  if g:vorax_explain_only_key != '' 
-        \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
-    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " :call vorax#Explain(voraxlib#utils#SelectedBlock(), 1)<cr>"
-  endif
-
   " oradoc mappings
   let mapdesc = maparg(g:vorax_oradoc_undercursor_key, 'n', 0, 1)
   if g:vorax_oradoc_undercursor_key != '' 
