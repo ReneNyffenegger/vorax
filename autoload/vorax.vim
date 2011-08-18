@@ -216,6 +216,8 @@ endfunction"}}}
 function! vorax#CompileBuffer()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#CompileBuffer()') | endif
   if &ft == 'plsql'
+    redraw
+    echo 'Compiling...'
     " get the content of the buffer
     let content = join(getline(0, line('$')), "\n")
     if substitute(content, '\_s', '', 'g') != ''
@@ -237,15 +239,16 @@ function! vorax#CompileBuffer()"{{{
           endif
         endif
       endif
-      let content = voraxlib#utils#AddSqlDelimitator(content)
+      "let content = voraxlib#utils#AddSqlDelimitator(content)
       " execute the buffer content which, for a plsql buffer, it means a compilation
       let exec_file = sqlplus.Pack(substitute(content, '\_s*\_$', '', 'g'), {'include_eor' : 1}) 
-      let output = sqlplus.Exec(exec_file, {'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
-            \ [
-            \ {'option' : 'echo', 'value' : 'off'}, 
-            \ {'option' : 'feedback', 'value' : 'on'},
-            \ {'option' : 'markup', 'value' : 'html off'},
-            \ ])})
+      let output = sqlplus.Exec(exec_file, {
+            \ 'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+              \ [
+              \ {'option' : 'echo', 'value' : 'off'}, 
+              \ {'option' : 'feedback', 'value' : 'on'},
+              \ {'option' : 'markup', 'value' : 'html off'},
+              \ ])})
       " look for errors in ALL_ERRORS view
       let qerr = voraxlib#utils#GetQuickFixCompilationErrors(b:vorax_module['owner'], 
                                                  \ b:vorax_module['object'], 
@@ -320,15 +323,17 @@ function! vorax#GetDDL(schema, object_name, type, ...)"{{{
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'BODY', TRUE );\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'PRETTY', TRUE );\n" .
             \ "exec dbms_metadata.set_transform_param( DBMS_METADATA.SESSION_TRANSFORM, 'CONSTRAINTS_AS_ALTER', TRUE );\n" .
-            \ "exec dbms_output.put_line(dbms_metadata.get_ddl('" . a:type . "', '" . a:object_name . "', '" . a:schema . "'));"
+            \ "select dbms_metadata.get_ddl('" . a:type . "', '" . a:object_name . "', '" . a:schema . "') from dual;"
   let sqlplus = vorax#GetSqlplusHandler()
   let params = {}
   if exists('a:1')
   	let params = a:1
   endif
   let params['sqlplus_options'] = extend(sqlplus.GetSafeOptions(), 
-                            \ [{'option' : 'serveroutput', 'value' : 'on'},
+                            \ [{'option' : 'serveroutput', 'value' : 'on size 1000000'},
                             \  {'option' : 'pagesize', 'value' : '0'},
+                            \  {'option' : 'long', 'value' : '1000000000'},
+                            \  {'option' : 'longc', 'value' : '60000'},
                             \  {'option' : 'feedback', 'value' : 'off'},
                             \  {'option' : 'echo', 'value' : 'off'}, 
                             \  {'option' : 'markup', 'value' : 'html off'},

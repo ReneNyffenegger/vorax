@@ -348,7 +348,7 @@ let g:vorax_profiles_window_size = 30
 
 " The anchor of the explorer window. The allowed values are: topleft or
 " botright.
-TLet g:vorax_explorer_window_anchor = 'topleft'
+TLet g:vorax_explorer_window_anchor = 'botright'
 
 "}}}
 " g:vorax_explorer_window_orientation"{{{

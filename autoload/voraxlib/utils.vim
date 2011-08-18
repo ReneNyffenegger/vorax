@@ -431,6 +431,7 @@ endfunction"}}}
 
 " Adds a sql delimitator at the end of the statement.
 function! voraxlib#utils#AddSqlDelimitator(statement)"{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#utils#AddSqlDelimitator()') | endif
   let end_delimitator = voraxlib#utils#GetSqlDelimitator(a:statement)
   " add the delimitator on the same line. This is needed because VoraX
   " doesn't know if it's an sqlplus command or an SQL command. For
@@ -438,6 +439,7 @@ function! voraxlib#utils#AddSqlDelimitator(statement)"{{{
   " The second is dangerous because it excutes also the previous SQL
   " command. Likewise, take care about the trailing comment. Something
   " like 'SELECT * FROM CAT -- my comment;' is useless.
+  if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#utils#AddSqlDelimitator()') | endif
   return substitute(voraxlib#utils#RTrimSqlComments(a:statement), '\_s*$', '', '') . end_delimitator
 endfunction"}}}
 
