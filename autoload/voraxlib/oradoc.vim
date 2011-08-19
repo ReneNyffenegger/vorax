@@ -32,7 +32,7 @@ function! voraxlib#oradoc#CreateIndex(...)"{{{
 endfunction"}}}
 
 " search into the indexes oracledoc for the provided pattern
-function voraxlib#oradoc#Search(pattern)"{{{
+function! voraxlib#oradoc#Search(pattern)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#oradoc#Search(' . string(a:pattern) . ')') | endif
   let pattern = a:pattern
   if empty(a:pattern)

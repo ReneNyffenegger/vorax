@@ -191,7 +191,7 @@ TLet g:vorax_output_window_orientation = 'h'
 " g:vorax_output_window_size"{{{
 
 " The size of the output window. 
-TLet g:vorax_output_window_size = 30
+TLet g:vorax_output_window_size = 15
 
 "}}}
 " g:vorax_output_window_keep_focus_after_exec"{{{

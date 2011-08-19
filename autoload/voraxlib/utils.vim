@@ -396,7 +396,7 @@ endfunction"}}}
 function! voraxlib#utils#IsSlashRequiredAsEnd(statement)"{{{
   " check for a type
   if a:statement !~ '\v\n\s*/\s*\n*$'
-    let pattern = '\_s*create\_s\+\(or\_s\+replace\_s\+\)\?type\_s\+'
+    let pattern = '^\_s*create\_s\+\(or\_s\+replace\_s\+\)\?type\_s\+'
     return a:statement =~? pattern || a:statement =~? s:plsql_end_marker
   endif
   return 0
@@ -439,7 +439,6 @@ function! voraxlib#utils#AddSqlDelimitator(statement)"{{{
   " The second is dangerous because it excutes also the previous SQL
   " command. Likewise, take care about the trailing comment. Something
   " like 'SELECT * FROM CAT -- my comment;' is useless.
-  if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#utils#AddSqlDelimitator()') | endif
   return substitute(voraxlib#utils#RTrimSqlComments(a:statement), '\_s*$', '', '') . end_delimitator
 endfunction"}}}
 
