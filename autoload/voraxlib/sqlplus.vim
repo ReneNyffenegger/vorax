@@ -391,7 +391,7 @@ function! s:sqlplus.Cancel(message) dict"{{{
   rescue NotImplementedError
     VIM::command('return 0')
   rescue Vorax::TimeoutException
-    VIM::command('echo "Timeout trying to cancel the currently executing statement."')
+    VIM::command('echo "*** TIMEOUT REACHED ***"')
     VIM::command('return 0')
   end
 EORC
