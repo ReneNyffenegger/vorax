@@ -270,6 +270,7 @@ module Vorax
       self << "\n"
       self << "prompt #{CANCEL_MARKER}\n"
       chunk = "" 
+      start = Time.now
       while true
         buf = @process.read(@read_buffer_size)
         yield if block_given?
@@ -281,6 +282,9 @@ module Vorax
         else
           # just wait a little bit
           sleep READ_SLEEP_TICK
+        end
+        if ((Time.now - start).to_i % 60) > 30
+          raise TimeoutException
         end
       end
       # not busy anymore.
@@ -388,4 +392,8 @@ module Vorax
 
 
   end
+
+  class TimeoutException < RuntimeError
+  end
+
 end

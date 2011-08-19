@@ -382,11 +382,16 @@ endfunction"}}}
 function! s:sqlplus.Cancel(message) dict"{{{
   ruby <<EORC
   begin
+    start = Time.now
     $sqlplus_factory[VIM::evaluate('self.ruby_key')].cancel do
-      VIM::command('redraw | echon ' + VIM::evaluate('a:message').inspect)
+      elapsed = ((Time.now - start).to_i % 60).to_s + 's of 30s elapsed...'
+      VIM::command('redraw | echon ' + (VIM::evaluate('a:message') + ' - ' + elapsed).inspect)
     end
     VIM::command('return 1')
   rescue NotImplementedError
+    VIM::command('return 0')
+  rescue Vorax::TimeoutException
+    VIM::command('echo "Timeout trying to cancel the currently executing statement."')
     VIM::command('return 0')
   end
 EORC
