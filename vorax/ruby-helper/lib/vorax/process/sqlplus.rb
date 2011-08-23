@@ -114,7 +114,7 @@ module Vorax
       @busy = true
       self << "#{command}\n"
       # mark the end of the request
-      self << "prompt #{END_OF_REQUEST}\n" if include_eor
+      self << "\n.\nprompt #{END_OF_REQUEST}\n" if include_eor
     end
 
     # Set the session owner monitor mode. If activated, after every exec
@@ -307,7 +307,7 @@ module Vorax
       # directory will be under $TEMP.
       cmds = (commands.nil? ? [] : commands)
       file_content = cmds.join("\n")
-      file_content << "\nprompt #{END_OF_REQUEST}\n" if include_eor
+      file_content << "\n.\nprompt #{END_OF_REQUEST}\n" if include_eor
       filename = DEFAULT_PACK_FILE if filename.nil?
       File.open(@process.convert_path("#@tmp_dir/#{filename}"), 'w') {|f| f.write(file_content) }
       file = @process.convert_path("#@tmp_dir/#{filename}")

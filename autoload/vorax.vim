@@ -105,7 +105,7 @@ function! vorax#Exec(command)"{{{
     " exec the command in bg. All trailing CR/spaces are removed before exec.
     " This is important especially in connection with set echo on. With CRs
     " the sqlprompt will be echoed
-    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\_$', '', 'g'), {'include_eor' : 1}), 0)
+    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\%$', '', 'g'), {'include_eor' : 1}), 0)
     call outputwin.StartMonitor()
   else
     if s:log.isDebugEnabled() | call s:log.debug('User decided to cancel the exec because of the pause on.') | endif
@@ -241,7 +241,7 @@ function! vorax#CompileBuffer()"{{{
       endif
       "let content = voraxlib#utils#AddSqlDelimitator(content)
       " execute the buffer content which, for a plsql buffer, it means a compilation
-      let exec_file = sqlplus.Pack(substitute(content, '\_s*\_$', '', 'g'), {'include_eor' : 1}) 
+      let exec_file = sqlplus.Pack(substitute(content, '\_s*\%$', '', 'g'), {'include_eor' : 1}) 
       let output = sqlplus.Exec(exec_file, {
             \ 'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
               \ [

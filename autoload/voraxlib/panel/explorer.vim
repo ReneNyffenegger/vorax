@@ -85,7 +85,7 @@ function! s:ExtendExplorer()"{{{
   function! s:explorer.window.Configure()"{{{
     " set options
     setlocal foldcolumn=0
-    "setlocal winfixwidth
+    setlocal winfixwidth
     setlocal buftype=nofile
     setlocal nobuflisted
     setlocal nospell
