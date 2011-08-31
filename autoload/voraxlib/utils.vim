@@ -461,6 +461,9 @@ function! voraxlib#utils#AddRownumFilter(text, limit)"{{{
       let result .= "select * from (\n/* original query starts here */\n" . 
             \ substitute(voraxlib#utils#RemoveSqlDelimitator(statement), '\v(\_^\_s*)|(\_s*\_$)', '', 'g') . 
             \ "\n/* original query ends here */\n) where rownum <= " . string(a:limit) . ";\n"
+      if g:vorax_limit_rows_show_warning
+      	let result .= "prompt *** output may be truncated ***\n"
+      endif
     else
     	let result .= voraxlib#utils#AddSqlDelimitator(statement)."\n"
     endif

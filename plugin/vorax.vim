@@ -142,6 +142,15 @@ TLet g:vorax_session_owner_monitor = 1
 TLet g:vorax_limit_rows = 0
 
 "}}}
+" g:vorax_limit_rows_show_warning"{{{
+
+" Whenever or not to display a warning after every executed query in order to
+" let know the user that a limit rows filter is active and the output might be
+" truncated
+
+TLet g:vorax_limit_rows_show_warning = 1
+
+"}}}
 " g:vorax_open_compilation_errors_command"{{{
 
 " The command used to display the compilation errors using the quickfix window.
