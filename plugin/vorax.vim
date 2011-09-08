@@ -326,10 +326,10 @@ TLet g:vorax_oradoc_target_folder = substitute(
 " g:vorax_oradoc_open_with "{{{
 
 if has('win32')
-  let g:vorax_oradoc_open_with = 'silent! !start C:\Program Files\Internet Explorer\iexplore.exe %u'
+  TLet g:vorax_oradoc_open_with = 'silent! !start C:\Program Files\Internet Explorer\iexplore.exe %u'
 elseif has('unix')
   " asume firefox executable is in your $PATH
-  let g:vorax_oradoc_open_with = "silent! !firefox -remote 'ping()' && firefox -remote 'openURL(%u)' || firefox '%u' &"
+  TLet g:vorax_oradoc_open_with = "silent! !firefox -remote 'ping()' && firefox -remote 'openURL(%u)' || firefox '%u' &"
 endif
 
 "}}}
@@ -350,7 +350,7 @@ TLet g:vorax_profiles_window_orientation = 'v'
 " g:vorax_profiles_window_size"{{{
 
 " The size of the profile window. 
-let g:vorax_profiles_window_size = 30
+TLet g:vorax_profiles_window_size = 30
 
 "}}}
 " g:vorax_explorer_window_anchor"{{{
