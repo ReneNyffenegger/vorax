@@ -106,7 +106,7 @@ function! s:ExtendExplorer()"{{{
     exe 'noremap <silent> <buffer> ' . g:vorax_explorer_window_menu_key . ' :call <SID>Menu()<CR>'
 
     " configure plugins
-    call s:explorer._ConfigureMappingsForPlugins()
+    call s:explorer._ConfigurePlugins()
 
   endfunction"}}}
   
@@ -204,7 +204,7 @@ function! s:ExtendExplorer()"{{{
   endfunction"}}}
 
   " Internal function for configuring mappings for the plugins.
-  function! s:explorer._ConfigureMappingsForPlugins()
+  function! s:explorer._ConfigurePlugins()
     if !s:explorer.plugins_configured
       if s:log.isDebugEnabled() | call s:log.debug('Configure explorer plugins') | endif
       for id in keys(s:explorer.plugins)
@@ -214,6 +214,7 @@ function! s:ExtendExplorer()"{{{
           if s:log.isDebugEnabled() | call s:log.debug(command) | endif
           exe command
         endif
+        call plugin.Configure()
       endfor
       let s:explorer.plugins_configured = 1
     endif
