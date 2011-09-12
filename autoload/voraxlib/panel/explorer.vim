@@ -139,7 +139,7 @@ function! s:ExtendExplorer()"{{{
 
   " Refresh the whole explorer.
   function! s:explorer.Refresh()"{{{
-    let self.window.Focus()
+    call self.window.Focus()
     let state = winsaveview()
     let root = vorax#GetSqlplusHandler().GetConnectedTo()
     call self.SetRoot(root)
