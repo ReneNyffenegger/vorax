@@ -36,7 +36,6 @@ create or replace package body `package_name^ as
 end;
 /
 ..XPT
-u
 
 XPT function
 XSET name=fnamemodify( bufname( '%' ), ':t:r' )
@@ -62,6 +61,17 @@ end;
 /
 create or replace type body `type_name^ as
   
+end;
+/
+..XPT
+
+XPT trigger
+create or replace trigger `getObjectName()^ 
+  `fires: before|after|instead of^ `event: insert|update|delete^
+  on `table|view^
+  for each row
+begin
+  `cursor^
 end;
 /
 ..XPT
