@@ -24,7 +24,7 @@ let s:plugin.shortcut = g:vorax_explorer_plugin_body_edit_key
 function! s:plugin.IsActive(path)
   let s:info = g:vorax_explorer.DescribePath(a:path)
   " Only for packages and types please
-  if s:info.type == 'PACKAGE' || s:info.type == 'TYPE'
+  if (s:info.type == 'PACKAGE' || s:info.type == 'TYPE') && !empty(s:info.object)
     return 1
   else
   	return 0

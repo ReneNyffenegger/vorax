@@ -24,7 +24,7 @@ let s:plugin.shortcut = g:vorax_explorer_plugin_spec_edit_key
 function! s:plugin.IsActive(path)
   let info = g:vorax_explorer.DescribePath(a:path)
   " Only for packages and types please
-  if info.type == 'PACKAGE' || info.type == 'TYPE'
+  if (info.type == 'PACKAGE' || info.type == 'TYPE') && !empty(info.object)
     return 1
   else
   	return 0
@@ -34,10 +34,12 @@ endfunction
 " What to do when the plugin is invoked
 function! s:plugin.Callback()
   let info = g:vorax_explorer.DescribePath(g:vorax_explorer.GetCurrentNode())
-  if info.type == 'PACKAGE'
-    let type = 'PACKAGE_SPEC'
-  elseif info.type == 'TYPE'
-    let type = 'TYPE_SPEC'
+  if !empty(s:info.object)
+    if info.type == 'PACKAGE'
+      let type = 'PACKAGE_SPEC'
+    elseif info.type == 'TYPE'
+      let type = 'TYPE_SPEC'
+    endif
   endif
   if exists('type')
     call vorax#LoadDbObject(info.owner, info.object, type)

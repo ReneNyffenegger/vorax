@@ -22,8 +22,9 @@ let s:plugin.shortcut = g:vorax_explorer_plugin_recompile_key
 function! s:plugin.IsActive(path)
   let info = g:vorax_explorer.DescribePath(a:path)
   " Only for packages and types please
-  if info.type == 'PACKAGE' || info.type == 'TYPE' || info.type == 'VIEW'
-        \ || info.type == 'PROCEDURE' || info.type == 'FUNCTION' || info.type == 'TRIGGER'
+  if (info.type == 'PACKAGE' || info.type == 'TYPE' || info.type == 'VIEW'
+        \ || info.type == 'PROCEDURE' || info.type == 'FUNCTION' || info.type == 'TRIGGER')
+        \ && !empty(info.object)
     return 1
   else
   	return 0
