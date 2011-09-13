@@ -32,6 +32,7 @@ end;
 
 XPT _new_procedure hidden
 create or replace procedure `getObjectOwner()^.`getObjectName()^ as
+begin
   `cursor^
 end;
 /
