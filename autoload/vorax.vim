@@ -224,21 +224,6 @@ function! vorax#CompileBuffer()"{{{
       let crr_win = winnr()
       " only if it's not empty
       let sqlplus = vorax#GetSqlplusHandler()
-      if b:vorax_module['type'] !~? '\(BODY\)\|\(SPEC\)'
-        " get the status of the object but only if it's not a SPEC or BODY object. We'll use this
-        " information to decide later if we have to refresh the dbexplorer or
-        " not
-        let result = sqlplus.Query("select status from all_objects where owner='" . 
-              \ b:vorax_module['owner'] . "' and object_name='" . b:vorax_module['object'] . "' " .
-              \ "and object_type='" . b:vorax_module['type'] . "';")
-        if empty(result.errors)
-          if result.resultset[0]['STATUS'] =~? 'INVALID'
-          	let initial_valid = 0
-          else
-          	let initial_valid = 1
-          endif
-        endif
-      endif
       "let content = voraxlib#utils#AddSqlDelimitator(content)
       " execute the buffer content which, for a plsql buffer, it means a compilation
       let exec_file = sqlplus.Pack(substitute(content, '\_s*\%$', '', 'g'), {'include_eor' : 1}) 
@@ -259,23 +244,11 @@ function! vorax#CompileBuffer()"{{{
         " if we have errors to show
         call setqflist(qerr, 'r')
         botright cwindow
-        let after_valid = 0
       else
         " just close the cwindow
-        let after_valid = 1
         cclose
       endif
       call vorax#GetOutputWindowHandler().AppendText(output, g:vorax_output_window_clear_before_exec)
-      " refresh db explorer
-      if exists('initial_valid') &&
-            \ exists('after_valid') &&
-            \ initial_valid != after_valid
-        if g:vorax_explorer.window.IsOpen()
-          call g:vorax_explorer.Refresh()
-        else
-          let g:vorax_explorer.must_refresh = 1
-        endif
-      endif
       " go back to the originating buffer
       exe crr_win . 'wincmd w'
     else
