@@ -63,6 +63,8 @@ function! s:GetWordItems(prefix)"{{{
   "call extend(result, s:Schemas(a:prefix))
   " let user choose an oracle object
   call extend(result, s:SchemaObjects("USER, 'PUBLIC'", a:prefix, 1))
+  " let user choose a word from the previous content (the same editing buffer)
+  call extend(result, s:WordsFromAbove(a:prefix))
   " let user choose a word from the output window
   call extend(result, s:WordsFromOutput(a:prefix))
   return result
@@ -346,6 +348,25 @@ function! s:WordsFromOutput(prefix)"{{{
     call winrestview(state)
     exe current_window . 'wincmd w'
   endif
+  return result
+endfunction"}}}
+
+" Word completion for words from the current buffer.
+function! s:WordsFromAbove(prefix)"{{{
+  let result = []
+  let state = winsaveview()
+  let crr_ignorecase = &ignorecase
+  let &ignorecase = 1
+  let bufnam = bufname('%')
+  while 1
+    if search('\<' . a:prefix .'.\{-\}\>', 'bW', 0, 500)
+      call voraxlib#utils#AddUnique(result, {"word" : expand("<cword>"), "kind" : bufnam, "icase" : 1})
+    else
+      break
+    endif
+  endwhile
+  let &ignorecase = crr_ignorecase
+  call winrestview(state)
   return result
 endfunction"}}}
 
