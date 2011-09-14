@@ -404,6 +404,11 @@ VoraX provides code completion for the following editing spots (contexts):
 		- words from the output window which match the prefix from the 
 		  current word.
 
+		- words from the current buffer
+
+		- column names which are relevant in the context of the currently editing
+			SQL statement
+
 	2. After a dot (e.g. DBMS_STATS., MYTABLE.): the "dot" completion
 	applies to: 
 	
