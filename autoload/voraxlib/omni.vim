@@ -54,6 +54,10 @@ function! voraxlib#omni#Meets(text)"{{{
         \ s:IsArgumentCompletion(a:text)
 endfunction"}}}
 
+function! voraxlib#omni#Compare(i1, i2)
+  return a:i1["word"] == a:i2["word"] ? 0 : a:i1["word"] > a:i2["word"] ? 1 : -1
+endfunction
+
 " Get all items for a WORD completion
 function! s:GetWordItems(prefix)"{{{
   let result = []
@@ -67,7 +71,9 @@ function! s:GetWordItems(prefix)"{{{
   call extend(result, s:WordsFromAbove(a:prefix))
   " let user choose a word from the output window
   call extend(result, s:WordsFromOutput(a:prefix))
-  return result
+  " add all posibile columns
+  call extend(result, s:GetAllPosibileColumns(s:context.statement, a:prefix))
+  return sort(result, "voraxlib#omni#Compare")
 endfunction"}}}
 
 " Get completion items involving a dot (e.g table. or owner.package.).
@@ -99,12 +105,12 @@ function! s:GetDotItems(prefix)"{{{
       call extend(result, s:SchemaObjects("'" . toupper(leader) . "'", a:prefix))
     endif
   endif
-  return result
+  return sort(result, "voraxlib#omni#Compare")
 endfunction"}}}
 
 " Get the items for a sequence object.
 function! s:GetSequenceItems(prefix)"{{{
-  let result = [ {"word" : 'nextval', 'icase' : 1}, {"word" : 'currval', 'icase' : 1} ]
+  let result = [ {"word" : 'currval', 'icase' : 1}, {"word" : 'nextval', 'icase' : 1} ]
   let pattern = '^' . a:prefix
   call filter(result, 'v:val.word =~? pattern')
   if s:HasLowerHead(a:prefix)
@@ -273,9 +279,23 @@ function! s:GetSubmodules(owner, object, lowercase, prefix)"{{{
   return procs
 endfunction"}}}
 
-" Get a list of columns for the provided owner.object. 
+" Get a list of columns for the provided owner.object. If owner and objects
+" are provided as lists then all columns corresponding to the owner[i],
+" object[i] pairs are returned. The second case should be used in order to
+" avoid many roundtrips.
 function! s:GetColumns(owner, object, lowercase, prefix)"{{{
-  let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and column_name like '" . toupper(a:prefix) . "%'"
+  if type(a:owner) == 1 && type(a:object) == 1
+    let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and column_name like '" . toupper(a:prefix) . "%'"
+  elseif type(a:owner) == 3 && type(a:object) == 3
+    if len(a:owner) != len(a:object)
+    	throw 'Invalid arguments: incompatible list length'
+    endif
+    let filters = []
+    for i in range(len(a:owner))
+      call add(filters, "(owner = '" . a:owner[i] . "' and table_name = '" . a:object[i] . "')")
+    endfor
+    let where = "(" . join(filters, ' or ') . ") and column_name like '" . toupper(a:prefix) . "%'"
+  end
   if a:lowercase
     let column_name = 'lower(column_name)'
   else
@@ -293,6 +313,36 @@ function! s:GetColumns(owner, object, lowercase, prefix)"{{{
       call add(columns, col['ALIAS_COLUMN'])
     endfor
   endif
+  return columns
+endfunction"}}}
+
+" Get a list of all posible columns for the provided statement and prefix.
+function! s:GetAllPosibileColumns(statement, prefix)"{{{
+  let statement = toupper(a:statement)
+  let raw_columns = []
+  ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Alias::Lexer.all_columns_for(VIM::evaluate('statement')))}"
+  let columns = []
+  let schemas = []
+  let tables = []
+  for column in raw_columns
+    if column =~ '\.\*$'
+      " expand please
+      let prefix = substitute(column, '\.\*$', '', 'g')
+      let object_properties = voraxlib#utils#ResolveDbObject(prefix)
+      if !empty(object_properties) && (object_properties.type == 'TABLE' || object_properties.type == 'VIEW')
+        call add(schemas, object_properties.schema)
+        call add(tables, object_properties.object)
+      endif
+    else
+    	if column =~ '^' . a:prefix
+        call add(columns, (s:HasLowerHead(a:prefix) ? tolower(column) : toupper(column)))
+      endif
+    endif
+  endfor
+  if !empty(schemas) && !empty(tables)
+    call extend(columns, s:GetColumns(schemas, tables, s:HasLowerHead(a:prefix), a:prefix))
+  endif
+  call map(columns, '{"word" : v:val, "kind" : "column"}')
   return columns
 endfunction"}}}
 

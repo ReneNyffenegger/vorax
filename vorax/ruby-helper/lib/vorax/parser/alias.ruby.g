@@ -3,6 +3,8 @@ lexer grammar Alias;
 options {
   language=Ruby;
   filter=true;
+	backtrack=true;
+	k=100;
 }
 
 @members /*embbed*/ {
@@ -12,27 +14,41 @@ options {
   attr_accessor :aliases, :cpos
 
   def self.columns_for(stmt, prefix)
-      cols = []
-      text = stmt.upcase
-      prefix.upcase!
-      sources = self.gather_for(text, 0)
-      # is the prefix a simple word?
-      if prefix =~ /^[A-Z0-9$#_]+$/
-        # it could be an alias... is it?
-        a = sources.find do |src| 
-          src.idn && src.idn == prefix 
-        end
-        if a && a.expr
-          #get subselect columns
-          collect_columns(a.object, sources, 1, cols)
-        elsif a
-          cols << "#{a.owner=="" ? "" : a.owner + "."}#{a.object}.*"
-        else
-          cols << "#{prefix}.*"
-        end
+    cols = []
+    text = stmt.upcase
+    prefix.upcase!
+    sources = self.gather_for(text, 0)
+    # is the prefix a simple word?
+    if prefix =~ /^[A-Z0-9$#_]+$/
+      # it could be an alias... is it?
+      a = sources.find do |src| 
+        src.idn && src.idn == prefix 
       end
-      cols
+      if a && a.expr
+        #get subselect columns
+        collect_columns(a.object, sources, 1, cols)
+      elsif a
+        cols << "#{a.owner=="" ? "" : a.owner + "."}#{a.object}.*"
+      else
+        cols << "#{prefix}.*"
+      end
     end
+    cols
+  end
+
+  def self.all_columns_for(stmt)
+    cols = []
+    text = stmt.upcase
+    sources = self.gather_for(text, 0)
+    sources.each do |source|
+      if source.expr
+     	  collect_columns(source.object, sources, 1, cols)
+      else
+        cols << "#{source.owner=="" ? "" : source.owner + "."}#{source.object}.*"
+     	end
+    end
+    cols
+  end
 
   private
 
