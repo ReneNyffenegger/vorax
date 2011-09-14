@@ -42,7 +42,7 @@ function! voraxlib#omni#OnPopupClose()"{{{
   let prefix = matchstr(strpart(getline('.'), 0, col('.')-1), '[0-9a-zA-z#$_.]*\s*[,(]\?\s*$')
   if prefix =~ '\(\.\)\|\(,\s*\)\|\((\s*\)$'
     if s:IsPrefixValid(prefix)
-      call feedkeys("\<C-x>\<C-o>")
+      call feedkeys("\<C-x>\<C-o>", 'n')
     endif
   endif
 endfunction"}}}
@@ -54,9 +54,10 @@ function! voraxlib#omni#Meets(text)"{{{
         \ s:IsArgumentCompletion(a:text)
 endfunction"}}}
 
-function! voraxlib#omni#Compare(i1, i2)
+" Sort function for omni items
+function! voraxlib#omni#Compare(i1, i2)"{{{
   return a:i1["word"] == a:i2["word"] ? 0 : a:i1["word"] > a:i2["word"] ? 1 : -1
-endfunction
+endfunction"}}}
 
 " Get all items for a WORD completion
 function! s:GetWordItems(prefix)"{{{
@@ -147,7 +148,12 @@ function! s:GetArgItems(prefix)"{{{
       endif
     endif
   endif
-  return params
+  if len(params) > 1
+    return params
+  else
+  	" if just one param exists then don't bother
+  	return []
+  endif
 endfunction"}}}
 
 " Whenever or not the provided prefix is a valid one (not matched by the
