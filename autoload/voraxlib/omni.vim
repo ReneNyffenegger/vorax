@@ -72,8 +72,10 @@ function! s:GetWordItems(prefix)"{{{
   call extend(result, s:WordsFromAbove(a:prefix))
   " let user choose a word from the output window
   call extend(result, s:WordsFromOutput(a:prefix))
-  " add all posibile columns
-  call extend(result, s:GetAllPosibileColumns(s:context.statement, a:prefix))
+  if g:vorax_omni_guess_columns_without_alias
+    " add all posibile columns
+    call extend(result, s:GetAllPosibileColumns(s:context.statement, a:prefix))
+  endif
   return sort(result, "voraxlib#omni#Compare")
 endfunction"}}}
 

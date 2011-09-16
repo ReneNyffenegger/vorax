@@ -163,6 +163,9 @@ TLet g:vorax_open_compilation_errors_command = 'botright cwindow'
 TLet g:vorax_sqlplus_default_options = ['set linesize 10000',
                                       \ 'set tab off',
                                       \ 'set flush on',
+                                      \ 'set sqlprefix #',
+                                      \ 'set blockterminator .',
+                                      \ 'set pause off',
                                       \ 'set sqlblanklines on',]
 
 "}}}
@@ -205,7 +208,7 @@ TLet g:vorax_output_window_size = 15
 "}}}
 " g:vorax_output_window_keep_focus_after_exec"{{{
 
-" Whenever or not, after executing a statement, the output window to reamain
+" Whenever or not, after executing a statement, the output window to remain
 " focused. If 0 then the window from which the exec comes from is focused.
 TLet g:vorax_output_window_keep_focus_after_exec = 0
 
@@ -213,7 +216,7 @@ TLet g:vorax_output_window_keep_focus_after_exec = 0
 " g:vorax_output_window_pause"{{{
 
 " wherever or not the results printed to the output window to be displayed
-" page by page. After the first page is spit the execution is susspended.
+" page by page. After the first page is spit the execution is suspended.
 " The user has the possibility to get the next page or to simply cancel the
 " current request.
 TLet g:vorax_output_window_pause = 0
@@ -224,7 +227,7 @@ TLet g:vorax_output_window_pause = 0
 " this global variable is used in connection with the
 " g:vorax_output_window_pause and is used to configure how many lines a page
 " should have. If g:vorax_output_window_pause is 1 then, after reaching the
-" limit set by this variable, VoraX will stop writting into the output
+" limit set by this variable, VoraX will stop writing into the output
 " window until the user requests the next page. If
 " g:vorax_output_window_page_size is 0 then the value is automatically computed 
 " as the height of the output window. Negative values are not valid and
@@ -250,7 +253,7 @@ TLet g:vorax_output_window_statusline = "%!voraxlib#panel#output#StatusLine()"
 "}}}
 " g:vorax_output_window_clear_before_exec"{{{
 
-" Whenever or not the output window shoul be cleared before executing
+" Whenever or not the output window should be cleared before executing
 " anything.
 TLet g:vorax_output_window_clear_before_exec = 1
 
@@ -328,8 +331,8 @@ TLet g:vorax_oradoc_target_folder = substitute(
 if has('win32')
   TLet g:vorax_oradoc_open_with = 'silent! !start C:\Program Files\Internet Explorer\iexplore.exe %u'
 elseif has('unix')
-  " asume firefox executable is in your $PATH
-  TLet g:vorax_oradoc_open_with = "silent! !firefox -remote 'ping()' && firefox -remote 'openURL(%u)' || firefox '%u' &"
+  " assume firefox executable is in your $PATH
+  TLet g:vorax_oradoc_open_with = "silent! !firefox -remote 'ping()' && firefox -remote 'openURL(%u)' || firefox '%u' > /dev/null &"
 endif
 
 "}}}
@@ -401,6 +404,13 @@ TLet g:vorax_omni_word_prefix_length = 2
 
 " If the completion prefix matches the following regexp just skip it.
 TLet g:vorax_omni_skip_prefixes = '^sys\.$'
+
+"}}}
+" g:vorax_omni_guess_columns_without_alias "{{{
+
+" Whenever or not Vorax will try to figure out from what tables do you intend
+" to query and will suggest columns based on this asumption.
+TLet g:vorax_omni_guess_columns_without_alias = 1
 
 "}}}
 " g:vorax_force_keymappings"{{{
