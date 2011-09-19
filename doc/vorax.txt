@@ -1,8 +1,8 @@
 *vorax.txt*   Plugin for working with Oracle databases.
-            For vim version 7.x
+              For vim version 7.x
 
-			       By Alexandru Tică
-		     alexandru.tica email-at-sign gmail.com
+                               By Alexandru Tică
+                     alexandru.tica email-at-sign gmail.com
 
                                                         *vorax* *vorax-plugin*
 
@@ -922,5 +922,75 @@ opened.
 
 The anchor of the profile window. The allowed values are: topleft or
 botright. By default is botright.
+
+*g:vorax_profiles_window_orientation*
+
+The orientation of the profile window. The allowed values are: 'v' for
+vertical and 'h' for horizontal. The default value is 'v'.
+
+*g:vorax_profiles_window_size*
+
+The size of the profile window. The default value is 30.
+
+*g:vorax_explorer_window_anchor*
+
+The anchor of the explorer window. The allowed values are: topleft or
+botright. The default value is botright.
+
+*g:vorax_explorer_window_orientation*
+
+The orientation of the explorer window. The allowed values are: 'v' for
+vertical and 'h' for horizontal. The default value is 'v'.
+
+*g:vorax_explorer_window_size*
+
+The size of the explorer window. The default value is 30.
+
+*g:vorax_explorer_file_extensions*
+
+Configures the file extension for every database object type. If a type is 
+not specified here then the .sql extension is assumed. The default value is:
+
+                    { 'PACKAGE' : 'pkg',
+                \     'PACKAGE_SPEC' : 'spc',
+                \     'PACKAGE_BODY' : 'bdy',
+                \     'FUNCTION' : 'fnc',
+                \     'PROCEDURE' : 'prc',
+                \     'TRIGGER' : 'trg',
+                \     'TYPE' : 'typ',
+                \     'TYPE_SPEC' : 'tps',
+                \     'TYPE_BODY' : 'tpb',
+                \     'TABLE' : 'tab',
+                \     'VIEW' : 'viw', }
+
+*g:vorax_omni_word_prefix_length*
+
+How many chars to type before suggesting completion items. The default value 
+is 2. A lower value is not recommended because it might slow down the completion
+system quite a bit.
+
+*g:vorax_omni_skip_prefixes*
+
+If the completion prefix matches the RegExp specified by this setting then the
+omni completion will not compute any items to be completed. The default value is
+'^sys\.$'.
+
+*g:vorax_omni_guess_columns_without_alias*
+
+Whenever or not VoraX will try to figure out from what tables do you intend
+to query and will suggest columns based on this assumption. By default it's ON.
+
+*g:vorax_force_keymappings*
+
+If this setting is ON then VoraX will try to overwrite an already defined key
+mapping by another plugin. For example, if <Leader>x is already taken by a previously
+initialized plugin, then VoraX will try to reassign this key to its default action.
+However, this doesn't prevent other plugins initialized after VoraX to steal and
+overwrite this key mapping. The default value for this setting is 1.
+
+*g:vorax_test_constr*
+
+This global variable is used by VoraX unit tests. Ignore it if you do not
+intend to run the test suite.
 
 "vim:ts=8 sw=8 noexpandtab tw=78 ft=help:
