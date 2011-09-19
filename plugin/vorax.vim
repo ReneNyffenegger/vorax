@@ -332,7 +332,7 @@ if has('win32')
   TLet g:vorax_oradoc_open_with = 'silent! !start C:\Program Files\Internet Explorer\iexplore.exe %u'
 elseif has('unix')
   " assume firefox executable is in your $PATH
-  TLet g:vorax_oradoc_open_with = "silent! !firefox -remote 'ping()' && firefox -remote 'openURL(%u)' || firefox '%u' > /dev/null &"
+  TLet g:vorax_oradoc_open_with = "silent! !firefox -remote 'ping()' > /dev/null 2>&1 && firefox -remote 'openURL(%u)' > /dev/null 2>&1 || firefox '%u' > /dev/null &2>1"
 endif
 
 "}}}
