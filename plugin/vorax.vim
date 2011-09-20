@@ -539,6 +539,11 @@ if exists(':VoraxPaginatingToggle') != 2
   command! -nargs=0 VoraxPaginatingToggle :call vorax#TogglePaginating()
   nmap <unique> <script> <Plug>VoraxPaginatingToggle :VoraxPaginatingToggle<CR>
 endif"}}}
+" :VoraxOutputWindowToggle"{{{
+if exists(':VoraxOutputWindowToggle') != 2
+  command! -nargs=0 VoraxOutputWindowToggle :call vorax#ToggleOutputWindow()
+  nmap <unique> <script> <Plug>VoraxOutputWindowToggle :VoraxOutputWindowToggle<CR>
+endif"}}}
 
 " ==============================================================================
 
@@ -588,6 +593,10 @@ TLet g:vorax_output_window_clear_key = "cle"
 "}}}
 " g:vorax_output_window_pause_key"{{{
 TLet g:vorax_output_window_pause_key = "<Space>"
+"}}}
+" g:vorax_output_window_toggle_show"{{{
+TLet g:vorax_output_window_toggle_show = "<Leader>o"
+exe "nmap <silent> " . (g:vorax_output_window_toggle_show ? "" : "<unique> ") . g:vorax_output_window_toggle_show . " <Plug>VoraxOutputWindowToggle"
 "}}}
 " g:vorax_output_window_toggle_append"{{{
 TLet g:vorax_output_window_toggle_append = "<Leader>a"

@@ -73,7 +73,7 @@ function! s:ExtendWindow()"{{{
     setlocal nonu
     setlocal cursorline
     setlocal modifiable
-    setlocal bufhidden=delete
+    "setlocal bufhidden=delete
     setlocal nolist
     setlocal foldcolumn=0 nofoldenable
     setlocal noreadonly
