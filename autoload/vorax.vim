@@ -476,10 +476,10 @@ function! vorax#TogglePaginating()"{{{
 endfunction"}}}
 
 " Toggle the display of the output window
-function! vorax#ToggleOutputWindow()
+function! vorax#ToggleOutputWindow()"{{{
   let output_win = vorax#GetOutputWindowHandler()
   call output_win.Toggle()
-endfunction
+endfunction"}}}
 
 " Get the profiles manager object.
 function! vorax#GetProfilesHandler()"{{{
