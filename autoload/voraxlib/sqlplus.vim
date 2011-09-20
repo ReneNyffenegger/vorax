@@ -254,6 +254,77 @@ function! s:sqlplus.Query(statement, ...)"{{{
 EORC
 endfunction"}}}
 
+" It gets a list of SQL queries and returns the corresponding commands to
+" format the corresponding columns so that the full heading to be desplayed.
+" This function returns a dictionary with the following structure:
+" {'format_commands' : [], 'reset_commands' : []}
+" The format_commands contains the COLUMN col FORMAT commands and the 
+" reset_commands the ones used to clear their settings.
+function! s:sqlplus.EnforceColumnsHeading(statements)"{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:sqlplus.FormatColumns(' . string(a:statements) . ')') | endif
+  if type(a:statements) != 3 || len(a:statements) == 0
+    return {'format_commands' : [], 'reset_commands' : []}
+  endif
+  let options = {}
+  let options['sqlplus_options'] = extend(self.GetSafeOptions(),
+        \ [{'option' : 'pagesize', 'value' : '9999'},
+        \ {'option' : 'serveroutput', 'value' : 'on size 100000'},
+        \ {'option' : 'markup', 'value' : 'html off'},])
+  let all_columns = []
+  for stmt in a:statements
+    let parse_stmt = ''
+    let output = self.Exec(
+          \ "declare " .
+          \ "l_c number; " .
+          \ "l_col_cnt number; " .
+          \ "l_rec_tab DBMS_SQL.DESC_TAB2; " .
+          \ "l_col_metadata DBMS_SQL.DESC_REC2; " .
+          \ "l_col_num number; " .
+          \ "begin " .
+          \ "l_c := dbms_sql.open_cursor; " .
+          \ "dbms_sql.parse(l_c, '" . substitute(stmt, "'", "''", 'g') . "', DBMS_SQL.NATIVE); " .
+          \ "DBMS_SQL.DESCRIBE_COLUMNS2(l_c, l_col_cnt, l_rec_tab); " .
+          \ "dbms_output.put_line('<html><body><table>'); " .
+          \ "dbms_output.put_line(' <tr>'); " .
+          \ "dbms_output.put_line('  <th>name</th>'); " .
+          \ "dbms_output.put_line('  <th>headsize</th>'); " .
+          \ "dbms_output.put_line('  <th>maxsize</th>'); " .
+          \ "dbms_output.put_line(' </tr>'); " .
+          \ "for colidx in l_rec_tab.first .. l_rec_tab.last loop " .
+          \ "l_col_metadata := l_rec_tab(colidx); " .
+          \ "if l_col_metadata.col_type in (dbms_sql.varchar2_type, dbms_sql.char_type) and " .
+          \ "l_col_metadata.col_name_len > l_col_metadata.col_max_len then " .
+          \ "dbms_output.put_line(' <tr>'); " .
+          \ "dbms_output.put_line('  <td>' || l_col_metadata.col_name || '</td>'); " .
+          \ "dbms_output.put_line('  <td>' || l_col_metadata.col_name_len || '</td>'); " .
+          \ "dbms_output.put_line('  <td>' || l_col_metadata.col_max_len || '</td>'); " .
+          \ "dbms_output.put_line(' </tr>'); " .
+          \ "end if; " .
+          \ "end loop; " .
+          \ "dbms_output.put_line('</table></body></html>'); " .
+          \ "DBMS_SQL.CLOSE_CURSOR(l_c); " .
+          \ "end; " .  
+          \ "\n/\n", options) 
+    ruby <<EORC
+    resultset = Vorax::TableReader.extract(output)
+    VIM::command("let head_columns = #{Vorax::VimUtils.to_vim(resultset)}")
+EORC
+    let all_columns += head_columns.resultset
+  endfor
+  let defined_columns = self.Exec("column")
+  let format_commands = []
+  let reset_commands = []
+  for column in all_columns
+    if defined_columns !~ '^COLUMN\s\+' . voraxlib#utils#LiteralRegexp(column['name'])
+      call add(format_commands, 'COLUMN ' . column['name'] . ' FORMAT A' . column['headsize'])
+      call add(reset_commands, 'COLUMN ' . column['name'] . ' CLEAR')
+    endif
+  endfor
+  if s:log.isTraceEnabled() | call s:log.trace('END s:sqlplus.FormatColumns') | endif
+  return {'format_commands' : format_commands, 'reset_commands' : reset_commands}
+endfunction"}}}
+
+
 " Return a set of sqlplus options which guarantee that the statement is
 " executed as expected without interfearing with the user options like
 " autotrace or pause.

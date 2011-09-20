@@ -98,14 +98,33 @@ function! vorax#Exec(command)"{{{
     " save the last command. this is require in order to be able to replay it.
     let sqlplus.last_stmt = {'cmd' : voraxlib#utils#AddSqlDelimitator(a:command), 'from_buf' : bufnr('%')}
     if s:log.isDebugEnabled() | call s:log.debug('with delimitator added: '.string(sqlplus.last_stmt)) | endif
+    " limiting rows logic
     if exists('g:vorax_limit_rows') && g:vorax_limit_rows > 0
-      let sqlplus.last_stmt['cmd'] = voraxlib#utils#AddRownumFilter(sqlplus.last_stmt['cmd'], g:vorax_limit_rows)
+      let statements = voraxlib#parser#script#Split(sqlplus.last_stmt['cmd'])
+      let sqlplus.last_stmt['cmd'] = voraxlib#utils#AddRownumFilter(statements, g:vorax_limit_rows)
       if s:log.isDebugEnabled() | call s:log.debug('limit rows enabled. statements coverted to: '.string(sqlplus.last_stmt)) | endif
+    endif
+    " force column headings
+    if exists('g:vorax_output_window_force_column_heading') && g:vorax_output_window_force_column_heading
+      let queries = []
+      if !exists('statements')
+        let statements = voraxlib#parser#script#Split(sqlplus.last_stmt['cmd'])
+      endif
+      for statement in statements
+        if voraxlib#utils#IsQuery(statement)
+          call add(queries, substitute(voraxlib#utils#RemoveSqlDelimitator(statement), '\v(\_^\_s*)|(\_s*\_$)', '', 'g'))
+        endif
+      endfor
+      let cmds = sqlplus.EnforceColumnsHeading(queries)
+      call sqlplus.Exec(join(cmds['format_commands'], "\n"))
     endif
     " exec the command in bg. All trailing CR/spaces are removed before exec.
     " This is important especially in connection with set echo on. With CRs
     " the sqlprompt will be echoed
-    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\%$', '', 'g'), {'include_eor' : 1}), 0)
+    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\%$', '', 'g')
+          \ , {'include_eor' : 1}) . 
+          \ (exists('cmds') ? "\n" . join(cmds['reset_commands'], "\n") : '')
+          \ , 0)
     call outputwin.StartMonitor()
   else
     if s:log.isDebugEnabled() | call s:log.debug('User decided to cancel the exec because of the pause on.') | endif

@@ -51,6 +51,7 @@ function! voraxlib#panel#output#StatusLine()"{{{
         \ (sqlplus.html && s:output_window.buffer.vertical ? 'vertical ' : '') . 
         \ (s:output_window.spooling ? '[spool to: ' . simplify(s:output_window.spool_file) . '] ' : '') . 
         \ (g:vorax_output_window_clear_before_exec ? '' : '[>>] ') . 
+        \ (g:vorax_output_window_force_column_heading ? '[headings] ' : '') . 
         \ (exists('g:vorax_monitor_end_exec') && g:vorax_monitor_end_exec ? 'bell ' : '' ) . 
         \ sqlplus.GetConnectedTo() . ' '
 endfunction"}}}
@@ -88,6 +89,9 @@ function! s:ExtendWindow()"{{{
     endif
     if exists('g:vorax_output_window_toggle_append') && g:vorax_output_window_toggle_append != ''
       exe 'nnoremap <silent> <buffer> ' . g:vorax_output_window_toggle_append . ' :call <SID>ToggleAppend()<cr>'
+    endif
+    if exists('g:vorax_output_window_toggle_column_headings') && g:vorax_output_window_toggle_column_headings != ''
+      exe 'nnoremap <silent> <buffer> ' . g:vorax_output_window_toggle_column_headings . ' :call <SID>ToggleColumnHeadings()<cr>'
     endif
 
     " allow oradoc/describe mappings
@@ -504,6 +508,16 @@ function! s:ToggleAppend()"{{{
   	echo 'Append mode for the output window is disabled'
   else
   	echo 'Append mode for the output window is enabled'
+  endif
+endfunction"}}}
+
+" This function is invoked by the toggle column heading mapping
+function! s:ToggleColumnHeadings()"{{{
+  let g:vorax_output_window_force_column_heading = !g:vorax_output_window_force_column_heading
+  if g:vorax_output_window_force_column_heading
+  	echo 'Force column headings is disabled.'
+  else
+  	echo 'Force column headings is enabled.'
   endif
 endfunction"}}}
 

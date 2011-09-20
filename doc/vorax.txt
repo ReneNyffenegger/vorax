@@ -163,7 +163,7 @@ In addition the following Vim script must be also installed:
 Also, it's best to have "filetype plugin on" in your .vimrc file.
 
 ==============================================================================
-CONNECTING TO A DATABASE			               *vorax-connect* 
+CONNECTING TO A DATABASE                                       *vorax-connect* 
 
 The simplest method to connect to a new database is to use the VoraxConnect
 command. For example, the following command is used to connect to an imaginary
@@ -218,7 +218,7 @@ bang version except for:
 	from the current location.
 
 ==============================================================================
-EXECUTING STATEMENTS    			                  *vorax-exec* 
+EXECUTING STATEMENTS                                              *vorax-exec* 
 
 In SqlPLUS you just write the statement on the SQL> prompt, press ENTER and
 you have the results back with the SQL> prompt waiting for you, again, to 
@@ -238,7 +238,7 @@ not ask you to save its content so it's important to realize that this scratch
 is just a playground. If you care about your SQL statements and want them 
 stored in a file then you must use a real sql buffer. For example:
 
-			       :e my_script.sql
+                               :e my_script.sql
 
 Being an sql buffer VoraX will work without a problem.
 
@@ -310,7 +310,7 @@ some data to be entered or it is waiting for a long running statement to
 complete.
 
 ==============================================================================
-THE OUTPUT WINDOW    				                *vorax-output* 
+THE OUTPUT WINDOW                                               *vorax-output* 
 
 The result returned by the commands you execute is displayed into the output
 window. This window is automatically opened whenever something is needed to be
@@ -367,6 +367,14 @@ The vertical output displays each record like a card:
 Sometimes is better to scroll vertically. This output format may be activated
 using <Leader>vo. "vo" stands for "Vertical Output". This mapping acts like a
 toggle.
+
+Another annoying problem is that, by default, SqlPlus truncates the name of
+the column if the maximum data size derived from the corresponding column
+type is less than the size of the column name (e.g. IS_BIND_SENSITIVE from
+V$SQL or SQL_TRACE_WAITS from V$SESSION, etc.). You may force column headings
+display using the |g:vorax_output_window_force_column_heading| variable or
+using the <Leader>ch predefined key map which is always active within the output
+window. "ch" stands for "Column Headings".
 
 The output window can be also paginated. This is useful when you want to
 inspect the output page by page. When paginating is in place after every page
@@ -434,6 +442,12 @@ plugins which help quite a bit in this area:
 
 	- SuperTab: http://www.vim.org/scripts/script.php?script_id=1643
 	- AutocomplPop: http://www.vim.org/scripts/script.php?script_id=1879
+
+Note: AutocomplPop may slow down your typing because it tries to get
+completion items on almost every character you type. Because VoraX completion
+doesn't use any caching strategies, it queries the database dictionary tables
+every time some completion items must be returned. Across slow connections
+it's recommended to disable/suspend this plugin.
 
 You may tweak some aspects of the completion system using the following global
 variables:
@@ -535,8 +549,8 @@ using the following call:
      call g:vorax_explorer.RegisterPlugin(<unique_name>, <plugin_object>)
 
 The unique name is typically the plugin filename script.
-You can find some real examples of explorer plugins into the vorax/plugin/explorer/
-folder.
+You can find some real examples of explorer plugins into the 
+vorax/plugin/explorer/ folder.
 
 ==============================================================================
 DESCRIBING OBJECTS                                            *vorax-describe* 
@@ -695,7 +709,7 @@ When you setup this feature you may consider the following tips:
 	  the |g:vorax_oradoc_open_with| variable.
 
 ==============================================================================
-VORAX OPTIONS                                                   *vorax-oradoc* 
+VORAX OPTIONS                                                  *vorax-options* 
 
 Various aspects of VoraX may be controlled using a set of global variables,
 all of them being prefixed with "g:vorax_".
@@ -875,6 +889,12 @@ the output window. The default value is 'Directory'
 
 The highlight group to use for displaying errors withing the output window.
 The default value is 'ErrorMsg'.
+
+*g:vorax_output_window_force_column_heading*
+
+Controls whenever or not VoraX is trying to format columns so that their
+headings to be displayed without being truncated (a common problem 
+in SqlPlus). By default is disabled.
 
 *g:vorax_oradoc_window_anchor*
 

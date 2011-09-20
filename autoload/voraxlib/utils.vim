@@ -453,10 +453,9 @@ endfunction"}}}
 
 " For the identified queries identified in the a:text apply the a:limit rownum
 " filter.
-function! voraxlib#utils#AddRownumFilter(text, limit)"{{{
+function! voraxlib#utils#AddRownumFilter(statements, limit)"{{{
   let result = ''
-  let statements = voraxlib#parser#script#Split(a:text)
-  for statement in statements
+  for statement in a:statements
     if voraxlib#utils#IsQuery(statement)
       let result .= "select * from (\n/* original query starts here */\n" . 
             \ substitute(voraxlib#utils#RemoveSqlDelimitator(statement), '\v(\_^\_s*)|(\_s*\_$)', '', 'g') . 
@@ -805,7 +804,7 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
 endfunction"}}}
 
 " whenever or not the provided file is a VoraX managed one.
-function! voraxlib#utils#IsVoraxManagedFile(file)
+function! voraxlib#utils#IsVoraxManagedFile(file)"{{{
   let ext = fnamemodify(a:file, ':e')
   if ext ==? 'sql'
   	return 1
@@ -817,7 +816,7 @@ function! voraxlib#utils#IsVoraxManagedFile(file)
     endfor
     return 0
   endif
-endfunction
+endfunction"}}}
 
 " Check if the buffer has the proper syntax.
 function! s:CheckSyntax()"{{{
