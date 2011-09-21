@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 #
-# source.ruby.g
+# orasource.ruby.g
 # --
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
-# Input grammar file: source.ruby.g
-# Generated at: 2011-09-20 23:29:23
+# Input grammar file: orasource.ruby.g
+# Generated at: 2011-09-21 12:16:07
 # 
 
 # ~~~> start load path setup
@@ -57,7 +57,7 @@ end
 # <~~~ end load path setup
 
 
-module Source
+module Orasource
   # TokenData defines all of the token type integer values
   # as constants, which will be included in all 
   # ANTLR-generated recognizers.
@@ -79,28 +79,27 @@ module Source
     # created from literal values in the grammar, do not
     # have descriptive names
     register_names( "DOT", "ID", "DOUBLEQUOTED_STRING", "WS", "SL_COMMENT", 
-                    "ML_COMMENT", "POINT", "'CREATE'", "'OR'", "'IS'", "'AS'", 
-                    "'FUNCTION'", "'PACKAGE'", "'PROCEDURE'", "'TYPE'", 
-                    "'TRIGGER'", "'VIEW'" )
+                    "ML_COMMENT", "POINT", "'CREATE'", "'OR'", "'PACKAGE'", 
+                    "'IS'", "'AS'", "'TYPE'", "'TRIGGER'", "'PROCEDURE'", 
+                    "'FUNCTION'", "'VIEW'" )
     
   end
 
 
   class Parser < ANTLR3::Parser
-    @grammar_home = Source
+    @grammar_home = Orasource
     include ANTLR3::ASTBuilder
 
     RULE_METHODS = [ :start_rule, :package_spec, :package_body, :type_spec, 
                      :type_body, :trigger, :procedure, :function, :view, 
-                     :object_name, :schema_name, :identifier, :keyBODY, 
-                     :keyFUNCTION, :keyPACKAGE, :keyPROCEDURE, :keyTYPE, 
-                     :keyTRIGGER, :keyVIEW, :keyREPLACE ].freeze
+                     :oracle_object_name, :schema_name, :identifier, :keyBODY, 
+                     :keyREPLACE ].freeze
 
 
     include TokenData
 
     begin
-      generated_using( "source.ruby.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
+      generated_using( "orasource.ruby.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
     rescue NoMethodError => error
       # ignore
     end
@@ -110,12 +109,12 @@ module Source
       @state.rule_memory = {}
 
       # - - - - - - begin action @parser::init - - - - - -
-      # source.ruby.g
+      # orasource.ruby.g
 
 
-        @object_owner = ''
-        @object_type = ''
-        @object_name = ''
+        @object_owner = nil
+        @object_type = nil
+        @object_name = nil
 
       # - - - - - - end action @parser::init - - - - - - -
 
@@ -124,14 +123,28 @@ module Source
 
       attr_reader :object_owner, :object_type, :object_name
 
+    	def self.describe(source)
+        lexer = Orasource::Lexer.new(source.upcase, :error_output => StringIO.new)
+        tokens = ANTLR3::CommonTokenStream.new(lexer)
+        parser = Orasource::Parser.new(tokens, :error_output => StringIO.new)
+        begin
+          parser.start_rule
+        rescue
+          #ignore errors
+        end
+        return {:object_owner => parser.object_owner, 
+                :object_type => parser.object_type, 
+                :object_name => parser.object_name }
+    	end
+
     # - - - - - - - - - - - - Rules - - - - - - - - - - - - -
     StartRuleReturnValue = define_return_scope 
 
     # 
     # parser rule start_rule
     # 
-    # (in source.ruby.g)
-    # 21:1: start_rule : 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view ) ;
+    # (in orasource.ruby.g)
+    # 35:1: start_rule : 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view ) ;
     # 
     def start_rule
       # -> uncomment the next line to manually enable rule tracing
@@ -169,7 +182,7 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 22:4: 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
+        # at line 36:4: 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
         string_literal1 = match( T__11, TOKENS_FOLLOWING_T__11_IN_start_rule_58 )
         if @state.backtracking == 0
 
@@ -177,7 +190,7 @@ module Source
           @adaptor.add_child( root_0, tree_for_string_literal1 )
 
         end
-        # at line 22:13: ( 'OR' keyREPLACE )?
+        # at line 36:13: ( 'OR' keyREPLACE )?
         alt_1 = 2
         look_1_0 = @input.peek( 1 )
 
@@ -186,7 +199,7 @@ module Source
         end
         case alt_1
         when 1
-          # at line 22:15: 'OR' keyREPLACE
+          # at line 36:15: 'OR' keyREPLACE
           string_literal2 = match( T__12, TOKENS_FOLLOWING_T__12_IN_start_rule_62 )
           if @state.backtracking == 0
 
@@ -202,12 +215,12 @@ module Source
           end
 
         end
-        # at line 23:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
+        # at line 37:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
         alt_2 = 8
         alt_2 = @dfa2.predict( @input )
         case alt_2
         when 1
-          # at line 23:6: package_spec
+          # at line 37:6: package_spec
           @state.following.push( TOKENS_FOLLOWING_package_spec_IN_start_rule_74 )
           package_spec4 = package_spec
           @state.following.pop
@@ -216,7 +229,7 @@ module Source
           end
 
         when 2
-          # at line 25:6: package_body
+          # at line 39:6: package_body
           @state.following.push( TOKENS_FOLLOWING_package_body_IN_start_rule_88 )
           package_body5 = package_body
           @state.following.pop
@@ -225,7 +238,7 @@ module Source
           end
 
         when 3
-          # at line 27:6: type_spec
+          # at line 41:6: type_spec
           @state.following.push( TOKENS_FOLLOWING_type_spec_IN_start_rule_102 )
           type_spec6 = type_spec
           @state.following.pop
@@ -234,7 +247,7 @@ module Source
           end
 
         when 4
-          # at line 29:6: type_body
+          # at line 43:6: type_body
           @state.following.push( TOKENS_FOLLOWING_type_body_IN_start_rule_116 )
           type_body7 = type_body
           @state.following.pop
@@ -243,7 +256,7 @@ module Source
           end
 
         when 5
-          # at line 31:6: trigger
+          # at line 45:6: trigger
           @state.following.push( TOKENS_FOLLOWING_trigger_IN_start_rule_130 )
           trigger8 = trigger
           @state.following.pop
@@ -252,7 +265,7 @@ module Source
           end
 
         when 6
-          # at line 33:6: procedure
+          # at line 47:6: procedure
           @state.following.push( TOKENS_FOLLOWING_procedure_IN_start_rule_144 )
           procedure9 = procedure
           @state.following.pop
@@ -261,7 +274,7 @@ module Source
           end
 
         when 7
-          # at line 35:6: function
+          # at line 49:6: function
           @state.following.push( TOKENS_FOLLOWING_function_IN_start_rule_158 )
           function10 = function
           @state.following.pop
@@ -270,7 +283,7 @@ module Source
           end
 
         when 8
-          # at line 37:6: view
+          # at line 51:6: view
           @state.following.push( TOKENS_FOLLOWING_view_IN_start_rule_172 )
           view11 = view
           @state.following.pop
@@ -310,8 +323,8 @@ module Source
     # 
     # parser rule package_spec
     # 
-    # (in source.ruby.g)
-    # 41:1: package_spec : keyPACKAGE object_name ( 'IS' | 'AS' ) ;
+    # (in orasource.ruby.g)
+    # 55:1: package_spec : 'PACKAGE' oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def package_spec
       # -> uncomment the next line to manually enable rule tracing
@@ -323,10 +336,11 @@ module Source
       package_spec_start_index = @input.index
 
       root_0 = nil
+      string_literal12 = nil
       set14 = nil
-      keyPACKAGE12 = nil
-      object_name13 = nil
+      oracle_object_name13 = nil
 
+      tree_for_string_literal12 = nil
       tree_for_set14 = nil
 
       success = false # flag used for memoization
@@ -340,21 +354,22 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 42:4: keyPACKAGE object_name ( 'IS' | 'AS' )
-        @state.following.push( TOKENS_FOLLOWING_keyPACKAGE_IN_package_spec_190 )
-        keyPACKAGE12 = keyPACKAGE
-        @state.following.pop
+        # at line 56:4: 'PACKAGE' oracle_object_name ( 'IS' | 'AS' )
+        string_literal12 = match( T__13, TOKENS_FOLLOWING_T__13_IN_package_spec_190 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyPACKAGE12.tree )
+
+          tree_for_string_literal12 = @adaptor.create_with_payload( string_literal12 )
+          @adaptor.add_child( root_0, tree_for_string_literal12 )
+
         end
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_package_spec_192 )
-        object_name13 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_package_spec_192 )
+        oracle_object_name13 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name13.tree )
+          @adaptor.add_child( root_0, oracle_object_name13.tree )
         end
         set14 = @input.look
-        if @input.peek( 1 ).between?( T__13, T__14 )
+        if @input.peek( 1 ).between?( T__14, T__15 )
           @input.consume
           if @state.backtracking == 0
             @adaptor.add_child( root_0, @adaptor.create_with_payload( set14 ) )
@@ -371,7 +386,7 @@ module Source
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'PACKAGE' 
+           @object_type = 'PACKAGE' unless @object_type  
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -405,8 +420,8 @@ module Source
     # 
     # parser rule package_body
     # 
-    # (in source.ruby.g)
-    # 46:1: package_body : keyPACKAGE ( keyBODY ) object_name ( 'IS' | 'AS' ) ;
+    # (in orasource.ruby.g)
+    # 60:1: package_body : 'PACKAGE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def package_body
       # -> uncomment the next line to manually enable rule tracing
@@ -418,11 +433,12 @@ module Source
       package_body_start_index = @input.index
 
       root_0 = nil
+      string_literal15 = nil
       set18 = nil
-      keyPACKAGE15 = nil
       keyBODY16 = nil
-      object_name17 = nil
+      oracle_object_name17 = nil
 
+      tree_for_string_literal15 = nil
       tree_for_set18 = nil
 
       success = false # flag used for memoization
@@ -436,15 +452,16 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 47:4: keyPACKAGE ( keyBODY ) object_name ( 'IS' | 'AS' )
-        @state.following.push( TOKENS_FOLLOWING_keyPACKAGE_IN_package_body_218 )
-        keyPACKAGE15 = keyPACKAGE
-        @state.following.pop
+        # at line 61:4: 'PACKAGE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' )
+        string_literal15 = match( T__13, TOKENS_FOLLOWING_T__13_IN_package_body_218 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyPACKAGE15.tree )
+
+          tree_for_string_literal15 = @adaptor.create_with_payload( string_literal15 )
+          @adaptor.add_child( root_0, tree_for_string_literal15 )
+
         end
-        # at line 47:15: ( keyBODY )
-        # at line 47:17: keyBODY
+        # at line 61:14: ( keyBODY )
+        # at line 61:16: keyBODY
         @state.following.push( TOKENS_FOLLOWING_keyBODY_IN_package_body_222 )
         keyBODY16 = keyBODY
         @state.following.pop
@@ -452,14 +469,14 @@ module Source
           @adaptor.add_child( root_0, keyBODY16.tree )
         end
 
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_package_body_226 )
-        object_name17 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_package_body_226 )
+        oracle_object_name17 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name17.tree )
+          @adaptor.add_child( root_0, oracle_object_name17.tree )
         end
         set18 = @input.look
-        if @input.peek( 1 ).between?( T__13, T__14 )
+        if @input.peek( 1 ).between?( T__14, T__15 )
           @input.consume
           if @state.backtracking == 0
             @adaptor.add_child( root_0, @adaptor.create_with_payload( set18 ) )
@@ -476,7 +493,7 @@ module Source
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'PACKAGE BODY' 
+           @object_type = 'PACKAGE_BODY' unless @object_type  
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -510,8 +527,8 @@ module Source
     # 
     # parser rule type_spec
     # 
-    # (in source.ruby.g)
-    # 51:1: type_spec : keyTYPE object_name ( 'IS' | 'AS' ) ;
+    # (in orasource.ruby.g)
+    # 65:1: type_spec : 'TYPE' oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def type_spec
       # -> uncomment the next line to manually enable rule tracing
@@ -523,10 +540,11 @@ module Source
       type_spec_start_index = @input.index
 
       root_0 = nil
+      string_literal19 = nil
       set21 = nil
-      keyTYPE19 = nil
-      object_name20 = nil
+      oracle_object_name20 = nil
 
+      tree_for_string_literal19 = nil
       tree_for_set21 = nil
 
       success = false # flag used for memoization
@@ -540,21 +558,22 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 52:4: keyTYPE object_name ( 'IS' | 'AS' )
-        @state.following.push( TOKENS_FOLLOWING_keyTYPE_IN_type_spec_251 )
-        keyTYPE19 = keyTYPE
-        @state.following.pop
+        # at line 66:4: 'TYPE' oracle_object_name ( 'IS' | 'AS' )
+        string_literal19 = match( T__16, TOKENS_FOLLOWING_T__16_IN_type_spec_251 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyTYPE19.tree )
+
+          tree_for_string_literal19 = @adaptor.create_with_payload( string_literal19 )
+          @adaptor.add_child( root_0, tree_for_string_literal19 )
+
         end
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_type_spec_253 )
-        object_name20 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_type_spec_253 )
+        oracle_object_name20 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name20.tree )
+          @adaptor.add_child( root_0, oracle_object_name20.tree )
         end
         set21 = @input.look
-        if @input.peek( 1 ).between?( T__13, T__14 )
+        if @input.peek( 1 ).between?( T__14, T__15 )
           @input.consume
           if @state.backtracking == 0
             @adaptor.add_child( root_0, @adaptor.create_with_payload( set21 ) )
@@ -571,7 +590,7 @@ module Source
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'TYPE' 
+           @object_type = 'TYPE' unless @object_type  
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -605,8 +624,8 @@ module Source
     # 
     # parser rule type_body
     # 
-    # (in source.ruby.g)
-    # 56:1: type_body : keyTYPE ( keyBODY ) object_name ( 'IS' | 'AS' ) ;
+    # (in orasource.ruby.g)
+    # 70:1: type_body : 'TYPE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def type_body
       # -> uncomment the next line to manually enable rule tracing
@@ -618,11 +637,12 @@ module Source
       type_body_start_index = @input.index
 
       root_0 = nil
+      string_literal22 = nil
       set25 = nil
-      keyTYPE22 = nil
       keyBODY23 = nil
-      object_name24 = nil
+      oracle_object_name24 = nil
 
+      tree_for_string_literal22 = nil
       tree_for_set25 = nil
 
       success = false # flag used for memoization
@@ -636,15 +656,16 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 57:4: keyTYPE ( keyBODY ) object_name ( 'IS' | 'AS' )
-        @state.following.push( TOKENS_FOLLOWING_keyTYPE_IN_type_body_278 )
-        keyTYPE22 = keyTYPE
-        @state.following.pop
+        # at line 71:4: 'TYPE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' )
+        string_literal22 = match( T__16, TOKENS_FOLLOWING_T__16_IN_type_body_278 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyTYPE22.tree )
+
+          tree_for_string_literal22 = @adaptor.create_with_payload( string_literal22 )
+          @adaptor.add_child( root_0, tree_for_string_literal22 )
+
         end
-        # at line 57:12: ( keyBODY )
-        # at line 57:14: keyBODY
+        # at line 71:11: ( keyBODY )
+        # at line 71:13: keyBODY
         @state.following.push( TOKENS_FOLLOWING_keyBODY_IN_type_body_282 )
         keyBODY23 = keyBODY
         @state.following.pop
@@ -652,14 +673,14 @@ module Source
           @adaptor.add_child( root_0, keyBODY23.tree )
         end
 
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_type_body_286 )
-        object_name24 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_type_body_286 )
+        oracle_object_name24 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name24.tree )
+          @adaptor.add_child( root_0, oracle_object_name24.tree )
         end
         set25 = @input.look
-        if @input.peek( 1 ).between?( T__13, T__14 )
+        if @input.peek( 1 ).between?( T__14, T__15 )
           @input.consume
           if @state.backtracking == 0
             @adaptor.add_child( root_0, @adaptor.create_with_payload( set25 ) )
@@ -676,7 +697,7 @@ module Source
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'TYPE BODY' 
+           @object_type = 'TYPE_BODY' unless @object_type  
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -710,8 +731,8 @@ module Source
     # 
     # parser rule trigger
     # 
-    # (in source.ruby.g)
-    # 61:1: trigger : keyTRIGGER object_name ;
+    # (in orasource.ruby.g)
+    # 75:1: trigger : 'TRIGGER' oracle_object_name ;
     # 
     def trigger
       # -> uncomment the next line to manually enable rule tracing
@@ -723,9 +744,10 @@ module Source
       trigger_start_index = @input.index
 
       root_0 = nil
-      keyTRIGGER26 = nil
-      object_name27 = nil
+      string_literal26 = nil
+      oracle_object_name27 = nil
 
+      tree_for_string_literal26 = nil
 
       success = false # flag used for memoization
 
@@ -738,23 +760,24 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 62:4: keyTRIGGER object_name
-        @state.following.push( TOKENS_FOLLOWING_keyTRIGGER_IN_trigger_310 )
-        keyTRIGGER26 = keyTRIGGER
-        @state.following.pop
+        # at line 76:4: 'TRIGGER' oracle_object_name
+        string_literal26 = match( T__17, TOKENS_FOLLOWING_T__17_IN_trigger_310 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyTRIGGER26.tree )
+
+          tree_for_string_literal26 = @adaptor.create_with_payload( string_literal26 )
+          @adaptor.add_child( root_0, tree_for_string_literal26 )
+
         end
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_trigger_312 )
-        object_name27 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_trigger_312 )
+        oracle_object_name27 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name27.tree )
+          @adaptor.add_child( root_0, oracle_object_name27.tree )
         end
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'TRIGGER' 
+           @object_type = 'TRIGGER' unless @object_type  
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -788,8 +811,8 @@ module Source
     # 
     # parser rule procedure
     # 
-    # (in source.ruby.g)
-    # 66:1: procedure : keyPROCEDURE object_name ;
+    # (in orasource.ruby.g)
+    # 80:1: procedure : 'PROCEDURE' oracle_object_name ;
     # 
     def procedure
       # -> uncomment the next line to manually enable rule tracing
@@ -801,9 +824,10 @@ module Source
       procedure_start_index = @input.index
 
       root_0 = nil
-      keyPROCEDURE28 = nil
-      object_name29 = nil
+      string_literal28 = nil
+      oracle_object_name29 = nil
 
+      tree_for_string_literal28 = nil
 
       success = false # flag used for memoization
 
@@ -816,23 +840,24 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 67:4: keyPROCEDURE object_name
-        @state.following.push( TOKENS_FOLLOWING_keyPROCEDURE_IN_procedure_326 )
-        keyPROCEDURE28 = keyPROCEDURE
-        @state.following.pop
+        # at line 81:4: 'PROCEDURE' oracle_object_name
+        string_literal28 = match( T__18, TOKENS_FOLLOWING_T__18_IN_procedure_326 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyPROCEDURE28.tree )
+
+          tree_for_string_literal28 = @adaptor.create_with_payload( string_literal28 )
+          @adaptor.add_child( root_0, tree_for_string_literal28 )
+
         end
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_procedure_328 )
-        object_name29 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_procedure_328 )
+        oracle_object_name29 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name29.tree )
+          @adaptor.add_child( root_0, oracle_object_name29.tree )
         end
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'PROCEDURE' 
+           @object_type = 'PROCEDURE' unless @object_type  
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -866,8 +891,8 @@ module Source
     # 
     # parser rule function
     # 
-    # (in source.ruby.g)
-    # 71:1: function : keyFUNCTION object_name ;
+    # (in orasource.ruby.g)
+    # 85:1: function : 'FUNCTION' oracle_object_name ;
     # 
     def function
       # -> uncomment the next line to manually enable rule tracing
@@ -879,9 +904,10 @@ module Source
       function_start_index = @input.index
 
       root_0 = nil
-      keyFUNCTION30 = nil
-      object_name31 = nil
+      string_literal30 = nil
+      oracle_object_name31 = nil
 
+      tree_for_string_literal30 = nil
 
       success = false # flag used for memoization
 
@@ -894,23 +920,24 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 72:4: keyFUNCTION object_name
-        @state.following.push( TOKENS_FOLLOWING_keyFUNCTION_IN_function_342 )
-        keyFUNCTION30 = keyFUNCTION
-        @state.following.pop
+        # at line 86:4: 'FUNCTION' oracle_object_name
+        string_literal30 = match( T__19, TOKENS_FOLLOWING_T__19_IN_function_342 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyFUNCTION30.tree )
+
+          tree_for_string_literal30 = @adaptor.create_with_payload( string_literal30 )
+          @adaptor.add_child( root_0, tree_for_string_literal30 )
+
         end
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_function_344 )
-        object_name31 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_function_344 )
+        oracle_object_name31 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name31.tree )
+          @adaptor.add_child( root_0, oracle_object_name31.tree )
         end
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'FUNCTION' 
+           @object_type = 'FUNCTION' unless @object_type  
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -944,8 +971,8 @@ module Source
     # 
     # parser rule view
     # 
-    # (in source.ruby.g)
-    # 76:1: view : keyVIEW object_name ;
+    # (in orasource.ruby.g)
+    # 90:1: view : 'VIEW' oracle_object_name ;
     # 
     def view
       # -> uncomment the next line to manually enable rule tracing
@@ -957,9 +984,10 @@ module Source
       view_start_index = @input.index
 
       root_0 = nil
-      keyVIEW32 = nil
-      object_name33 = nil
+      string_literal32 = nil
+      oracle_object_name33 = nil
 
+      tree_for_string_literal32 = nil
 
       success = false # flag used for memoization
 
@@ -972,23 +1000,24 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 77:4: keyVIEW object_name
-        @state.following.push( TOKENS_FOLLOWING_keyVIEW_IN_view_358 )
-        keyVIEW32 = keyVIEW
-        @state.following.pop
+        # at line 91:4: 'VIEW' oracle_object_name
+        string_literal32 = match( T__20, TOKENS_FOLLOWING_T__20_IN_view_358 )
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, keyVIEW32.tree )
+
+          tree_for_string_literal32 = @adaptor.create_with_payload( string_literal32 )
+          @adaptor.add_child( root_0, tree_for_string_literal32 )
+
         end
-        @state.following.push( TOKENS_FOLLOWING_object_name_IN_view_360 )
-        object_name33 = object_name
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_view_360 )
+        oracle_object_name33 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
-          @adaptor.add_child( root_0, object_name33.tree )
+          @adaptor.add_child( root_0, oracle_object_name33.tree )
         end
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_type = 'VIEW' 
+           @object_type = 'VIEW' unless @object_type 
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -1017,22 +1046,22 @@ module Source
       return return_value
     end
 
-    ObjectNameReturnValue = define_return_scope 
+    OracleObjectNameReturnValue = define_return_scope 
 
     # 
-    # parser rule object_name
+    # parser rule oracle_object_name
     # 
-    # (in source.ruby.g)
-    # 81:1: object_name : ( schema_name DOT )? identifier ;
+    # (in orasource.ruby.g)
+    # 95:1: oracle_object_name : ( schema_name DOT )? identifier ;
     # 
-    def object_name
+    def oracle_object_name
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 10 )
-      return_value = ObjectNameReturnValue.new
+      return_value = OracleObjectNameReturnValue.new
 
       # $rule.start = the first token seen before matching
       return_value.start = @input.look
-      object_name_start_index = @input.index
+      oracle_object_name_start_index = @input.index
 
       root_0 = nil
       __DOT35__ = nil
@@ -1052,8 +1081,8 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 82:4: ( schema_name DOT )? identifier
-        # at line 82:4: ( schema_name DOT )?
+        # at line 96:4: ( schema_name DOT )? identifier
+        # at line 96:4: ( schema_name DOT )?
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
 
@@ -1066,8 +1095,8 @@ module Source
         end
         case alt_3
         when 1
-          # at line 82:6: schema_name DOT
-          @state.following.push( TOKENS_FOLLOWING_schema_name_IN_object_name_376 )
+          # at line 96:6: schema_name DOT
+          @state.following.push( TOKENS_FOLLOWING_schema_name_IN_oracle_object_name_376 )
           schema_name34 = schema_name
           @state.following.pop
           if @state.backtracking == 0
@@ -1076,10 +1105,10 @@ module Source
           # syntactic predicate action gate test
           if @state.backtracking == 0
             # --> action
-             @object_owner = ( schema_name34 && @input.to_s( schema_name34.start, schema_name34.stop ) ) 
+             @object_owner = ( schema_name34 && @input.to_s( schema_name34.start, schema_name34.stop ) ) unless @object_owner 
             # <-- action
           end
-          __DOT35__ = match( DOT, TOKENS_FOLLOWING_DOT_IN_object_name_380 )
+          __DOT35__ = match( DOT, TOKENS_FOLLOWING_DOT_IN_oracle_object_name_380 )
           if @state.backtracking == 0
 
             tree_for_DOT35 = @adaptor.create_with_payload( __DOT35__ )
@@ -1088,7 +1117,7 @@ module Source
           end
 
         end
-        @state.following.push( TOKENS_FOLLOWING_identifier_IN_object_name_387 )
+        @state.following.push( TOKENS_FOLLOWING_identifier_IN_oracle_object_name_387 )
         identifier36 = identifier
         @state.following.pop
         if @state.backtracking == 0
@@ -1097,7 +1126,7 @@ module Source
         # syntactic predicate action gate test
         if @state.backtracking == 0
           # --> action
-           @object_name = ( identifier36 && @input.to_s( identifier36.start, identifier36.stop ) ) 
+           @object_name = ( identifier36 && @input.to_s( identifier36.start, identifier36.stop ) ) unless @object_name 
           # <-- action
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -1119,7 +1148,7 @@ module Source
       ensure
         # -> uncomment the next line to manually enable rule tracing
         # trace_out( __method__, 10 )
-        memoize( __method__, object_name_start_index, success ) if @state.backtracking > 0
+        memoize( __method__, oracle_object_name_start_index, success ) if @state.backtracking > 0
 
       end
       
@@ -1131,8 +1160,8 @@ module Source
     # 
     # parser rule schema_name
     # 
-    # (in source.ruby.g)
-    # 86:1: schema_name : identifier ;
+    # (in orasource.ruby.g)
+    # 100:1: schema_name : identifier ;
     # 
     def schema_name
       # -> uncomment the next line to manually enable rule tracing
@@ -1158,7 +1187,7 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 87:4: identifier
+        # at line 101:4: identifier
         @state.following.push( TOKENS_FOLLOWING_identifier_IN_schema_name_400 )
         identifier37 = identifier
         @state.following.pop
@@ -1196,8 +1225,8 @@ module Source
     # 
     # parser rule identifier
     # 
-    # (in source.ruby.g)
-    # 90:1: identifier : ( ID | DOUBLEQUOTED_STRING );
+    # (in orasource.ruby.g)
+    # 104:1: identifier : ( ID | DOUBLEQUOTED_STRING );
     # 
     def identifier
       # -> uncomment the next line to manually enable rule tracing
@@ -1271,8 +1300,8 @@ module Source
     # 
     # parser rule keyBODY
     # 
-    # (in source.ruby.g)
-    # 95:1: keyBODY : {...}? ID ;
+    # (in orasource.ruby.g)
+    # 109:1: keyBODY : {...}? ID ;
     # 
     def keyBODY
       # -> uncomment the next line to manually enable rule tracing
@@ -1299,7 +1328,7 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 95:36: {...}? ID
+        # at line 109:36: {...}? ID
         unless ( ( self.input.look(1).text.upcase == ("BODY") ) )
           @state.backtracking > 0 and raise( ANTLR3::Error::BacktrackingFailed )
 
@@ -1338,27 +1367,27 @@ module Source
       return return_value
     end
 
-    KeyFUNCTIONReturnValue = define_return_scope 
+    KeyREPLACEReturnValue = define_return_scope 
 
     # 
-    # parser rule keyFUNCTION
+    # parser rule keyREPLACE
     # 
-    # (in source.ruby.g)
-    # 96:1: keyFUNCTION : 'FUNCTION' ;
+    # (in orasource.ruby.g)
+    # 110:1: keyREPLACE : {...}? ID ;
     # 
-    def keyFUNCTION
+    def keyREPLACE
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 14 )
-      return_value = KeyFUNCTIONReturnValue.new
+      return_value = KeyREPLACEReturnValue.new
 
       # $rule.start = the first token seen before matching
       return_value.start = @input.look
-      keyFUNCTION_start_index = @input.index
+      keyREPLACE_start_index = @input.index
 
       root_0 = nil
-      string_literal40 = nil
+      __ID40__ = nil
 
-      tree_for_string_literal40 = nil
+      tree_for_ID40 = nil
 
       success = false # flag used for memoization
 
@@ -1371,12 +1400,17 @@ module Source
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 96:36: 'FUNCTION'
-        string_literal40 = match( T__15, TOKENS_FOLLOWING_T__15_IN_keyFUNCTION_484 )
+        # at line 110:36: {...}? ID
+        unless ( ( self.input.look(1).text.upcase == ("REPLACE") ) )
+          @state.backtracking > 0 and raise( ANTLR3::Error::BacktrackingFailed )
+
+          raise FailedPredicate( "keyREPLACE", "self.input.look(1).text.upcase == (\"REPLACE\")" )
+        end
+        __ID40__ = match( ID, TOKENS_FOLLOWING_ID_IN_keyREPLACE_487 )
         if @state.backtracking == 0
 
-          tree_for_string_literal40 = @adaptor.create_with_payload( string_literal40 )
-          @adaptor.add_child( root_0, tree_for_string_literal40 )
+          tree_for_ID40 = @adaptor.create_with_payload( __ID40__ )
+          @adaptor.add_child( root_0, tree_for_ID40 )
 
         end
         # - - - - - - - rule clean up - - - - - - - -
@@ -1398,413 +1432,6 @@ module Source
       ensure
         # -> uncomment the next line to manually enable rule tracing
         # trace_out( __method__, 14 )
-        memoize( __method__, keyFUNCTION_start_index, success ) if @state.backtracking > 0
-
-      end
-      
-      return return_value
-    end
-
-    KeyPACKAGEReturnValue = define_return_scope 
-
-    # 
-    # parser rule keyPACKAGE
-    # 
-    # (in source.ruby.g)
-    # 97:1: keyPACKAGE : 'PACKAGE' ;
-    # 
-    def keyPACKAGE
-      # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 15 )
-      return_value = KeyPACKAGEReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
-      keyPACKAGE_start_index = @input.index
-
-      root_0 = nil
-      string_literal41 = nil
-
-      tree_for_string_literal41 = nil
-
-      success = false # flag used for memoization
-
-      begin
-        # rule memoization
-        if @state.backtracking > 0 and already_parsed_rule?( __method__ )
-          success = true
-          return return_value
-        end
-        root_0 = @adaptor.create_flat_list
-
-
-        # at line 97:36: 'PACKAGE'
-        string_literal41 = match( T__16, TOKENS_FOLLOWING_T__16_IN_keyPACKAGE_513 )
-        if @state.backtracking == 0
-
-          tree_for_string_literal41 = @adaptor.create_with_payload( string_literal41 )
-          @adaptor.add_child( root_0, tree_for_string_literal41 )
-
-        end
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
-
-        if @state.backtracking == 0
-
-          return_value.tree = @adaptor.rule_post_processing( root_0 )
-          @adaptor.set_token_boundaries( return_value.tree, return_value.start, return_value.stop )
-
-        end
-        success = true
-
-      rescue ANTLR3::Error::RecognitionError => re
-        report_error(re)
-        recover(re)
-        return_value.tree = @adaptor.create_error_node( @input, return_value.start, @input.look(-1), re )
-
-      ensure
-        # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 15 )
-        memoize( __method__, keyPACKAGE_start_index, success ) if @state.backtracking > 0
-
-      end
-      
-      return return_value
-    end
-
-    KeyPROCEDUREReturnValue = define_return_scope 
-
-    # 
-    # parser rule keyPROCEDURE
-    # 
-    # (in source.ruby.g)
-    # 98:1: keyPROCEDURE : 'PROCEDURE' ;
-    # 
-    def keyPROCEDURE
-      # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 16 )
-      return_value = KeyPROCEDUREReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
-      keyPROCEDURE_start_index = @input.index
-
-      root_0 = nil
-      string_literal42 = nil
-
-      tree_for_string_literal42 = nil
-
-      success = false # flag used for memoization
-
-      begin
-        # rule memoization
-        if @state.backtracking > 0 and already_parsed_rule?( __method__ )
-          success = true
-          return return_value
-        end
-        root_0 = @adaptor.create_flat_list
-
-
-        # at line 98:36: 'PROCEDURE'
-        string_literal42 = match( T__17, TOKENS_FOLLOWING_T__17_IN_keyPROCEDURE_540 )
-        if @state.backtracking == 0
-
-          tree_for_string_literal42 = @adaptor.create_with_payload( string_literal42 )
-          @adaptor.add_child( root_0, tree_for_string_literal42 )
-
-        end
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
-
-        if @state.backtracking == 0
-
-          return_value.tree = @adaptor.rule_post_processing( root_0 )
-          @adaptor.set_token_boundaries( return_value.tree, return_value.start, return_value.stop )
-
-        end
-        success = true
-
-      rescue ANTLR3::Error::RecognitionError => re
-        report_error(re)
-        recover(re)
-        return_value.tree = @adaptor.create_error_node( @input, return_value.start, @input.look(-1), re )
-
-      ensure
-        # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 16 )
-        memoize( __method__, keyPROCEDURE_start_index, success ) if @state.backtracking > 0
-
-      end
-      
-      return return_value
-    end
-
-    KeyTYPEReturnValue = define_return_scope 
-
-    # 
-    # parser rule keyTYPE
-    # 
-    # (in source.ruby.g)
-    # 99:1: keyTYPE : 'TYPE' ;
-    # 
-    def keyTYPE
-      # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 17 )
-      return_value = KeyTYPEReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
-      keyTYPE_start_index = @input.index
-
-      root_0 = nil
-      string_literal43 = nil
-
-      tree_for_string_literal43 = nil
-
-      success = false # flag used for memoization
-
-      begin
-        # rule memoization
-        if @state.backtracking > 0 and already_parsed_rule?( __method__ )
-          success = true
-          return return_value
-        end
-        root_0 = @adaptor.create_flat_list
-
-
-        # at line 99:36: 'TYPE'
-        string_literal43 = match( T__18, TOKENS_FOLLOWING_T__18_IN_keyTYPE_572 )
-        if @state.backtracking == 0
-
-          tree_for_string_literal43 = @adaptor.create_with_payload( string_literal43 )
-          @adaptor.add_child( root_0, tree_for_string_literal43 )
-
-        end
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
-
-        if @state.backtracking == 0
-
-          return_value.tree = @adaptor.rule_post_processing( root_0 )
-          @adaptor.set_token_boundaries( return_value.tree, return_value.start, return_value.stop )
-
-        end
-        success = true
-
-      rescue ANTLR3::Error::RecognitionError => re
-        report_error(re)
-        recover(re)
-        return_value.tree = @adaptor.create_error_node( @input, return_value.start, @input.look(-1), re )
-
-      ensure
-        # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 17 )
-        memoize( __method__, keyTYPE_start_index, success ) if @state.backtracking > 0
-
-      end
-      
-      return return_value
-    end
-
-    KeyTRIGGERReturnValue = define_return_scope 
-
-    # 
-    # parser rule keyTRIGGER
-    # 
-    # (in source.ruby.g)
-    # 100:1: keyTRIGGER : 'TRIGGER' ;
-    # 
-    def keyTRIGGER
-      # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 18 )
-      return_value = KeyTRIGGERReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
-      keyTRIGGER_start_index = @input.index
-
-      root_0 = nil
-      string_literal44 = nil
-
-      tree_for_string_literal44 = nil
-
-      success = false # flag used for memoization
-
-      begin
-        # rule memoization
-        if @state.backtracking > 0 and already_parsed_rule?( __method__ )
-          success = true
-          return return_value
-        end
-        root_0 = @adaptor.create_flat_list
-
-
-        # at line 100:36: 'TRIGGER'
-        string_literal44 = match( T__19, TOKENS_FOLLOWING_T__19_IN_keyTRIGGER_602 )
-        if @state.backtracking == 0
-
-          tree_for_string_literal44 = @adaptor.create_with_payload( string_literal44 )
-          @adaptor.add_child( root_0, tree_for_string_literal44 )
-
-        end
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
-
-        if @state.backtracking == 0
-
-          return_value.tree = @adaptor.rule_post_processing( root_0 )
-          @adaptor.set_token_boundaries( return_value.tree, return_value.start, return_value.stop )
-
-        end
-        success = true
-
-      rescue ANTLR3::Error::RecognitionError => re
-        report_error(re)
-        recover(re)
-        return_value.tree = @adaptor.create_error_node( @input, return_value.start, @input.look(-1), re )
-
-      ensure
-        # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 18 )
-        memoize( __method__, keyTRIGGER_start_index, success ) if @state.backtracking > 0
-
-      end
-      
-      return return_value
-    end
-
-    KeyVIEWReturnValue = define_return_scope 
-
-    # 
-    # parser rule keyVIEW
-    # 
-    # (in source.ruby.g)
-    # 101:1: keyVIEW : 'VIEW' ;
-    # 
-    def keyVIEW
-      # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 19 )
-      return_value = KeyVIEWReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
-      keyVIEW_start_index = @input.index
-
-      root_0 = nil
-      string_literal45 = nil
-
-      tree_for_string_literal45 = nil
-
-      success = false # flag used for memoization
-
-      begin
-        # rule memoization
-        if @state.backtracking > 0 and already_parsed_rule?( __method__ )
-          success = true
-          return return_value
-        end
-        root_0 = @adaptor.create_flat_list
-
-
-        # at line 101:36: 'VIEW'
-        string_literal45 = match( T__20, TOKENS_FOLLOWING_T__20_IN_keyVIEW_635 )
-        if @state.backtracking == 0
-
-          tree_for_string_literal45 = @adaptor.create_with_payload( string_literal45 )
-          @adaptor.add_child( root_0, tree_for_string_literal45 )
-
-        end
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
-
-        if @state.backtracking == 0
-
-          return_value.tree = @adaptor.rule_post_processing( root_0 )
-          @adaptor.set_token_boundaries( return_value.tree, return_value.start, return_value.stop )
-
-        end
-        success = true
-
-      rescue ANTLR3::Error::RecognitionError => re
-        report_error(re)
-        recover(re)
-        return_value.tree = @adaptor.create_error_node( @input, return_value.start, @input.look(-1), re )
-
-      ensure
-        # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 19 )
-        memoize( __method__, keyVIEW_start_index, success ) if @state.backtracking > 0
-
-      end
-      
-      return return_value
-    end
-
-    KeyREPLACEReturnValue = define_return_scope 
-
-    # 
-    # parser rule keyREPLACE
-    # 
-    # (in source.ruby.g)
-    # 102:1: keyREPLACE : {...}? ID ;
-    # 
-    def keyREPLACE
-      # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 20 )
-      return_value = KeyREPLACEReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
-      keyREPLACE_start_index = @input.index
-
-      root_0 = nil
-      __ID46__ = nil
-
-      tree_for_ID46 = nil
-
-      success = false # flag used for memoization
-
-      begin
-        # rule memoization
-        if @state.backtracking > 0 and already_parsed_rule?( __method__ )
-          success = true
-          return return_value
-        end
-        root_0 = @adaptor.create_flat_list
-
-
-        # at line 102:36: {...}? ID
-        unless ( ( self.input.look(1).text.upcase == ("REPLACE") ) )
-          @state.backtracking > 0 and raise( ANTLR3::Error::BacktrackingFailed )
-
-          raise FailedPredicate( "keyREPLACE", "self.input.look(1).text.upcase == (\"REPLACE\")" )
-        end
-        __ID46__ = match( ID, TOKENS_FOLLOWING_ID_IN_keyREPLACE_667 )
-        if @state.backtracking == 0
-
-          tree_for_ID46 = @adaptor.create_with_payload( __ID46__ )
-          @adaptor.add_child( root_0, tree_for_ID46 )
-
-        end
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
-
-        if @state.backtracking == 0
-
-          return_value.tree = @adaptor.rule_post_processing( root_0 )
-          @adaptor.set_token_boundaries( return_value.tree, return_value.start, return_value.stop )
-
-        end
-        success = true
-
-      rescue ANTLR3::Error::RecognitionError => re
-        report_error(re)
-        recover(re)
-        return_value.tree = @adaptor.create_error_node( @input, return_value.start, @input.look(-1), re )
-
-      ensure
-        # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 20 )
         memoize( __method__, keyREPLACE_start_index, success ) if @state.backtracking > 0
 
       end
@@ -1818,22 +1445,22 @@ module Source
     class DFA2 < ANTLR3::DFA
       EOT = unpack( 13, -1 )
       EOF = unpack( 13, -1 )
-      MIN = unpack( 1, 15, 2, 5, 4, -1, 1, 4, 1, -1, 1, 4, 3, -1 )
-      MAX = unpack( 1, 20, 2, 6, 4, -1, 1, 14, 1, -1, 1, 14, 3, -1 )
+      MIN = unpack( 1, 13, 2, 5, 4, -1, 1, 4, 1, -1, 1, 4, 3, -1 )
+      MAX = unpack( 1, 20, 2, 6, 4, -1, 1, 15, 1, -1, 1, 15, 3, -1 )
       ACCEPT = unpack( 3, -1, 1, 5, 1, 6, 1, 7, 1, 8, 1, -1, 1, 1, 1, -1, 
                        1, 3, 1, 2, 1, 4 )
       SPECIAL = unpack( 13, -1 )
       TRANSITION = [
-        unpack( 1, 5, 1, 1, 1, 4, 1, 2, 1, 3, 1, 6 ),
+        unpack( 1, 1, 2, -1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6 ),
         unpack( 1, 7, 1, 8 ),
         unpack( 1, 9, 1, 10 ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
-        unpack( 1, 8, 2, 11, 6, -1, 2, 8 ),
+        unpack( 1, 8, 2, 11, 7, -1, 2, 8 ),
         unpack(  ),
-        unpack( 1, 10, 2, 12, 6, -1, 2, 10 ),
+        unpack( 1, 10, 2, 12, 7, -1, 2, 10 ),
         unpack(  ),
         unpack(  ),
         unpack(  )
@@ -1850,7 +1477,7 @@ module Source
 
       def description
         <<-'__dfa_description__'.strip!
-          23:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
+          37:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
         __dfa_description__
       end
     end
@@ -1863,9 +1490,9 @@ module Source
       @dfa2 = DFA2.new( self, 2 )
 
     end
-    TOKENS_FOLLOWING_T__11_IN_start_rule_58 = Set[ 12, 15, 16, 17, 18, 19, 20 ]
+    TOKENS_FOLLOWING_T__11_IN_start_rule_58 = Set[ 12, 13, 16, 17, 18, 19, 20 ]
     TOKENS_FOLLOWING_T__12_IN_start_rule_62 = Set[ 5 ]
-    TOKENS_FOLLOWING_keyREPLACE_IN_start_rule_64 = Set[ 12, 15, 16, 17, 18, 19, 20 ]
+    TOKENS_FOLLOWING_keyREPLACE_IN_start_rule_64 = Set[ 12, 13, 16, 17, 18, 19, 20 ]
     TOKENS_FOLLOWING_package_spec_IN_start_rule_74 = Set[ 1 ]
     TOKENS_FOLLOWING_package_body_IN_start_rule_88 = Set[ 1 ]
     TOKENS_FOLLOWING_type_spec_IN_start_rule_102 = Set[ 1 ]
@@ -1874,41 +1501,35 @@ module Source
     TOKENS_FOLLOWING_procedure_IN_start_rule_144 = Set[ 1 ]
     TOKENS_FOLLOWING_function_IN_start_rule_158 = Set[ 1 ]
     TOKENS_FOLLOWING_view_IN_start_rule_172 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyPACKAGE_IN_package_spec_190 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_package_spec_192 = Set[ 13, 14 ]
+    TOKENS_FOLLOWING_T__13_IN_package_spec_190 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_package_spec_192 = Set[ 14, 15 ]
     TOKENS_FOLLOWING_set_IN_package_spec_194 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyPACKAGE_IN_package_body_218 = Set[ 5 ]
+    TOKENS_FOLLOWING_T__13_IN_package_body_218 = Set[ 5 ]
     TOKENS_FOLLOWING_keyBODY_IN_package_body_222 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_package_body_226 = Set[ 13, 14 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_package_body_226 = Set[ 14, 15 ]
     TOKENS_FOLLOWING_set_IN_package_body_228 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyTYPE_IN_type_spec_251 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_type_spec_253 = Set[ 13, 14 ]
+    TOKENS_FOLLOWING_T__16_IN_type_spec_251 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_type_spec_253 = Set[ 14, 15 ]
     TOKENS_FOLLOWING_set_IN_type_spec_255 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyTYPE_IN_type_body_278 = Set[ 5 ]
+    TOKENS_FOLLOWING_T__16_IN_type_body_278 = Set[ 5 ]
     TOKENS_FOLLOWING_keyBODY_IN_type_body_282 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_type_body_286 = Set[ 13, 14 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_type_body_286 = Set[ 14, 15 ]
     TOKENS_FOLLOWING_set_IN_type_body_288 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyTRIGGER_IN_trigger_310 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_trigger_312 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyPROCEDURE_IN_procedure_326 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_procedure_328 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyFUNCTION_IN_function_342 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_function_344 = Set[ 1 ]
-    TOKENS_FOLLOWING_keyVIEW_IN_view_358 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_object_name_IN_view_360 = Set[ 1 ]
-    TOKENS_FOLLOWING_schema_name_IN_object_name_376 = Set[ 4 ]
-    TOKENS_FOLLOWING_DOT_IN_object_name_380 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_identifier_IN_object_name_387 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__17_IN_trigger_310 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_trigger_312 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__18_IN_procedure_326 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_procedure_328 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__19_IN_function_342 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_function_344 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__20_IN_view_358 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_view_360 = Set[ 1 ]
+    TOKENS_FOLLOWING_schema_name_IN_oracle_object_name_376 = Set[ 4 ]
+    TOKENS_FOLLOWING_DOT_IN_oracle_object_name_380 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_identifier_IN_oracle_object_name_387 = Set[ 1 ]
     TOKENS_FOLLOWING_identifier_IN_schema_name_400 = Set[ 1 ]
     TOKENS_FOLLOWING_set_IN_identifier_0 = Set[ 1 ]
     TOKENS_FOLLOWING_ID_IN_keyBODY_456 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__15_IN_keyFUNCTION_484 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__16_IN_keyPACKAGE_513 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__17_IN_keyPROCEDURE_540 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__18_IN_keyTYPE_572 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__19_IN_keyTRIGGER_602 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__20_IN_keyVIEW_635 = Set[ 1 ]
-    TOKENS_FOLLOWING_ID_IN_keyREPLACE_667 = Set[ 1 ]
+    TOKENS_FOLLOWING_ID_IN_keyREPLACE_487 = Set[ 1 ]
 
   end # class Parser < ANTLR3::Parser
 

@@ -605,11 +605,16 @@ function! voraxlib#utils#GetQuickFixCompilationErrors(owner, object, type)"{{{
     "let offset = voraxlib#utils#GetStartLineOfPlsqlObject(a:type)
     let filter_clause = "('" . substitute(a:type, '_', ' ', 'g') . "')"
   endif
+  if empty(a:owner)
+  	let owner = "sys_context('userenv', 'session_user')"
+  else
+  	let owner = "'" . a:owner . "'"
+  endif
   let query = "select  line + " . offset . " line, " .
                     \ "position, " . 
                     \ "replace(replace(text, chr(10), ' '), chr(92), chr(92) || chr(92)) text " .
                   \ "from all_errors " . 
-                  \ "where owner = '" . a:owner . "' " .
+                  \ "where owner = " . owner . " " .
                   \ "and name = '" . a:object . "' " .
                   \ "and type in " . filter_clause . " order by 1;"
   let data = vorax#GetSqlplusHandler().Query(query)
@@ -816,6 +821,39 @@ function! voraxlib#utils#IsVoraxManagedFile(file)"{{{
     endfor
     return 0
   endif
+endfunction"}}}
+
+" Describe the current buffer. It returns info about the current loaded source
+" as a dictionary with the following structure:
+"
+" { 'object_name' : '', 'object_owner' : '', 'object_type' : '' }
+"
+function! voraxlib#utils#DescribeCurrentBuffer()"{{{
+  let source = join(getline(0, '$'), "\n")
+  let describe_data = { 'object_name' : '', 'object_owner' : '', 'object_type' : '' }
+  if exists('b:vorax_module')
+    " look at the buffer metadata
+  	let describe_data['object_name'] = b:vorax_module['object']
+  	let describe_data['object_type'] = b:vorax_module['type']
+  	let describe_data['object_owner'] = b:vorax_module['owner']
+  else
+    " inspect content
+    let content_data = voraxlib#parser#source#Describe(source)
+  	let describe_data['object_name'] = content_data['object_name']
+  	let describe_data['object_type'] = content_data['object_type']
+  	let describe_data['object_owner'] = content_data['object_owner']
+    " look at the file extension
+    let ext = fnamemodify('%', ':e')
+    if ext !=? 'sql'
+      for managed_ext in values(g:vorax_explorer_file_extensions)
+        if ext ==? managed_ext
+          let describe_data['object_type'] = managed_ext
+          break
+        endif
+      endfor
+    endif
+  endif
+  return describe_data
 endfunction"}}}
 
 " Check if the buffer has the proper syntax.

@@ -43,4 +43,6 @@ Vorax::source('vorax/parser/PlsqlLexer.rb')
 Vorax::source('vorax/parser/PlsqlParser.rb')
 Vorax::source('vorax/parser/Alias.rb')
 Vorax::source('vorax/parser/Argument.rb')
+Vorax::source('vorax/parser/OrasourceLexer.rb')
+Vorax::source('vorax/parser/OrasourceParser.rb')
 

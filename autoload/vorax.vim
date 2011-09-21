@@ -254,9 +254,10 @@ function! vorax#CompileBuffer()"{{{
               \ {'option' : 'markup', 'value' : 'html off'},
               \ ])})
       " look for errors in ALL_ERRORS view
-      let qerr = voraxlib#utils#GetQuickFixCompilationErrors(b:vorax_module['owner'], 
-                                                 \ b:vorax_module['object'], 
-                                                 \ b:vorax_module['type'])
+      let buffer_metadata = voraxlib#utils#DescribeCurrentBuffer()
+      let qerr = voraxlib#utils#GetQuickFixCompilationErrors(buffer_metadata['object_owner'], 
+                                                 \ buffer_metadata['object_name'], 
+                                                 \ buffer_metadata['object_type'])
       if len(qerr) > 0
         " set cursor on the first error
         call setpos('.', [qerr[0]["bufnr"], qerr[0]["lnum"], qerr[0]["col"], 0])
