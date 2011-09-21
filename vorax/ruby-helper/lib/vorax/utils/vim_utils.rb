@@ -13,7 +13,11 @@ module Vorax
       elsif object.kind_of?(Numeric)
         object
       else
-        object.to_s.inspect
+        if object
+          object.to_s.inspect
+        else
+          '""'
+        end
       end
     end
 
@@ -31,7 +35,7 @@ module Vorax
         elsif hash[key].kind_of?(Numeric)
           parts << "#{key.to_s.inspect} : #{hash[key]}"
         else
-          parts << "#{key.to_s.inspect} : #{hash[key].inspect}"
+          parts << "#{key.to_s.inspect} : #{(hash[key] ? hash[key].inspect : '""')}"
         end
       end
       "{#{parts.join(',')}}"
@@ -51,7 +55,7 @@ module Vorax
         elsif element.kind_of?(Array)
           parts << VimUtils.to_vimarray(element)
         else
-          parts << element.to_s.inspect
+          parts << (element ? element.to_s.inspect : '""')
         end
       end
       "[#{parts.join(',')}]"
