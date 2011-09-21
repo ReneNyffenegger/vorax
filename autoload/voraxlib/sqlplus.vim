@@ -292,7 +292,7 @@ function! s:sqlplus.EnforceColumnsHeading(statements)"{{{
           \ "dbms_output.put_line(' </tr>'); " .
           \ "for colidx in l_rec_tab.first .. l_rec_tab.last loop " .
           \ "l_col_metadata := l_rec_tab(colidx); " .
-          \ "if l_col_metadata.col_type in (dbms_sql.varchar2_type, dbms_sql.char_type) and " .
+          \ "if l_col_metadata.col_type in (1, 96) and " .
           \ "l_col_metadata.col_name_len > l_col_metadata.col_max_len then " .
           \ "dbms_output.put_line(' <tr>'); " .
           \ "dbms_output.put_line('  <td>' || l_col_metadata.col_name || '</td>'); " .
