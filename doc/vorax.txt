@@ -309,14 +309,24 @@ output window. This means you still can figure out if SqlPLUS is waiting for
 some data to be entered or it is waiting for a long running statement to
 complete.
 
+VoraX also allows to execute external SQL scripts directly from the NERDTree
+file explorer. Just install this plugin from:
+
+http://www.vim.org/scripts/script.php?script_id=1658
+
+and then, you may browse to the SQL script that you want to execute and 
+press "@" on that file selection. The script will be executed into the VoraX
+environment.
+
 ==============================================================================
 THE OUTPUT WINDOW                                               *vorax-output* 
 
 The result returned by the commands you execute is displayed into the output
 window. This window is automatically opened whenever something is needed to be
-shown (typically after an exec).
+shown (typically after an exec). Nevertheless, you can always toggle the
+displaying of this window using the <Leader>o mapping. "o" stands from output.
 
-You can choose between two modes:
+As far as the results flushing is concerned, you may choose between two modes:
 
 	1. Clear the output window before executing something. This means
 	you'll always have the results from the last command only.
@@ -368,13 +378,15 @@ Sometimes is better to scroll vertically. This output format may be activated
 using <Leader>vo. "vo" stands for "Vertical Output". This mapping acts like a
 toggle.
 
-Another annoying problem is that, by default, SqlPlus truncates the name of
-the column if the maximum data size derived from the corresponding column
-type is less than the size of the column name (e.g. IS_BIND_SENSITIVE from
+A really annoying output formatting problem is that, by default, SqlPlus truncates 
+the name of the column if the maximum data size derived from the corresponding 
+column type is less than the size of the column name (e.g. IS_BIND_SENSITIVE from
 V$SQL or SQL_TRACE_WAITS from V$SESSION, etc.). You may force column headings
 display using the |g:vorax_output_window_force_column_heading| variable or
-using the <Leader>ch predefined key map which is always active within the output
-window. "ch" stands for "Column Headings".
+using the <Leader>ch predefined key map, which is always active within the output
+window. "ch" stands for "Column Headings". This setting applies only to those
+queries interactively executed from an SQL buffer. SQL queries from scripts
+are not affected by this setting.
 
 The output window can be also paginated. This is useful when you want to
 inspect the output page by page. When paginating is in place after every page
@@ -894,7 +906,9 @@ The default value is 'ErrorMsg'.
 
 Controls whenever or not VoraX is trying to format columns so that their
 headings to be displayed without being truncated (a common problem 
-in SqlPlus). By default is disabled.
+in SqlPlus). By default is disabled. Pay attention that with this setting in
+place, for every SQL query an additional parse operation will be made in order
+to get the corresponding columns metadata.
 
 *g:vorax_oradoc_window_anchor*
 
