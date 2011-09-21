@@ -515,9 +515,9 @@ endfunction"}}}
 function! s:ToggleColumnHeadings()"{{{
   let g:vorax_output_window_force_column_heading = !g:vorax_output_window_force_column_heading
   if g:vorax_output_window_force_column_heading
-  	echo 'Force column headings is disabled.'
-  else
   	echo 'Force column headings is enabled.'
+  else
+  	echo 'Force column headings is disabled.'
   endif
 endfunction"}}}
 
