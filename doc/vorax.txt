@@ -628,10 +628,10 @@ answer is YES then keep reading.
 One of the best things of Oracle is its extensive documentation. When you're
 in doubt about something regarding your Oracle code the next natural move is
 to go straight to the Oracle official documentation. Every good DBA or
-database developer knows exactly where to look at. There are a few "books"
+database developer knows exactly where to look for. There are a few "books"
 which are the most frequently used like "The Oracle Database Reference", "The
 SQL Reference", "The Database PL/SQL Packages and Types Reference", etc.
-Without knowing exactly where to look at it's quite easy to get lost in all
+Without knowing exactly where to look for it's quite easy to get lost in all
 that documentation. Of course, Oracle provides an online search feature with
 which the exact spots where the term you're interested in will be eventually 
 highlighted. However, this search feature doesn't work without an internet
