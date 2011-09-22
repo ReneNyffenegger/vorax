@@ -71,6 +71,11 @@ function! vorax#Connect(cstr, bang)"{{{
                                       \ {'option' : 'markup', 'value' : 'html off'},
                                       \ {'option' : 'define', 'value' : '"&"'}, 
                                       \ {'option' : 'sqlprompt', 'value' : "''"}])}) . "\n" . conn_output
+          if sqlplus.HasDbaRights()
+            let sqlplus['query_dba'] = 1
+          else
+            let sqlplus['query_dba'] = 0
+          endif
         endif
         call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
       endif

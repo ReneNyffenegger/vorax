@@ -14,7 +14,7 @@ set cpo&vim
 let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
 " the sqlplus object
-let s:sqlplus = {'ruby_key' : '', 'last_stmt' : {}, 'html' : 0}
+let s:sqlplus = {'ruby_key' : '', 'last_stmt' : {}, 'html' : 0, 'query_dba' : 0}
 
 " the current object count. it is incremented on each new sqlplus object
 " creation
@@ -495,6 +495,24 @@ function! s:sqlplus.RestoreState()"{{{
   let output = self.Exec("@" . self.GetStagingSqlplusSettingsFile())
   if s:log.isDebugEnabled() | call s:log.debug("RestoreState output: " . string(output)) | endif
 endfunction"}}}
+
+" Whenever or not the currently connected user has rights to query DBA views.
+function! s:sqlplus.HasDbaRights()
+  let data = self.Query("select count(1) counter from all_objects " . 
+        \ "where object_name in ('DBA_OBJECTS', 'DBA_USERS', 'DBA_ARGUMENTS', 'DBA_PROCEDURES') " .
+        \ "and owner = 'SYS' and object_type='VIEW';")
+  if empty(data.errors)
+    for record in data.resultset
+      if str2nr(record['COUNTER']) == 4
+      	return 1
+      else
+      	return 0
+      endif
+    endfor
+  endif
+  return 1
+endfunction
+
 
 " Destroy the sqlplus process
 function! s:sqlplus.Destroy() dict "{{{

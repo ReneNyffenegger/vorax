@@ -129,10 +129,11 @@ function! s:GetArgItems(prefix)"{{{
     let object_properties = voraxlib#utils#ResolveDbObject(s:context.module)
     if !empty(object_properties) 
       let argument = s:HasLowerHead(a:prefix) ? 'lower(argument_name)' : 'argument_name'
+      let sqlplus = vorax#GetSqlplusHandler()
       let query =   "column kind format a100\n" .
                   \ "column menu format a100\n" .
                   \ 'select ' . argument . '|| '' => '' "word", DATA_TYPE "kind", decode(overload, null, '''' ,''o'' || OVERLOAD) "menu" ' .
-                  \ 'from all_arguments ' .
+                  \ 'from ' . (sqlplus.query_dba ? 'dba' : 'all') . '_arguments ' .
                   \ "where owner='" . toupper(object_properties.schema) . "' " .
                   \ "and package_name = '" . toupper(object_properties.object) . "' " .
                   \ "and object_name ='" . toupper(object_properties.submodule) . "' " .
@@ -140,7 +141,6 @@ function! s:GetArgItems(prefix)"{{{
                   \ "and argument_name like '" . toupper(a:prefix) . "%' " .
                   \ "and data_level = 0 " .
                   \ "order by overload, position; "
-      let sqlplus = vorax#GetSqlplusHandler()
       let result = sqlplus.Query(query)
       if empty(result.errors)
         " process the results because sqlplus.Query cannot handle integers and
@@ -272,9 +272,9 @@ function! s:GetSubmodules(owner, object, lowercase, prefix)"{{{
   else
     let procedure_name = 'procedure_name'
   endif
-  let query = 'select distinct ' . procedure_name . ' procedure_name from all_procedures where ' . where . ' order by procedure_name;' 
-  let procs = []
   let sqlplus = vorax#GetSqlplusHandler()
+  let query = 'select distinct ' . procedure_name . ' procedure_name from ' . (sqlplus.query_dba ? 'dba' : 'all') . '_procedures where ' . where . ' order by procedure_name;' 
+  let procs = []
   let params = {'executing_msg' : 'Querying for database objects...',
         \  'throbber' : vorax#GetDefaultThrobber(),
         \  'done_msg' : 'Done.'}
@@ -309,8 +309,8 @@ function! s:GetColumns(owner, object, lowercase, prefix)"{{{
   else
     let column_name = 'column_name'
   endif
-  let query = 'select ' . column_name . ' alias_column from all_tab_columns where ' . where . ' order by column_id;' 
   let sqlplus = vorax#GetSqlplusHandler()
+  let query = 'select ' . column_name . ' alias_column from ' . (sqlplus.query_dba ? 'dba' : 'all') . '_tab_columns where ' . where . ' order by column_id;' 
   let params = {'executing_msg' : 'Querying for database objects...',
         \  'throbber' : vorax#GetDefaultThrobber(),
         \  'done_msg' : 'Done.'}
@@ -430,13 +430,13 @@ endfunction"}}}
 
 " Whenever or not the number of schema objects exceeds the provided limit.
 function! s:IsNumberOfObjectsExceeded(objects_in, prefix, limit)"{{{
+  let sqlplus = vorax#GetSqlplusHandler()
   let query = 'select count(*) limit ' .
-        \ "from all_objects " .
+        \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_objects " .
         \ "where owner in (" . a:objects_in . ") ".
         \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION') " .
         \ "and object_name like upper('" . a:prefix . "%') " .
         \ "and rownum <= " . (a:limit + 1) . ";"
-  let sqlplus = vorax#GetSqlplusHandler()
   let result = sqlplus.Query(query)
   if empty(result.errors)
     if str2nr(result.resultset[0]['LIMIT']) == a:limit + 1
@@ -453,14 +453,14 @@ function! s:Schemas(prefix)"{{{
   else
   	let column = 'username'
   endif
+  let sqlplus = vorax#GetSqlplusHandler()
   let query = "column kind format a10\n" .
         \ "select " . column . ' "word", ' .
         \ "'schema' \"kind\" ".
-        \ "from all_users " .
+        \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_users " .
         \ "where ".
         \ "username like upper('" . a:prefix . "%') " .
         \ "order by 1;"
-  let sqlplus = vorax#GetSqlplusHandler()
   let result = sqlplus.Query(query)
   if empty(result.errors)
     call map(result.resultset, 'extend(v:val, {"icase" : 1, "dup" : 1})')
@@ -482,6 +482,7 @@ function! s:SchemaObjects(objects_in, prefix, ...)"{{{
   else
   	let column = 'object_name'
   endif
+  let sqlplus = vorax#GetSqlplusHandler()
   " double quoting any quote from prefix
   let prefix = substitute(a:prefix, "'", "''", 'g')
   " the query to return oracle objects
@@ -495,18 +496,17 @@ function! s:SchemaObjects(objects_in, prefix, ...)"{{{
         \ "when object_type = 'PROCEDURE' then 'prc' " .
         \ "when object_type = 'SEQUENCE' then 'seq' " .
         \ "when object_type = 'FUNCTION' then 'fnc' end \"kind\" ".
-        \ "from all_objects " .
+        \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_objects " .
         \ "where owner in (" . a:objects_in . ") ".
         \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION', 'SEQUENCE') " .
         \ "and object_name like upper('" . prefix . "%') "
   if exists('a:1') && a:1 == 1
     let query .= 'union all ' .
         \ "select username, 'schema' " .
-        \ "from all_users " .
+        \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_users " .
         \ "where username like upper('" . prefix . "%') "
   endif
   let query .= ';'
-  let sqlplus = vorax#GetSqlplusHandler()
   let params = {'executing_msg' : 'Querying for database objects...',
         \  'throbber' : vorax#GetDefaultThrobber(),
         \  'done_msg' : 'Done.'}
