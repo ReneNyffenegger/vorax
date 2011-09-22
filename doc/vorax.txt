@@ -409,7 +409,7 @@ also appended to the configured spool file.
 THE CODE COMPLETION SYSTEM                                        *vorax-omni* 
 
 We strongly believe that a good code completion system brings a lot of
-efficiency in coding activities. This is a common sense feature every IDE
+efficiency for coding activities. This is a common sense feature every IDE
 should have.
 
 VoraX provides code completion for the following editing spots (contexts):
@@ -456,7 +456,7 @@ plugins which help quite a bit in this area:
 	- AutocomplPop: http://www.vim.org/scripts/script.php?script_id=1879
 
 Note: AutocomplPop may slow down your typing because it tries to get
-completion items on almost every character you type. Because VoraX completion
+completion items on almost every character you enter. Because VoraX completion
 doesn't use any caching strategies, it queries the database dictionary tables
 every time some completion items must be returned. Across slow connections
 it's recommended to disable/suspend this plugin.
@@ -499,6 +499,18 @@ will provide these completion items taking into consideration the first
 character of the prefix. If the alias is written like "T." the columns
 corresponding to this alias are given in uppercase, but the "t." alias will
 provide the columns in lowercase.
+
+As far as speed is concerned, VoraX omni completion system tries to get
+advantage of whenever the currently connected user has SELECT_CATALOG rights
+or not. After every connect, VoraX will check if the following dictionary
+views are available for querying:
+  - DBA_OBJECTS
+  - DBA_PROCEDURES
+  - DBA_ARGUMENTS
+  - DBA_USERS
+If these views are accessible then VoraX will query these ones instead of
+their ALL_ counterparts. The reason for that is simply because querying DBA_
+views is faster than querying ALL_ ones.
 
 ==============================================================================
 THE DATABASE EXPLORER                                         *vorax-explorer* 
