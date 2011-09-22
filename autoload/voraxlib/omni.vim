@@ -20,18 +20,24 @@ function! voraxlib#omni#Complete(findstart, base)"{{{
   if a:findstart
     " compute the completion context
     call s:ComputeCompletionContext()
-    return s:context.complete_from
+    if exists('s:context')
+      return s:context.complete_from
+    else
+      return -1
+    endif
   else
     let result = [] " here we'll put the items to be shown in the completion list
-    if s:context.type == 'word'
-      " completion for a local object
-      call extend(result, s:GetWordItems(a:base))
-    elseif s:context.type == 'dot'
-      " we have a prefix which involves dot
-      call extend(result, s:GetDotItems(a:base))
-    elseif s:context.type == 'args'
-      " argument completion
-      call extend(result, s:GetArgItems(a:base))
+    if exists('s:context')
+      if s:context.type == 'word'
+        " completion for a local object
+        call extend(result, s:GetWordItems(a:base))
+      elseif s:context.type == 'dot'
+        " we have a prefix which involves dot
+        call extend(result, s:GetDotItems(a:base))
+      elseif s:context.type == 'args'
+        " argument completion
+        call extend(result, s:GetArgItems(a:base))
+      endif
     endif
     return result
   endif  
@@ -130,6 +136,7 @@ function! s:GetArgItems(prefix)"{{{
     if !empty(object_properties) 
       let argument = s:HasLowerHead(a:prefix) ? 'lower(argument_name)' : 'argument_name'
       let sqlplus = vorax#GetSqlplusHandler()
+      let prefix = voraxlib#utils#LiteralRegexp(substitute(a:prefix, "'", "''", 'g'))
       let query =   "column kind format a100\n" .
                   \ "column menu format a100\n" .
                   \ 'select ' . argument . '|| '' => '' "word", DATA_TYPE "kind", decode(overload, null, '''' ,''o'' || OVERLOAD) "menu" ' .
@@ -138,7 +145,7 @@ function! s:GetArgItems(prefix)"{{{
                   \ "and package_name = '" . toupper(object_properties.object) . "' " .
                   \ "and object_name ='" . toupper(object_properties.submodule) . "' " .
                   \ "and argument_name is not null " .
-                  \ "and argument_name like '" . toupper(a:prefix) . "%' " .
+                  \ "and regexp_like(argument_name, '^" . prefix . "') " .
                   \ "and data_level = 0 " .
                   \ "order by overload, position; "
       let result = sqlplus.Query(query)
@@ -161,7 +168,9 @@ endfunction"}}}
 " Whenever or not the provided prefix is a valid one (not matched by the
 " g:vorax_omni_skip_prefixes)
 function! s:IsPrefixValid(prefix)"{{{
-  return g:vorax_omni_skip_prefixes == '' || a:prefix !~ g:vorax_omni_skip_prefixes 
+  let result = g:vorax_omni_skip_prefixes == '' || a:prefix !~ g:vorax_omni_skip_prefixes 
+  if s:log.isDebugEnabled() | call s:log.debug('s:IsPrefixValid('. string(a:prefix) . ') => '. string(result)) | endif
+  return result
 endfunction"}}}
 
 " Return true if the provided text is candidate for a DOT completion.
@@ -207,6 +216,9 @@ endfunction"}}}
 " Compute the current completion context.
 function! s:ComputeCompletionContext()"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN voraxlib#omni#ComputeCompletionContext()') | endif
+  if exists('s:context')
+  	unlet s:context
+  endif
   " The omni completion context. This dictionary helps to decide what kind of
   " completion should be performed.
   let context = { 'statement' : '', 
@@ -233,16 +245,16 @@ function! s:ComputeCompletionContext()"{{{
   if context.module != ''
     " parameters completion
     let context.type = 'args'
-    let context.complete_from = match(context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-z#$_]*$\)')
+    let context.complete_from = match(context.line, '\(\((\|,\)\_s*\)\@<=\([0-9a-zA-Z#$_]*$\)')
     let context.prefix = strpart(context.line, context.complete_from)
   elseif s:IsDotCompletion(context.line)
     " completion involving a dot (e.g. owner. or table.)
-    let context.prefix = matchstr(context.line, '[0-9a-zA-z#$_.]*$')
+    let context.prefix = matchstr(context.line, '[0-9a-zA-Z#$_.]*$')
     let context.type = 'dot'
-    let context.complete_from = match(context.line, '\(\.\)\@<=\([0-9a-zA-z#$_]*$\)')
+    let context.complete_from = match(context.line, '\(\.\)\@<=\([0-9a-zA-Z#$_]*$\)')
   elseif s:IsWordCompletion(context.line)
     " completion involving a word (e.g. dbms_sta)
-    let context.complete_from = match(context.line, '\(\s*\)\@<=\([0-9a-zA-z#$_]\{'.g:vorax_omni_word_prefix_length.',\}$\)')
+    let context.complete_from = match(context.line, '\(\s*\)\@<=\([0-9a-zA-Z#\$\_]\{'.g:vorax_omni_word_prefix_length.',\}$\)')
     let context.prefix = strpart(context.line, context.complete_from)
     if s:IsPrefixValid(context.prefix)
       let context.type = 'word'
@@ -251,8 +263,9 @@ function! s:ComputeCompletionContext()"{{{
   if s:IsPrefixValid(context.prefix)
     let s:context = context
   endif
-  if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#omni#ComputeCompletionContext() => ' . string(s:context)) | endif
-  return s:context
+  if exists('s:context')
+    if s:log.isTraceEnabled() | call s:log.trace('END voraxlib#omni#ComputeCompletionContext() => ' . string(s:context)) | endif
+  endif
 endfunction"}}}
 
 " Get the inner module which correspond to the provided argument completion spot.
@@ -266,7 +279,8 @@ endfunction"}}}
 
 " Get a list of all procedure/functions within the provided package or type.
 function! s:GetSubmodules(owner, object, lowercase, prefix)"{{{
-  let where = "owner = '" . a:owner . "' and object_name = '" . a:object . "' and procedure_name like '" . toupper(a:prefix) . "%'"
+  let prefix = voraxlib#utils#LiteralRegexp(substitute(a:prefix, "'", "''", 'g'))
+  let where = "owner = '" . a:owner . "' and object_name = '" . a:object . "' and regexp_like(procedure_name, '^" . toupper(prefix) . "')"
   if a:lowercase
     let procedure_name = 'lower(procedure_name)'
   else
@@ -292,8 +306,9 @@ endfunction"}}}
 " object[i] pairs are returned. The second case should be used in order to
 " avoid many roundtrips.
 function! s:GetColumns(owner, object, lowercase, prefix)"{{{
+  let prefix = voraxlib#utils#LiteralRegexp(substitute(a:prefix, "'", "''", 'g'))
   if type(a:owner) == 1 && type(a:object) == 1
-    let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and column_name like '" . toupper(a:prefix) . "%'"
+    let where = "owner = '" . a:owner . "' and table_name = '" . a:object . "' and regexp_like(column_name, '^" . toupper(prefix) . "')"
   elseif type(a:owner) == 3 && type(a:object) == 3
     if len(a:owner) != len(a:object)
     	throw 'Invalid arguments: incompatible list length'
@@ -302,7 +317,7 @@ function! s:GetColumns(owner, object, lowercase, prefix)"{{{
     for i in range(len(a:owner))
       call add(filters, "(owner = '" . a:owner[i] . "' and table_name = '" . a:object[i] . "')")
     endfor
-    let where = "(" . join(filters, ' or ') . ") and column_name like '" . toupper(a:prefix) . "%'"
+    let where = "(" . join(filters, ' or ') . ") and regexp_like(column_name, '^" . toupper(prefix) . "')"
   end
   if a:lowercase
     let column_name = 'lower(column_name)'
@@ -430,12 +445,13 @@ endfunction"}}}
 
 " Whenever or not the number of schema objects exceeds the provided limit.
 function! s:IsNumberOfObjectsExceeded(objects_in, prefix, limit)"{{{
+  let prefix = voraxlib#utils#LiteralRegexp(substitute(a:prefix, "'", "''", 'g'))
   let sqlplus = vorax#GetSqlplusHandler()
   let query = 'select count(*) limit ' .
         \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_objects " .
         \ "where owner in (" . a:objects_in . ") ".
         \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION') " .
-        \ "and object_name like upper('" . a:prefix . "%') " .
+        \ "and regexp_like(object_name, upper('^" . prefix . "')) " .
         \ "and rownum <= " . (a:limit + 1) . ";"
   let result = sqlplus.Query(query)
   if empty(result.errors)
@@ -454,12 +470,13 @@ function! s:Schemas(prefix)"{{{
   	let column = 'username'
   endif
   let sqlplus = vorax#GetSqlplusHandler()
+  let prefix = voraxlib#utils#LiteralRegexp(substitute(a:prefix, "'", "''", 'g'))
   let query = "column kind format a10\n" .
         \ "select " . column . ' "word", ' .
         \ "'schema' \"kind\" ".
         \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_users " .
         \ "where ".
-        \ "username like upper('" . a:prefix . "%') " .
+        \ "regexp_like(username, upper('^" . prefix . "')) " .
         \ "order by 1;"
   let result = sqlplus.Query(query)
   if empty(result.errors)
@@ -484,7 +501,7 @@ function! s:SchemaObjects(objects_in, prefix, ...)"{{{
   endif
   let sqlplus = vorax#GetSqlplusHandler()
   " double quoting any quote from prefix
-  let prefix = substitute(a:prefix, "'", "''", 'g')
+  let prefix = voraxlib#utils#LiteralRegexp(substitute(a:prefix, "'", "''", 'g'))
   " the query to return oracle objects
   let query = "column kind format a20\n" .
         \ "select distinct " . column . ' "word", ' .
@@ -499,12 +516,12 @@ function! s:SchemaObjects(objects_in, prefix, ...)"{{{
         \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_objects " .
         \ "where owner in (" . a:objects_in . ") ".
         \ "and object_type in ('TABLE', 'VIEW', 'TYPE', 'PACKAGE', 'SYNONYM', 'PROCEDURE', 'FUNCTION', 'SEQUENCE') " .
-        \ "and object_name like upper('" . prefix . "%') "
+        \ "and regexp_like(object_name, upper('^" . prefix . "')) "
   if exists('a:1') && a:1 == 1
     let query .= 'union all ' .
         \ "select username, 'schema' " .
         \ "from " . (sqlplus.query_dba ? 'dba' : 'all') . "_users " .
-        \ "where username like upper('" . prefix . "%') "
+        \ "where regexp_like(username, upper('^" . prefix . "')) "
   endif
   let query .= ';'
   let params = {'executing_msg' : 'Querying for database objects...',
