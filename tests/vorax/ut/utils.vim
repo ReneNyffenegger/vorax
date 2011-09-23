@@ -195,6 +195,8 @@ function! TestVoraxUtilsAddSqlDelimitator()
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin\ndbms_output.put_line('muci');\nend\n;"), "begin\ndbms_output.put_line('muci');\nend\n;\n/\n", 'Incomplete plsql block 3.')
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator("begin\ndbms_output.put_line('muci');\nend \"muci\"\n;"), "begin\ndbms_output.put_line('muci');\nend \"muci\"\n;\n/\n", 'InComplete plsql block 3.')
   call VUAssertEquals(voraxlib#utils#AddSqlDelimitator('select * from cat --my comment'), 'select * from cat;', 'Statement with comment at the end.')
+  let stmt = "select count(*), max(val2) as endpoint_value , endpoint_number\nfrom (\nselect val2, ntile(5) over (order by val2) as endpoint_number\nfrom t)\ngroup by endpoint_number\n order by endpoint_number;"
+  call VUAssertEquals(voraxlib#utils#AddSqlDelimitator(stmt), stmt, 'Statement with ; and "end" at the end.')
 endfunction
 
 function! TestVoraxUtilsIsQuery()
@@ -206,12 +208,15 @@ function! TestVoraxUtilsIsQuery()
 endfunction
 
 function! TestVoraxUtilsAddRownumFilter()
+  let bak = g:vorax_limit_rows_show_warning
+  let g:vorax_limit_rows_show_warning = 0
   let bwrap = "select * from (\n/* original query starts here */\n"
   let ewrap = "\n/* original query ends here */\n) where rownum <= 10;\n"
-  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;', 10), bwrap . 'select * from cat' . ewrap, 'test 1')
-  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;', 10), bwrap . 'select * from cat' . ewrap."set autotrace on;\n", 'test 2')
-  call VUAssertEquals(voraxlib#utils#AddRownumFilter('select * from cat;set autotrace on;with x as (select * from dual) select * from x', 10), 
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter(['select * from cat;'], 10), bwrap . 'select * from cat' . ewrap, 'test 1')
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter(['select * from cat;', 'set autotrace on;'], 10), bwrap . 'select * from cat' . ewrap."set autotrace on;\n", 'test 2')
+  call VUAssertEquals(voraxlib#utils#AddRownumFilter(['select * from cat;', 'set autotrace on;', 'with x as (select * from dual) select * from x'], 10), 
         \ bwrap . 'select * from cat' . ewrap."set autotrace on;\n" . bwrap . 'with x as (select * from dual) select * from x' . ewrap, 'test 3')
+  let g:vorax_limit_rows_show_warning = bak
 endfunction
 
 function! TestVoraxGetStartLineOfPlsqlObject()

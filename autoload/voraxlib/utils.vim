@@ -15,7 +15,8 @@ let s:log = voraxlib#logger#New(expand('<sfile>:t'))
 
 " How statements are sepparated
 let s:sql_delimitator_pattern = ';\|^\s*\/\s*$'
-let s:plsql_end_marker = '\v\_s+end\_s*"?[^"]*"?\_s*;\_s*\_$'
+"let s:plsql_end_marker = '\v\_s+end\_s*"?[^"]*"?\_s*;\_s*\_$'
+let s:plsql_end_marker = '\v(\_s+end\_s+"[^"]+"\_s*;\_s*$)|(\_s+end\_s+[A-Za-z0-9$_#]+\_s*;\_s*$)|(\_s+end\_s*;\_s*$)'
 let s:sql_strip_comments_pattern = '((\s*\/\*[^*\/]*\*\/\s*)|(\s*--[^\n]*((\n\s*)|\Z)))+'
 
 " Display a warning message.
