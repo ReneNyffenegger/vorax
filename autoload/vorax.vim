@@ -595,6 +595,11 @@ function! vorax#NewSqlScratch()"{{{
     let s:scratch_no = 1
   endif
   silent! exe 'edit ' . '__scratch' . string(s:scratch_no) . '__.sql'
+  let l:template_file = g:vorax_home_dir . '/template_scratch.sql'
+  if filereadable( l:template_file)
+    exe '0read ' . l:template_file
+    normal G
+  endif
   setlocal hidden
   setlocal noswapfile
   setlocal buftype=nowrite

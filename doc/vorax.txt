@@ -242,6 +242,10 @@ stored in a file then you must use a real sql buffer. For example:
 
 Being an sql buffer VoraX will work without a problem.
 
+You can provide a template for a sql scratch by creating a "template_scratch.sql"
+file into your |g:vorax_home_dir| folder. Then, every new SQL scratch will be 
+opened with your defined template.
+
 To execute a statement, VoraX provides a standard keymap: <Leader>e. If you
 want to easily remember this keymap just think of "exec". Yes, "e" stands for
 "exec". Now, you may execute the current statement or the current selection.
