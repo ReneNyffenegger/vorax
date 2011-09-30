@@ -10,7 +10,10 @@ endif
  
 " we don't have indenting for plsql yet therefore indent 
 " like an sql file please
-exec 'runtime indent/sql.vim'
+let s:indent_file = substitute(
+      \ fnamemodify(expand('<sfile>:p:h') . '/../indent/sql.vim', ':p:8'),
+      \ '\\\\\|\\', '/', 'g')
+exec 'so ' . s:indent_file
 
 " tag plsql files as sqls
 if exists('loaded_taglist')
