@@ -190,7 +190,7 @@ TLet g:vorax_keep_selection_after_exec = 0
 
 " The options to be pased to DBMS_XPLAN in order to fetch the corresponding
 " explain plan.
-TLet g:vorax_explain_options = "ALLSTATS LAST +alias"
+TLet g:vorax_explain_options = "ALLSTATS LAST"
 
 "}}}
 " g:vorax_output_window_anchor"{{{
