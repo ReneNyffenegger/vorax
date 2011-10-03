@@ -6,6 +6,8 @@
 -- to be explained. All current sqlplus options are saved before
 -- and restore after, therefore you may set whatever sqlplus
 -- option you want.
+--
+-- The &2 parameter is the options to be used by DBMS_XPLAN.
 
 -- by default, don't show the query results for the statement.
 set termout off
@@ -30,5 +32,5 @@ set heading off
 set feedback off
 
 -- show the plan for the last sql
-select * from table(dbms_xplan.display_cursor(null, null, 'ALLSTATS LAST'));
+select * from table(dbms_xplan.display_cursor(null, null, '&2'));
 

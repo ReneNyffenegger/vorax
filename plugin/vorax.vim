@@ -186,6 +186,13 @@ TLet g:vorax_sqlplus_pause_warning = 1
 TLet g:vorax_keep_selection_after_exec = 0
 
 "}}}
+" g:vorax_explain_options"{{{
+
+" The options to be pased to DBMS_XPLAN in order to fetch the corresponding
+" explain plan.
+TLet g:vorax_explain_options = "ALLSTATS LAST +alias"
+
+"}}}
 " g:vorax_output_window_anchor"{{{
 
 " The anchor of the output window. The allowed values are: topleft or
@@ -499,6 +506,16 @@ endif"}}}
 if exists(':VoraxExecSelection') != 2
   command! -nargs=0 -bar -range VoraxExecSelection :call vorax#ExecSelection()
   xmap <unique> <script> <Plug>VoraxExecSelection :VoraxExecSelection<CR>
+endif"}}}
+" :VoraxExplainSelection"{{{
+if exists(':VoraxExplainSelection') != 2
+  command! -nargs=0 -bar -range VoraxExplainSelection :call vorax#Explain(voraxlib#utils#SelectedBlock(), 0)
+  xmap <unique> <script> <Plug>VoraxExplainSelection :VoraxExplainSelection<CR>
+endif"}}}
+" :VoraxExplainOnlySelection"{{{
+if exists(':VoraxExplainOnlySelection') != 2
+  command! -nargs=0 -bar -range VoraxExplainOnlySelection :call vorax#Explain(voraxlib#utils#SelectedBlock(), 1)
+  xmap <unique> <script> <Plug>VoraxExplainOnlySelection :VoraxExplainOnlySelection<CR>
 endif"}}}
 " :VoraxProfilesWindowToggle"{{{
 if exists(':VoraxProfilesWindowToggle') != 2

@@ -213,7 +213,7 @@ function! vorax#Explain(sql, only)"{{{
     let explain_script = fnamemodify(s:script_dir . '/../vorax/scripts/explain.sql', ':p:8')
   endif
   let explain_script = sqlplus.ConvertPath(substitute(explain_script, '\\\\\|\\', '/', 'g'))
-  let explain_command = '@' . explain_script . ' ' . shellescape(sqlplus.ConvertPath(sql_file))
+  let explain_command = '@' . explain_script . ' ' . shellescape(sqlplus.ConvertPath(sql_file)) . ' ' . shellescape(g:vorax_explain_options)
   call sqlplus.SaveState()
   let output = sqlplus.Exec(explain_command,
               \ {'executing_msg' : 'Gathering the explain plan...',

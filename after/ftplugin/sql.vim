@@ -42,12 +42,12 @@ if voraxlib#utils#IsSqlOracleBuffer()
   let mapdesc = maparg(g:vorax_explain_key, 'v', 0, 1)
   if g:vorax_explain_key != '' 
         \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
-    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_key . " :call vorax#Explain(voraxlib#utils#SelectedBlock(), 0)<cr>"
+    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_key . " <Plug>VoraxExplainSelection"
   endif
   let mapdesc = maparg(g:vorax_explain_only_key, 'v', 0, 1)
   if g:vorax_explain_only_key != '' 
         \ && ((has_key(mapdesc, 'buffer') && !mapdesc['buffer']) || empty(mapdesc))
-    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " :call vorax#Explain(voraxlib#utils#SelectedBlock(), 1)<cr>"
+    exe "xmap <silent> " . (g:vorax_force_keymappings ? "" : "<unique> ") . " <buffer>" . g:vorax_explain_only_key . " <Plug>VoraxExplainOnlySelection"
   endif
 
 
