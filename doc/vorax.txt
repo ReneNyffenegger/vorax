@@ -842,6 +842,13 @@ Whenever or not to keep the current visual selection after the statement was
 executed. Does work only if the |g:vorax_output_window_keep_focus_after_exec|
 is 0. The default value is 0.
 
+*g:vorax_explain_options*
+
+When the user invokes the explain plan mapping for a given statement, VoraX
+uses DBMS_XPLAN package behind. You may control the format of this explain
+plan using this option, which is further used as parameter to DBMS_XPLAN. The
+default value is "ALLSTATS LAST".
+
 *g:vorax_output_window_anchor*
 
 The anchor of the output window. The allowed values are: topleft or
