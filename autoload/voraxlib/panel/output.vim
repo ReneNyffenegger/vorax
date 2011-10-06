@@ -35,6 +35,8 @@ function! voraxlib#panel#output#New()"{{{
     let s:output_window['spooling'] = 0
     " Log destination.
     let s:output_window['spool_file'] = ''
+    " last lines of output used for omni completion
+    let s:output_window['hot_area'] = []
     " Add additional functionality
     call s:ExtendWindow()
   endif
@@ -115,6 +117,10 @@ function! s:ExtendWindow()"{{{
     let text = substitute(a:text, '\r', '', 'g')
     let lines = split(text, '\n', 1)
     if len(lines) > 0
+      let self.hot_area += lines
+      if len(self.hot_area) > 500
+        let self.hot_area = remove(self.hot_area, 0, len(self.hot_area) - 500)
+      endif
       call setline(lines_no, last_line . lines[0])
       call remove(lines, 0)
       if len(lines) > 0
@@ -166,6 +172,7 @@ function! s:ExtendWindow()"{{{
     call self.Focus()
     " delete everything with nothing saved in registers
     normal gg"_dG
+    let self.hot_area = []
   endfunction"}}}
 
   " Start the monitor for the output window.

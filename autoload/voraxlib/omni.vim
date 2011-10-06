@@ -397,29 +397,41 @@ function! s:ResolveAlias(statement, alias, prefix)"{{{
 endfunction"}}}
 
 " Returns a list of words from the VoraX output window having the provided
-" prefix. No more than 300 items are returned and every search should not
-" exceed 500ms per item.
+" prefix. Only the hot_area is searched.
 function! s:WordsFromOutput(prefix)"{{{
   let result = []
   let output_win = vorax#GetOutputWindowHandler()
   if bufwinnr(output_win.name) != -1
     " only if the output window is visible
-    let current_window = winnr()
-    call output_win.Focus()
-    let state = winsaveview()
-    normal G
-    let crr_ignorecase = &ignorecase
-    let &ignorecase = 1
-    for i in range(300)
-      if search('\<' . a:prefix .'.\{-\}\>', 'bW', 0, 500)
-        call voraxlib#utils#AddUnique(result, {"word" : expand("<cword>"), "kind" : "output", "icase" : 1})
-      else
-        break
-      endif
+    let lines = output_win.hot_area
+    for line in lines 
+      let occurence = 1
+      while 1
+        let word = matchstr(line, '\c\<' . a:prefix . '.\{-\}\>', 0, occurence)
+        if !empty(word)
+          call voraxlib#utils#AddUnique(result, {"word" : word, "kind" : "output", "icase" : 1})
+          let occurence += 1
+        else
+          break
+        endif
+      endwhile
     endfor
-    let &ignorecase = crr_ignorecase
-    call winrestview(state)
-    exe current_window . 'wincmd w'
+    "let current_window = winnr()
+    "call output_win.Focus()
+    "let state = winsaveview()
+    "normal G
+    "let crr_ignorecase = &ignorecase
+    "let &ignorecase = 1
+    "for i in range(300)
+      "if search('\<' . a:prefix .'.\{-\}\>', 'bW', 0, 500)
+        "call voraxlib#utils#AddUnique(result, {"word" : expand("<cword>"), "kind" : "output", "icase" : 1})
+      "else
+        "break
+      "endif
+    "endfor
+    "let &ignorecase = crr_ignorecase
+    "call winrestview(state)
+    "exe current_window . 'wincmd w'
   endif
   return result
 endfunction"}}}

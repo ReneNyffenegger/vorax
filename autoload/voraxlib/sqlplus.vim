@@ -497,7 +497,7 @@ function! s:sqlplus.RestoreState()"{{{
 endfunction"}}}
 
 " Whenever or not the currently connected user has rights to query DBA views.
-function! s:sqlplus.HasDbaRights()
+function! s:sqlplus.HasDbaRights()"{{{
   let data = self.Query("select count(1) counter from all_objects " . 
         \ "where object_name in ('DBA_OBJECTS', 'DBA_USERS', 'DBA_ARGUMENTS', 'DBA_PROCEDURES') " .
         \ "and owner = 'SYS' and object_type='VIEW';")
@@ -511,8 +511,7 @@ function! s:sqlplus.HasDbaRights()
     endfor
   endif
   return 1
-endfunction
-
+endfunction"}}}
 
 " Destroy the sqlplus process
 function! s:sqlplus.Destroy() dict "{{{
