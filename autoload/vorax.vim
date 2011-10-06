@@ -77,7 +77,7 @@ function! vorax#Connect(cstr, bang)"{{{
             let sqlplus['query_dba'] = 0
           endif
         endif
-        call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
+        call outputwin.AppendText(substitute(output, '\_s*$', '', ''), g:vorax_output_window_clear_before_exec)
       endif
       " refresh the vorax db explorer window tree
       let explorer.expanded_nodes = []
