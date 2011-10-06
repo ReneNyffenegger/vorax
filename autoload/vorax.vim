@@ -95,9 +95,14 @@ function! vorax#Connect(cstr, bang)"{{{
 endfunction"}}}
 
 " Execute the provided command and spit the result into the output window.
-function! vorax#Exec(command)"{{{
+function! vorax#Exec(command, ...)"{{{
   let sqlplus = vorax#GetSqlplusHandler()
   let outputwin = vorax#GetOutputWindowHandler()
+  if exists('a:1')
+  	let pack = a:1
+  else
+  	let pack = 1
+  endif
   if s:ShouldGoOnWithPauseOn()
     if s:log.isTraceEnabled() | call s:log.trace('BEGIN vorax#Exec(' . string(a:command) . ')') | endif
     " save the last command. this is require in order to be able to replay it.
@@ -126,8 +131,13 @@ function! vorax#Exec(command)"{{{
     " exec the command in bg. All trailing CR/spaces are removed before exec.
     " This is important especially in connection with set echo on. With CRs
     " the sqlprompt will be echoed
-    call sqlplus.NonblockExec(sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\%$', '', 'g')
-          \ , {'include_eor' : 1}) . 
+    if pack 
+    	let run_this = sqlplus.Pack(substitute(sqlplus.last_stmt['cmd'], '\_s*\%$', '', 'g')
+          \ , {'include_eor' : 1}) 
+    else
+    	let run_this = substitute(sqlplus.last_stmt['cmd'], '\_s*\%$', '', 'g')
+    endif
+    call sqlplus.NonblockExec( run_this . 
           \ (exists('cmds') ? "\n" . join(cmds['reset_commands'], "\n") : '')
           \ , 0)
     call outputwin.StartMonitor()
@@ -203,37 +213,51 @@ function! vorax#Explain(sql, only)"{{{
     " assume the current statement
     let statement = voraxlib#utils#GetCurrentStatement()
   endif
+  let statement = voraxlib#utils#AddSqlDelimitator(statement)
   let sqlplus = vorax#GetSqlplusHandler()
+  call sqlplus.SaveState()
   let outputwin = vorax#GetOutputWindowHandler()
   let crr_win = winnr()
-  let sql_file = substitute(sqlplus.Pack(statement), '^@', '', '')
+  let sql_file = substitute(sqlplus.Pack(statement, {'target_file' : 'stmt_to_be_explained.sql'}), '^@', '', '')
   if a:only
     let explain_script = fnamemodify(s:script_dir . '/../vorax/scripts/explain_only.sql', ':p:8')
   else
     let explain_script = fnamemodify(s:script_dir . '/../vorax/scripts/explain.sql', ':p:8')
   endif
   let explain_script = sqlplus.ConvertPath(substitute(explain_script, '\\\\\|\\', '/', 'g'))
-  let explain_command = '@' . explain_script . ' ' . shellescape(sqlplus.ConvertPath(sql_file)) . ' ' . shellescape(g:vorax_explain_options)
-  call sqlplus.SaveState()
-  let output = sqlplus.Exec(explain_command,
-              \ {'executing_msg' : 'Gathering the explain plan...',
-              \  'throbber' : vorax#GetDefaultThrobber(),
-              \  'done_msg' : 'Done.',
-              \  'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
-                  \ [
-                  \ {'option' : 'echo', 'value' : 'off'}, 
-                  \ {'option' : 'feedback', 'value' : 'off'},
-                  \ {'option' : 'verify', 'value' : 'off'},
-                  \ {'option' : 'define', 'value' : 'on'},
-                  \ {'option' : 'sqlprompt', 'value' : "''"},
-                  \ {'option' : 'linesize', 'value' : '180'},
-                  \ {'option' : 'markup', 'value' : 'html off'},
-                \ ])})
-  call sqlplus.RestoreState()
-  call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
-  if !g:vorax_output_window_keep_focus_after_exec
-    exec crr_win . 'wincmd w'
-  endif
+  let explain_command = sqlplus.Pack('@' . explain_script . ' ' . 
+        \ shellescape(sqlplus.ConvertPath(sql_file)) . ' ' . 
+        \ shellescape(g:vorax_explain_options),
+        \ {'include_eor' : 1})
+  let explain_command = "set echo off " .
+                      \ "feedback off " .
+                      \ "verify off " .
+                      \ "define on " .
+                      \ "sqlprompt '' " .
+                      \ "linesize 180 " .
+                      \ "markup html off " .
+                      \ "\n" . explain_command .
+                      \ "\n" . join(readfile(sqlplus.GetStagingSqlplusSettingsFile()), "\n")
+  call vorax#Exec(explain_command, 0)
+  "let output = sqlplus.Exec(explain_command,
+              "\ {'executing_msg' : 'Gathering the explain plan...',
+              "\  'throbber' : vorax#GetDefaultThrobber(),
+              "\  'done_msg' : 'Done.',
+              "\  'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
+                  "\ [
+                  "\ {'option' : 'echo', 'value' : 'off'}, 
+                  "\ {'option' : 'feedback', 'value' : 'off'},
+                  "\ {'option' : 'verify', 'value' : 'off'},
+                  "\ {'option' : 'define', 'value' : 'on'},
+                  "\ {'option' : 'sqlprompt', 'value' : "''"},
+                  "\ {'option' : 'linesize', 'value' : '180'},
+                  "\ {'option' : 'markup', 'value' : 'html off'},
+                "\ ])})
+  "call sqlplus.RestoreState()
+  "call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
+  "if !g:vorax_output_window_keep_focus_after_exec
+    "exec crr_win . 'wincmd w'
+  "endif
 endfunction"}}}
 
 " Send the whole current buffer content to sqlplus for execution.
@@ -606,6 +630,45 @@ function! vorax#NewSqlScratch()"{{{
   setlocal noreadonly
   setlocal nowrap
   setlocal nomodified
+endfunction"}}}
+
+" Aborts the execution of the current statement.
+function! vorax#CancelExec()"{{{
+  if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:CancelExec()') | endif
+  let sqlplus = vorax#GetSqlplusHandler()
+  let output_window = vorax#GetOutputWindowHandler()
+  if sqlplus.IsBusy()
+    if !sqlplus.Cancel('Please wait. Aborting...')
+      if s:log.isWarnEnabled() | call s:log.warn('Could not cancel on this platform! Reconnect is needed.') | endif
+      call voraxlib#utils#Warn("Can not gracefully cancel the currently executing statement on your current OS platform.\n")
+      let response = voraxlib#utils#PickOption(
+            \ 'Do you want to abort this session? (if yes, reconnect is needed)',
+            \ ['(Y)es', '(N)o'])
+      if response == 'Y'
+        if s:log.isDebugEnabled() | call s:log.debug('User opts for aborting the session.') | endif
+        call vorax#ResetSqlplusHandler()
+      else
+        if s:log.isDebugEnabled() | call s:log.debug('User opts to NOT abort the session.') | endif
+      	redraw
+      	return
+      endif
+    endif
+    if getline('.') != ""
+      " if the last line is not empty then it means we are just in the middle
+      " of the output of the last cancelled statement. Let's add 2 empty lines
+      " so that the next executed command to nicelly appear below the
+      " cancelled one.
+      call output_window.AppendText("\n\n")
+    endif
+    call output_window.AppendText("\n*** Cancelled ***\n")
+    call output_window.StopMonitor()
+    redraw
+    echon "Done!"
+  else
+    if s:log.isWarnEnabled() | call s:log.warn('You want to cancel what?') | endif
+  	call voraxlib#utils#Warn("Nothing to cancel!")
+  endif
+  if s:log.isTraceEnabled() | call s:log.trace('END s:CancelExec') | endif
 endfunction"}}}
 
 " === PRIVATE FUNCTIONS ==="{{{
