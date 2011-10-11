@@ -272,15 +272,15 @@ take care to add the proper SQL separator at the end of the statement.
 In SqlPLUS, a statement may contain substitution variables. The user will be
 asked to provide the corresponding values at the execution time. From VoraX 
 point of view this is tricky because it sends the statement to SqlPLUS
-to be executed and then waits for the results, but in this case it will wait
-indefinitely because SqlPLUS also waits for the substitution variables values
-to be provided. Unfortunately, VoraX cannot figure out if a statement takes a
-lot of time simply because it's a long running command or the execution is
-stuck because SqlPLUS asks the user to enter some data. However, it's easy to
-figure out if something must be provided by the user by simply looking at the
-output.
+to be executed and then is waiting for the results, but in this case it will 
+wait indefinitely because SqlPLUS also is waiting for the substitution variables 
+values to be provided. Unfortunately, VoraX cannot figure out if a statement 
+takes a lot of time just because it's a long running command or the execution is
+stuck because SqlPLUS is asking the user to enter some data. However, it's easy 
+to figure out if something must be provided by the user by simply looking at 
+the output.
 
-Suppose you have the following script:
+Supposing you have the following script:
 
 		accept x prompt "Enter x: "
 		prompt &x
@@ -308,7 +308,7 @@ running the above script will show the following status:
 
 (Waiting in prompt or slow fetch). <CR> to input at prompt = [...Enter x: ] 
 
-Thus the possible prompt is displayed even no output was written yet into the
+Thus the "maybe" prompt is displayed even no output was written yet into the
 output window. This means you still can figure out if SqlPLUS is waiting for
 some data to be entered or it is waiting for a long running statement to
 complete.
@@ -330,7 +330,7 @@ window. This window is automatically opened whenever something is needed to be
 shown (typically after an exec). Nevertheless, you can always toggle the
 displaying of this window using the <Leader>o mapping. "o" stands from output.
 
-As far as the results flushing is concerned, you may choose between two modes:
+As far as the results displaying is concerned, you may choose between two modes:
 
 	1. Clear the output window before executing something. This means
 	you'll always have the results from the last command only.
@@ -339,7 +339,7 @@ As far as the results flushing is concerned, you may choose between two modes:
 	content (this is the default).
 
 You can use the |g:vorax_output_window_clear_before_exec| to control how the
-output window should behave or simply use the <Leader>a mapping to toggle
+output window should behave or just use the <Leader>a mapping to toggle
 between append and clear mode. "a" stands for append so it's easy to memorize
 it.
 
