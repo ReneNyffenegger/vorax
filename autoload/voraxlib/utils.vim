@@ -139,7 +139,7 @@ function! voraxlib#utils#SelectRange(start_l, start_c, end_l, end_c)"{{{
   if mode() !=# 'n'
     exec "normal \<Esc>"
   endif
-  exec 'normal' a:start_l.'gg'.a:start_c.'|'.
+  exec 'normal!' a:start_l.'gg'.a:start_c.'|'.
         \ 'v'.(lines > 0 ? lines . 'j' : '').
         \ (tail > 0 ? tail . 'l' : '')
 endfunction"}}}
@@ -514,7 +514,7 @@ function! voraxlib#utils#GetPlsqlBodyLine()"{{{
   " ignore events
   let _eventignore = &eventignore
   set eventignore=all
-  normal gg
+  normal! gg
   let [l, c] = [0, 0]
   while 1
     let [l, c] = searchpos(delimitator_pattern, 'W')  
@@ -562,7 +562,7 @@ function! voraxlib#utils#GetStartLineOfPlsqlObject(type)"{{{
   " ignore events
   let _eventignore = &eventignore
   set eventignore=all
-  normal gg
+  normal! gg
   let [l, c] = [0, 0]
   while 1
     let [l, c] = searchpos(pattern, 'W')  

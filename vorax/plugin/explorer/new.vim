@@ -52,7 +52,7 @@ function! s:plugin.Callback()
         " create a new buffer
         silent! exe 'edit ' . file_name
         " clear content if the file exists
-        normal gg"_dG
+        normal! gg"_dG
         let b:vorax_module = {'owner' : s:info.owner, 'type' : s:info.type, 'object' : toupper(object_name)}
         starti
         call XPTtgr("_new_" . tolower(s:info.type))

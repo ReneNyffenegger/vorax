@@ -622,7 +622,7 @@ function! vorax#NewSqlScratch()"{{{
   let l:template_file = g:vorax_home_dir . '/template_scratch.sql'
   if filereadable( l:template_file)
     exe '0read ' . l:template_file
-    normal G
+    normal! G
   endif
   setlocal hidden
   setlocal noswapfile
@@ -702,10 +702,10 @@ function! s:OpenDbBuffer(file_name, content)"{{{
   silent! call voraxlib#utils#FocusCandidateWindow()
   silent! exe 'edit ' . a:file_name
   " clear content if the file exists
-  normal gg"_dG
+  normal! gg"_dG
   call append(0, a:content)
   setlocal nomodified
-  normal gg
+  normal! gg
 endfunction"}}}
 
 "}}}

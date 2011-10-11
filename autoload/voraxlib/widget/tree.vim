@@ -43,7 +43,7 @@ function! s:tree.SetRoot(root) "{{{
   call self.window.Focus()
   setlocal nowrap
   call self._BuildTree()
-  normal gg
+  normal! gg
 endfunction"}}}
 
 " Get the children nodes for the provided path. This is intended to be
@@ -66,7 +66,7 @@ endfunction"}}}
 " Click on the current node.
 function! s:tree.ClickNode(path)"{{{
   call self.RevealNode(a:path)
-  normal ^
+  normal! ^
   let xpos = col('.') - 1
   let ypos = line('.')
   let path = self._GetPathName(xpos, ypos)
@@ -85,7 +85,7 @@ endfunction"}}}
 " Get the path to the current node.
 function! s:tree.GetCurrentNode() "{{{
   let crr_pos = getpos(".")
-  normal ^
+  normal! ^
   let xpos = col('.') - 1
   let ypos = line('.')
   let path = self._GetPathName(xpos, ypos)
@@ -96,7 +96,7 @@ endfunction"}}}
 " Expand the current node.
 function! s:tree.ExpandCurrentNode() "{{{
   let crr_pos = getpos(".")
-  normal ^
+  normal! ^
   let xpos = col('.') - 1
   let ypos = line('.')
   call self._TreeExpand(xpos, ypos)
@@ -106,7 +106,7 @@ endfunction"}}}
 " Collapse the current node.
 function! s:tree.CollapseCurrentNode() "{{{
   let crr_pos = getpos(".")
-  normal ^
+  normal! ^
   let xpos = col('.') - 1
   let ypos = line('.')
   call self._TreeCollapse(xpos, ypos)
@@ -117,7 +117,7 @@ endfunction"}}}
 function! s:tree.RevealNode(path) "{{{
   " split the provided path
   let parts = split(a:path, self.path_separator)
-  normal gg
+  normal! gg
   let ypos = 1
   let indent = 0
   let index = 1
@@ -136,7 +136,7 @@ function! s:tree.RevealNode(path) "{{{
         if index < len(parts) && line =~ '\m^\s\{' . indent . '\}[+]'
           " the node is collapsed therefore it have to be expanded in order to
           " find it's children
-          exe 'normal ' . ypos . 'G'
+          exe 'normal! ' . ypos . 'G'
           call self.ExpandCurrentNode()
         endif
         let found = 1
@@ -154,7 +154,7 @@ function! s:tree.RevealNode(path) "{{{
       endif
     endif
   endfor
-  exe 'normal' . (ypos - 1) . 'G'
+  exe 'normal!' . (ypos - 1) . 'G'
 endfunction!"}}}
 
 " Refresh the provided path
@@ -171,7 +171,7 @@ function! s:tree._BuildTree() "{{{
 	" unlock bufer
 	call self.window.UnlockBuffer()
 	" clean up
-	normal ggdGd
+	normal! ggdGd
 	call setline(1,path)
 	call self.window.LockBuffer()
 	call self._TreeExpand(-1, 1)
@@ -221,9 +221,9 @@ function! s:tree._TreeCollapse(xpos, ypos) "{{{
 	" turn - into +, go to next line
 	let path = self._GetPathName(a:xpos, a:ypos) 
 	if self.IsLeaf(path)
-		normal ^r j
+		normal! ^r j
 	else
-		normal ^r+j
+		normal! ^r+j
 	end
 	" delete lines til next line with same indent
 	while getline ('.')[a:xpos+1] =~ '[ +-]'
@@ -240,9 +240,9 @@ function! s:tree._AppendSubNodes(xpos, ypos, nodeList) "{{{
 	" turn + into -
 	if a:ypos != 1 
 		if getline(a:ypos)[a:xpos] == '+'  
-			normal r-
+			normal! r-
 		else
-			normal hxi-
+			normal! hxi-
 		endif 
 	endif 
 	let nodeList = a:nodeList

@@ -68,10 +68,10 @@ function! s:ExtendWindow()"{{{
     call self.Focus()
     call self.UnlockBuffer()
     " delete everything with nothing saved in registers
-    normal gg"_dG
+    normal! gg"_dG
     call append(0, a:lines)
     call self.LockBuffer()
-    normal gg
+    normal! gg
   endfunction
 
 endfunction"}}}

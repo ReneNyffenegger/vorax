@@ -127,7 +127,7 @@ function! s:ExtendWindow()"{{{
         call append(lines_no, lines)
       endif
     endif
-    normal G
+    normal! G
   endfunction"}}}
 
   " Append the provided text to the output buffer.
@@ -171,7 +171,7 @@ function! s:ExtendWindow()"{{{
   function! s:output_window.Clear() "{{{
     call self.Focus()
     " delete everything with nothing saved in registers
-    normal gg"_dG
+    normal! gg"_dG
     let self.hot_area = []
   endfunction"}}}
 
@@ -211,7 +211,7 @@ function! s:ExtendWindow()"{{{
       exe s:originating_window.'wincmd w'
       let sqlplus = vorax#GetSqlplusHandler()
       if g:vorax_keep_selection_after_exec
-        normal gv
+        normal! gv
       endif
     endif
     let &showcmd = s:old_showcmd
