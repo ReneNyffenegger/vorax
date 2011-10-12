@@ -64,7 +64,7 @@ let s:SQLBlockEnd = '^\s*end\>'
 " The indent level is also based on unmatched paranethesis
 " If a line has an extra "(" increase the indent
 " If a line has an extra ")" decrease the indent
-function s:CountUnbalancedParan( line, paran_to_check )
+function! s:CountUnbalancedParan( line, paran_to_check )
     let l = a:line
     let lp = substitute(l, '[^(]', '', 'g')
     let l = a:line
@@ -86,7 +86,7 @@ function s:CountUnbalancedParan( line, paran_to_check )
 endfunction
 
 " Unindent commands based on previous indent level
-function s:CheckToIgnoreRightParan( prev_lnum, num_levels )
+function! s:CheckToIgnoreRightParan( prev_lnum, num_levels )
     let lnum = a:prev_lnum
     let line = getline(lnum)
     let ends = 0
@@ -149,7 +149,7 @@ endfunction
 "         something;
 "    WHEN ...
 " Should return indent level of exception.
-function s:GetStmtStarterIndent( keyword, curr_lnum )
+function! s:GetStmtStarterIndent( keyword, curr_lnum )
     echom string(a:keyword) . ':' . string(a:curr_lnum)
     let lnum  = a:curr_lnum
 
@@ -195,7 +195,7 @@ endfunction
 
 
 " Check if the line is a comment
-function s:IsLineComment(lnum)
+function! s:IsLineComment(lnum)
     let rc = synIDattr(
                 \ synID(a:lnum,
                 \     match(getline(a:lnum), '\S')+1, 0)
@@ -207,7 +207,7 @@ endfunction
 
 
 " Check if the column is a comment
-function s:IsColComment(lnum, cnum)
+function! s:IsColComment(lnum, cnum)
     let rc = synIDattr(synID(a:lnum, a:cnum, 0), "name")
                 \           =~? "comment"
 
@@ -216,7 +216,7 @@ endfunction
 
 " Instead of returning a column position, return
 " an appropriate value as a factor of shiftwidth.
-function s:ModuloIndent(ind)
+function! s:ModuloIndent(ind)
     let ind = a:ind
 
     if ind > 0
