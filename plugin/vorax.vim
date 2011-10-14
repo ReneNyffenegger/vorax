@@ -292,6 +292,12 @@ TLet g:vorax_output_window_error_hi_group = 'ErrorMsg'
 TLet g:vorax_output_window_force_column_heading = 0
 
 "}}}
+" g:vorax_output_window_remove_trailing_sqlprompt "{{{
+
+" Whenever or not to remove the sqlprompt from the last line of output.
+TLet g:vorax_output_window_remove_trailing_sqlprompt = 1
+
+"}}}
 " g:vorax_oradoc_window_anchor"{{{
 
 " The anchor of the oradoc window. The allowed values are: topleft or

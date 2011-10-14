@@ -933,6 +933,10 @@ in SqlPlus). By default is disabled. Pay attention that with this setting in
 place, for every SQL query an additional parse operation will be made in order
 to get the corresponding columns metadata.
 
+*g:vorax_output_window_remove_trailing_sqlprompt*
+It controls whenever to remove the last sqlprompt from the output. The default
+is 1.
+
 *g:vorax_oradoc_window_anchor*
 
 The anchor of the OraDoc window. The allowed values are: topleft or

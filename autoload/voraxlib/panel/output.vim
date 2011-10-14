@@ -206,6 +206,9 @@ function! s:ExtendWindow()"{{{
     autocmd! VoraX CursorHold <buffer>
     call s:RemoveInteractivity()
     call self.EnsureEmptyLineAtTheEnd()
+    if g:vorax_output_window_remove_trailing_sqlprompt
+      normal! k"_ddG
+    endif
     if !g:vorax_output_window_keep_focus_after_exec
       " restore focus to the originating window
       exe s:originating_window.'wincmd w'
