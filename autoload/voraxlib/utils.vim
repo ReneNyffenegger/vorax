@@ -771,6 +771,7 @@ function! voraxlib#utils#ResolveDbObject(object)"{{{
                             \ [{'option' : 'serveroutput', 'value' : 'on'},
                             \  {'option' : 'pagesize', 'value' : '0'},
                             \  {'option' : 'feedback', 'value' : 'off'},
+                            \  {'option' : 'linesize', 'value' : '300'},
                             \  {'option' : 'echo', 'value' : 'off'}, 
                             \  {'option' : 'markup', 'value' : 'html off'},
                             \ ])})
