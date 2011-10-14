@@ -495,7 +495,7 @@ function! s:CancelExec()"{{{
       " cancelled one.
       call s:output_window.AppendText("\n\n")
     endif
-    call s:output_window.AppendText("\n*** Cancelled ***\n")
+    call s:output_window.AppendText("\n*** Cancelled ***\n\n")
     call s:output_window.StopMonitor()
     redraw
     echon "Done!"
