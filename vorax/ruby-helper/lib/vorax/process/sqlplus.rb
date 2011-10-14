@@ -45,7 +45,8 @@ module Vorax
             ENV['SQLPATH'] = "#{@process.convert_path(tmp_dir)}#{separator}#{ENV['SQLPATH']}"
             @local_login_warning = false
           end
-          @process.create("sqlplus #{sqlplus_params} /nolog \"#{pack(bootstrap_commands, '_vorax_bootstrap.sql', true)}\"" + 
+          bootstrap_commands << "#prompt ___VORAX_END_OF_REQUEST___" << "."
+          @process.create("sqlplus #{sqlplus_params} /nolog \"#{pack(bootstrap_commands, '_vorax_bootstrap.sql', false)}\"" + 
                           (debug ? " | tee sqlplus.log" : ""))
           # contain the current connected user@db, but
           # only if connection monitor is activated
@@ -67,6 +68,8 @@ module Vorax
           while buf = self.read()
             @startup_msg << buf
           end
+          # if "set echo on" then a "#prompt" text will apear in the output. Get rid of it.
+          @startup_msg.gsub!(/[^\n]*#prompt[^\n]*/, '')
         end
       else
         raise 'A process implementation must be provided'
@@ -99,6 +102,8 @@ module Vorax
         output << buf
         yield if block_given?
       end
+      # remove the last line (it comes from the end delimitator)
+      output.sub!(/[^\n]*\Z/, '') unless output[(-1..-1)] == "\n"
       output
     end
 
@@ -202,7 +207,7 @@ module Vorax
             #@residual = tail_str[Regexp.last_match.end(0)..-1]
             @residual = ''
             # remove the line containing the END_OF_REQUEST from chunk
-            chunk.slice!(/[^\n]*#{END_OF_REQUEST}[^\Z]*/)
+            chunk.slice!(/#{END_OF_REQUEST}[^\Z]*/)
             # get rid of the tail content... we don't need it anymore
             @tail.clear
             # the sqlplus is no longer busy
@@ -307,11 +312,13 @@ module Vorax
       # directory will be under $TEMP.
       cmds = (commands.nil? ? [] : commands)
       file_content = cmds.join("\n")
-      file_content << "\n#prompt #{END_OF_REQUEST}\n.\n" if include_eor
+      #file_content << "\n#prompt #{END_OF_REQUEST}\n.\n" if include_eor
       filename = DEFAULT_PACK_FILE if filename.nil?
       File.open(@process.convert_path("#@tmp_dir/#{filename}"), 'w') {|f| f.write(file_content) }
       file = @process.convert_path("#@tmp_dir/#{filename}")
-      return "@#{file}"
+      ret_val = "@#{file}"
+      ret_val += "\n" + '#prompt' + " #{END_OF_REQUEST}\n.\n" if include_eor
+      return ret_val
     end
 
     # Get the user@db for the current sqlplus session.
