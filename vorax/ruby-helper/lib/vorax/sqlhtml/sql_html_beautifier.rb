@@ -22,7 +22,8 @@ module Vorax
     end
 
     def beautify(html)
-      body = Nokogiri::HTML(html.gsub(/&amp;/, '&amp;amp;'), nil, 'utf-8').xpath('/html/body')
+      tailored_html = html.gsub(/\s*<br>\s*\n\s*<p>/, '<p>')
+      body = Nokogiri::HTML(tailored_html.gsub(/&amp;/, '&amp;amp;'), nil, 'utf-8').xpath('/html/body')
       return walk(body)
     end
 
