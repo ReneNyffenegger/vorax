@@ -77,7 +77,7 @@ function! vorax#Connect(cstr, bang)"{{{
             let sqlplus['query_dba'] = 0
           endif
         endif
-        call outputwin.AppendText(substitute(output, '\_s*$', '', ''), g:vorax_output_window_clear_before_exec)
+        call outputwin.AppendText(substitute(output, '\_s*$', '', '') . "\n", g:vorax_output_window_clear_before_exec)
       endif
       " refresh the vorax db explorer window tree
       let explorer.expanded_nodes = []
@@ -246,29 +246,9 @@ function! vorax#Explain(sql, only)"{{{
                       \ "define on " .
                       \ "sqlprompt '' " .
                       \ "linesize 180 " .
-                      \ "markup html off " .
                       \ "\n" . explain_command .
                       \ "\n" . join(readfile(sqlplus.GetStagingSqlplusSettingsFile()), "\n")
   call vorax#Exec(explain_command, 0)
-  "let output = sqlplus.Exec(explain_command,
-              "\ {'executing_msg' : 'Gathering the explain plan...',
-              "\  'throbber' : vorax#GetDefaultThrobber(),
-              "\  'done_msg' : 'Done.',
-              "\  'sqlplus_options' : extend(sqlplus.GetSafeOptions(), 
-                  "\ [
-                  "\ {'option' : 'echo', 'value' : 'off'}, 
-                  "\ {'option' : 'feedback', 'value' : 'off'},
-                  "\ {'option' : 'verify', 'value' : 'off'},
-                  "\ {'option' : 'define', 'value' : 'on'},
-                  "\ {'option' : 'sqlprompt', 'value' : "''"},
-                  "\ {'option' : 'linesize', 'value' : '180'},
-                  "\ {'option' : 'markup', 'value' : 'html off'},
-                "\ ])})
-  "call sqlplus.RestoreState()
-  "call outputwin.AppendText(output, g:vorax_output_window_clear_before_exec)
-  "if !g:vorax_output_window_keep_focus_after_exec
-    "exec crr_win . 'wincmd w'
-  "endif
 endfunction"}}}
 
 " Send the whole current buffer content to sqlplus for execution.
