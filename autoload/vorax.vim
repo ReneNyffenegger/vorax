@@ -215,8 +215,19 @@ function! vorax#Explain(sql, only)"{{{
   endif
   let statement = voraxlib#utils#AddSqlDelimitator(statement)
   let sqlplus = vorax#GetSqlplusHandler()
-  call sqlplus.SaveState()
   let outputwin = vorax#GetOutputWindowHandler()
+  if sqlplus.html && outputwin.buffer.vertical 
+    call voraxlib#utils#Warn("Vertical output display is incompatible with the explain plan format.")
+    let response = voraxlib#utils#PickOption(
+          \ 'Do you want to disable the current vertical output format?',
+          \ ['(Y)es', '(N)o'])
+    if response == 'Y'
+      call vorax#ToggleVerticalOutput()
+    else
+    	return
+    endif
+  endif
+  call sqlplus.SaveState()
   let crr_win = winnr()
   let sql_file = substitute(sqlplus.Pack(statement, {'target_file' : 'stmt_to_be_explained.sql'}), '^@', '', '')
   if a:only
