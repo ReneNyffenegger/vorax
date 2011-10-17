@@ -8,6 +8,15 @@ options {
 	output=AST;
 }
 
+@all::header {
+	module Vorax 
+}
+
+@all::footer {
+	end
+}
+
+
 @members {
   attr_reader :object_owner, :object_type, :object_name
 

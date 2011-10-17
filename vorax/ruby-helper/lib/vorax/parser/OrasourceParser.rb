@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: orasource.ruby.g
-# Generated at: 2011-09-21 12:16:07
+# Generated at: 2011-10-17 09:51:33
 # 
 
 # ~~~> start load path setup
@@ -55,6 +55,14 @@ rescue LoadError
   
 end
 # <~~~ end load path setup
+
+# - - - - - - begin action @all::header - - - - - -
+# orasource.ruby.g
+
+
+	module Vorax 
+
+# - - - - - - end action @all::header - - - - - - -
 
 
 module Orasource
@@ -144,7 +152,7 @@ module Orasource
     # parser rule start_rule
     # 
     # (in orasource.ruby.g)
-    # 35:1: start_rule : 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view ) ;
+    # 44:1: start_rule : 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view ) ;
     # 
     def start_rule
       # -> uncomment the next line to manually enable rule tracing
@@ -182,15 +190,15 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 36:4: 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
-        string_literal1 = match( T__11, TOKENS_FOLLOWING_T__11_IN_start_rule_58 )
+        # at line 45:4: 'CREATE' ( 'OR' keyREPLACE )? ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
+        string_literal1 = match( T__11, TOKENS_FOLLOWING_T__11_IN_start_rule_77 )
         if @state.backtracking == 0
 
           tree_for_string_literal1 = @adaptor.create_with_payload( string_literal1 )
           @adaptor.add_child( root_0, tree_for_string_literal1 )
 
         end
-        # at line 36:13: ( 'OR' keyREPLACE )?
+        # at line 45:13: ( 'OR' keyREPLACE )?
         alt_1 = 2
         look_1_0 = @input.peek( 1 )
 
@@ -199,15 +207,15 @@ module Orasource
         end
         case alt_1
         when 1
-          # at line 36:15: 'OR' keyREPLACE
-          string_literal2 = match( T__12, TOKENS_FOLLOWING_T__12_IN_start_rule_62 )
+          # at line 45:15: 'OR' keyREPLACE
+          string_literal2 = match( T__12, TOKENS_FOLLOWING_T__12_IN_start_rule_81 )
           if @state.backtracking == 0
 
             tree_for_string_literal2 = @adaptor.create_with_payload( string_literal2 )
             @adaptor.add_child( root_0, tree_for_string_literal2 )
 
           end
-          @state.following.push( TOKENS_FOLLOWING_keyREPLACE_IN_start_rule_64 )
+          @state.following.push( TOKENS_FOLLOWING_keyREPLACE_IN_start_rule_83 )
           keyREPLACE3 = keyREPLACE
           @state.following.pop
           if @state.backtracking == 0
@@ -215,13 +223,13 @@ module Orasource
           end
 
         end
-        # at line 37:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
+        # at line 46:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
         alt_2 = 8
         alt_2 = @dfa2.predict( @input )
         case alt_2
         when 1
-          # at line 37:6: package_spec
-          @state.following.push( TOKENS_FOLLOWING_package_spec_IN_start_rule_74 )
+          # at line 46:6: package_spec
+          @state.following.push( TOKENS_FOLLOWING_package_spec_IN_start_rule_93 )
           package_spec4 = package_spec
           @state.following.pop
           if @state.backtracking == 0
@@ -229,8 +237,8 @@ module Orasource
           end
 
         when 2
-          # at line 39:6: package_body
-          @state.following.push( TOKENS_FOLLOWING_package_body_IN_start_rule_88 )
+          # at line 48:6: package_body
+          @state.following.push( TOKENS_FOLLOWING_package_body_IN_start_rule_107 )
           package_body5 = package_body
           @state.following.pop
           if @state.backtracking == 0
@@ -238,8 +246,8 @@ module Orasource
           end
 
         when 3
-          # at line 41:6: type_spec
-          @state.following.push( TOKENS_FOLLOWING_type_spec_IN_start_rule_102 )
+          # at line 50:6: type_spec
+          @state.following.push( TOKENS_FOLLOWING_type_spec_IN_start_rule_121 )
           type_spec6 = type_spec
           @state.following.pop
           if @state.backtracking == 0
@@ -247,8 +255,8 @@ module Orasource
           end
 
         when 4
-          # at line 43:6: type_body
-          @state.following.push( TOKENS_FOLLOWING_type_body_IN_start_rule_116 )
+          # at line 52:6: type_body
+          @state.following.push( TOKENS_FOLLOWING_type_body_IN_start_rule_135 )
           type_body7 = type_body
           @state.following.pop
           if @state.backtracking == 0
@@ -256,8 +264,8 @@ module Orasource
           end
 
         when 5
-          # at line 45:6: trigger
-          @state.following.push( TOKENS_FOLLOWING_trigger_IN_start_rule_130 )
+          # at line 54:6: trigger
+          @state.following.push( TOKENS_FOLLOWING_trigger_IN_start_rule_149 )
           trigger8 = trigger
           @state.following.pop
           if @state.backtracking == 0
@@ -265,8 +273,8 @@ module Orasource
           end
 
         when 6
-          # at line 47:6: procedure
-          @state.following.push( TOKENS_FOLLOWING_procedure_IN_start_rule_144 )
+          # at line 56:6: procedure
+          @state.following.push( TOKENS_FOLLOWING_procedure_IN_start_rule_163 )
           procedure9 = procedure
           @state.following.pop
           if @state.backtracking == 0
@@ -274,8 +282,8 @@ module Orasource
           end
 
         when 7
-          # at line 49:6: function
-          @state.following.push( TOKENS_FOLLOWING_function_IN_start_rule_158 )
+          # at line 58:6: function
+          @state.following.push( TOKENS_FOLLOWING_function_IN_start_rule_177 )
           function10 = function
           @state.following.pop
           if @state.backtracking == 0
@@ -283,8 +291,8 @@ module Orasource
           end
 
         when 8
-          # at line 51:6: view
-          @state.following.push( TOKENS_FOLLOWING_view_IN_start_rule_172 )
+          # at line 60:6: view
+          @state.following.push( TOKENS_FOLLOWING_view_IN_start_rule_191 )
           view11 = view
           @state.following.pop
           if @state.backtracking == 0
@@ -324,7 +332,7 @@ module Orasource
     # parser rule package_spec
     # 
     # (in orasource.ruby.g)
-    # 55:1: package_spec : 'PACKAGE' oracle_object_name ( 'IS' | 'AS' ) ;
+    # 64:1: package_spec : 'PACKAGE' oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def package_spec
       # -> uncomment the next line to manually enable rule tracing
@@ -354,15 +362,15 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 56:4: 'PACKAGE' oracle_object_name ( 'IS' | 'AS' )
-        string_literal12 = match( T__13, TOKENS_FOLLOWING_T__13_IN_package_spec_190 )
+        # at line 65:4: 'PACKAGE' oracle_object_name ( 'IS' | 'AS' )
+        string_literal12 = match( T__13, TOKENS_FOLLOWING_T__13_IN_package_spec_209 )
         if @state.backtracking == 0
 
           tree_for_string_literal12 = @adaptor.create_with_payload( string_literal12 )
           @adaptor.add_child( root_0, tree_for_string_literal12 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_package_spec_192 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_package_spec_211 )
         oracle_object_name13 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -421,7 +429,7 @@ module Orasource
     # parser rule package_body
     # 
     # (in orasource.ruby.g)
-    # 60:1: package_body : 'PACKAGE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' ) ;
+    # 69:1: package_body : 'PACKAGE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def package_body
       # -> uncomment the next line to manually enable rule tracing
@@ -452,24 +460,24 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 61:4: 'PACKAGE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' )
-        string_literal15 = match( T__13, TOKENS_FOLLOWING_T__13_IN_package_body_218 )
+        # at line 70:4: 'PACKAGE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' )
+        string_literal15 = match( T__13, TOKENS_FOLLOWING_T__13_IN_package_body_237 )
         if @state.backtracking == 0
 
           tree_for_string_literal15 = @adaptor.create_with_payload( string_literal15 )
           @adaptor.add_child( root_0, tree_for_string_literal15 )
 
         end
-        # at line 61:14: ( keyBODY )
-        # at line 61:16: keyBODY
-        @state.following.push( TOKENS_FOLLOWING_keyBODY_IN_package_body_222 )
+        # at line 70:14: ( keyBODY )
+        # at line 70:16: keyBODY
+        @state.following.push( TOKENS_FOLLOWING_keyBODY_IN_package_body_241 )
         keyBODY16 = keyBODY
         @state.following.pop
         if @state.backtracking == 0
           @adaptor.add_child( root_0, keyBODY16.tree )
         end
 
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_package_body_226 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_package_body_245 )
         oracle_object_name17 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -528,7 +536,7 @@ module Orasource
     # parser rule type_spec
     # 
     # (in orasource.ruby.g)
-    # 65:1: type_spec : 'TYPE' oracle_object_name ( 'IS' | 'AS' ) ;
+    # 74:1: type_spec : 'TYPE' oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def type_spec
       # -> uncomment the next line to manually enable rule tracing
@@ -558,15 +566,15 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 66:4: 'TYPE' oracle_object_name ( 'IS' | 'AS' )
-        string_literal19 = match( T__16, TOKENS_FOLLOWING_T__16_IN_type_spec_251 )
+        # at line 75:4: 'TYPE' oracle_object_name ( 'IS' | 'AS' )
+        string_literal19 = match( T__16, TOKENS_FOLLOWING_T__16_IN_type_spec_270 )
         if @state.backtracking == 0
 
           tree_for_string_literal19 = @adaptor.create_with_payload( string_literal19 )
           @adaptor.add_child( root_0, tree_for_string_literal19 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_type_spec_253 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_type_spec_272 )
         oracle_object_name20 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -625,7 +633,7 @@ module Orasource
     # parser rule type_body
     # 
     # (in orasource.ruby.g)
-    # 70:1: type_body : 'TYPE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' ) ;
+    # 79:1: type_body : 'TYPE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' ) ;
     # 
     def type_body
       # -> uncomment the next line to manually enable rule tracing
@@ -656,24 +664,24 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 71:4: 'TYPE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' )
-        string_literal22 = match( T__16, TOKENS_FOLLOWING_T__16_IN_type_body_278 )
+        # at line 80:4: 'TYPE' ( keyBODY ) oracle_object_name ( 'IS' | 'AS' )
+        string_literal22 = match( T__16, TOKENS_FOLLOWING_T__16_IN_type_body_297 )
         if @state.backtracking == 0
 
           tree_for_string_literal22 = @adaptor.create_with_payload( string_literal22 )
           @adaptor.add_child( root_0, tree_for_string_literal22 )
 
         end
-        # at line 71:11: ( keyBODY )
-        # at line 71:13: keyBODY
-        @state.following.push( TOKENS_FOLLOWING_keyBODY_IN_type_body_282 )
+        # at line 80:11: ( keyBODY )
+        # at line 80:13: keyBODY
+        @state.following.push( TOKENS_FOLLOWING_keyBODY_IN_type_body_301 )
         keyBODY23 = keyBODY
         @state.following.pop
         if @state.backtracking == 0
           @adaptor.add_child( root_0, keyBODY23.tree )
         end
 
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_type_body_286 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_type_body_305 )
         oracle_object_name24 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -732,7 +740,7 @@ module Orasource
     # parser rule trigger
     # 
     # (in orasource.ruby.g)
-    # 75:1: trigger : 'TRIGGER' oracle_object_name ;
+    # 84:1: trigger : 'TRIGGER' oracle_object_name ;
     # 
     def trigger
       # -> uncomment the next line to manually enable rule tracing
@@ -760,15 +768,15 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 76:4: 'TRIGGER' oracle_object_name
-        string_literal26 = match( T__17, TOKENS_FOLLOWING_T__17_IN_trigger_310 )
+        # at line 85:4: 'TRIGGER' oracle_object_name
+        string_literal26 = match( T__17, TOKENS_FOLLOWING_T__17_IN_trigger_329 )
         if @state.backtracking == 0
 
           tree_for_string_literal26 = @adaptor.create_with_payload( string_literal26 )
           @adaptor.add_child( root_0, tree_for_string_literal26 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_trigger_312 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_trigger_331 )
         oracle_object_name27 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -812,7 +820,7 @@ module Orasource
     # parser rule procedure
     # 
     # (in orasource.ruby.g)
-    # 80:1: procedure : 'PROCEDURE' oracle_object_name ;
+    # 89:1: procedure : 'PROCEDURE' oracle_object_name ;
     # 
     def procedure
       # -> uncomment the next line to manually enable rule tracing
@@ -840,15 +848,15 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 81:4: 'PROCEDURE' oracle_object_name
-        string_literal28 = match( T__18, TOKENS_FOLLOWING_T__18_IN_procedure_326 )
+        # at line 90:4: 'PROCEDURE' oracle_object_name
+        string_literal28 = match( T__18, TOKENS_FOLLOWING_T__18_IN_procedure_345 )
         if @state.backtracking == 0
 
           tree_for_string_literal28 = @adaptor.create_with_payload( string_literal28 )
           @adaptor.add_child( root_0, tree_for_string_literal28 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_procedure_328 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_procedure_347 )
         oracle_object_name29 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -892,7 +900,7 @@ module Orasource
     # parser rule function
     # 
     # (in orasource.ruby.g)
-    # 85:1: function : 'FUNCTION' oracle_object_name ;
+    # 94:1: function : 'FUNCTION' oracle_object_name ;
     # 
     def function
       # -> uncomment the next line to manually enable rule tracing
@@ -920,15 +928,15 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 86:4: 'FUNCTION' oracle_object_name
-        string_literal30 = match( T__19, TOKENS_FOLLOWING_T__19_IN_function_342 )
+        # at line 95:4: 'FUNCTION' oracle_object_name
+        string_literal30 = match( T__19, TOKENS_FOLLOWING_T__19_IN_function_361 )
         if @state.backtracking == 0
 
           tree_for_string_literal30 = @adaptor.create_with_payload( string_literal30 )
           @adaptor.add_child( root_0, tree_for_string_literal30 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_function_344 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_function_363 )
         oracle_object_name31 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -972,7 +980,7 @@ module Orasource
     # parser rule view
     # 
     # (in orasource.ruby.g)
-    # 90:1: view : 'VIEW' oracle_object_name ;
+    # 99:1: view : 'VIEW' oracle_object_name ;
     # 
     def view
       # -> uncomment the next line to manually enable rule tracing
@@ -1000,15 +1008,15 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 91:4: 'VIEW' oracle_object_name
-        string_literal32 = match( T__20, TOKENS_FOLLOWING_T__20_IN_view_358 )
+        # at line 100:4: 'VIEW' oracle_object_name
+        string_literal32 = match( T__20, TOKENS_FOLLOWING_T__20_IN_view_377 )
         if @state.backtracking == 0
 
           tree_for_string_literal32 = @adaptor.create_with_payload( string_literal32 )
           @adaptor.add_child( root_0, tree_for_string_literal32 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_view_360 )
+        @state.following.push( TOKENS_FOLLOWING_oracle_object_name_IN_view_379 )
         oracle_object_name33 = oracle_object_name
         @state.following.pop
         if @state.backtracking == 0
@@ -1052,7 +1060,7 @@ module Orasource
     # parser rule oracle_object_name
     # 
     # (in orasource.ruby.g)
-    # 95:1: oracle_object_name : ( schema_name DOT )? identifier ;
+    # 104:1: oracle_object_name : ( schema_name DOT )? identifier ;
     # 
     def oracle_object_name
       # -> uncomment the next line to manually enable rule tracing
@@ -1081,8 +1089,8 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 96:4: ( schema_name DOT )? identifier
-        # at line 96:4: ( schema_name DOT )?
+        # at line 105:4: ( schema_name DOT )? identifier
+        # at line 105:4: ( schema_name DOT )?
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
 
@@ -1095,8 +1103,8 @@ module Orasource
         end
         case alt_3
         when 1
-          # at line 96:6: schema_name DOT
-          @state.following.push( TOKENS_FOLLOWING_schema_name_IN_oracle_object_name_376 )
+          # at line 105:6: schema_name DOT
+          @state.following.push( TOKENS_FOLLOWING_schema_name_IN_oracle_object_name_395 )
           schema_name34 = schema_name
           @state.following.pop
           if @state.backtracking == 0
@@ -1108,7 +1116,7 @@ module Orasource
              @object_owner = ( schema_name34 && @input.to_s( schema_name34.start, schema_name34.stop ) ) unless @object_owner 
             # <-- action
           end
-          __DOT35__ = match( DOT, TOKENS_FOLLOWING_DOT_IN_oracle_object_name_380 )
+          __DOT35__ = match( DOT, TOKENS_FOLLOWING_DOT_IN_oracle_object_name_399 )
           if @state.backtracking == 0
 
             tree_for_DOT35 = @adaptor.create_with_payload( __DOT35__ )
@@ -1117,7 +1125,7 @@ module Orasource
           end
 
         end
-        @state.following.push( TOKENS_FOLLOWING_identifier_IN_oracle_object_name_387 )
+        @state.following.push( TOKENS_FOLLOWING_identifier_IN_oracle_object_name_406 )
         identifier36 = identifier
         @state.following.pop
         if @state.backtracking == 0
@@ -1161,7 +1169,7 @@ module Orasource
     # parser rule schema_name
     # 
     # (in orasource.ruby.g)
-    # 100:1: schema_name : identifier ;
+    # 109:1: schema_name : identifier ;
     # 
     def schema_name
       # -> uncomment the next line to manually enable rule tracing
@@ -1187,8 +1195,8 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 101:4: identifier
-        @state.following.push( TOKENS_FOLLOWING_identifier_IN_schema_name_400 )
+        # at line 110:4: identifier
+        @state.following.push( TOKENS_FOLLOWING_identifier_IN_schema_name_419 )
         identifier37 = identifier
         @state.following.pop
         if @state.backtracking == 0
@@ -1226,7 +1234,7 @@ module Orasource
     # parser rule identifier
     # 
     # (in orasource.ruby.g)
-    # 104:1: identifier : ( ID | DOUBLEQUOTED_STRING );
+    # 113:1: identifier : ( ID | DOUBLEQUOTED_STRING );
     # 
     def identifier
       # -> uncomment the next line to manually enable rule tracing
@@ -1301,7 +1309,7 @@ module Orasource
     # parser rule keyBODY
     # 
     # (in orasource.ruby.g)
-    # 109:1: keyBODY : {...}? ID ;
+    # 118:1: keyBODY : {...}? ID ;
     # 
     def keyBODY
       # -> uncomment the next line to manually enable rule tracing
@@ -1328,13 +1336,13 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 109:36: {...}? ID
+        # at line 118:36: {...}? ID
         unless ( ( self.input.look(1).text.upcase == ("BODY") ) )
           @state.backtracking > 0 and raise( ANTLR3::Error::BacktrackingFailed )
 
           raise FailedPredicate( "keyBODY", "self.input.look(1).text.upcase == (\"BODY\")" )
         end
-        __ID39__ = match( ID, TOKENS_FOLLOWING_ID_IN_keyBODY_456 )
+        __ID39__ = match( ID, TOKENS_FOLLOWING_ID_IN_keyBODY_475 )
         if @state.backtracking == 0
 
           tree_for_ID39 = @adaptor.create_with_payload( __ID39__ )
@@ -1373,7 +1381,7 @@ module Orasource
     # parser rule keyREPLACE
     # 
     # (in orasource.ruby.g)
-    # 110:1: keyREPLACE : {...}? ID ;
+    # 119:1: keyREPLACE : {...}? ID ;
     # 
     def keyREPLACE
       # -> uncomment the next line to manually enable rule tracing
@@ -1400,13 +1408,13 @@ module Orasource
         root_0 = @adaptor.create_flat_list
 
 
-        # at line 110:36: {...}? ID
+        # at line 119:36: {...}? ID
         unless ( ( self.input.look(1).text.upcase == ("REPLACE") ) )
           @state.backtracking > 0 and raise( ANTLR3::Error::BacktrackingFailed )
 
           raise FailedPredicate( "keyREPLACE", "self.input.look(1).text.upcase == (\"REPLACE\")" )
         end
-        __ID40__ = match( ID, TOKENS_FOLLOWING_ID_IN_keyREPLACE_487 )
+        __ID40__ = match( ID, TOKENS_FOLLOWING_ID_IN_keyREPLACE_506 )
         if @state.backtracking == 0
 
           tree_for_ID40 = @adaptor.create_with_payload( __ID40__ )
@@ -1477,7 +1485,7 @@ module Orasource
 
       def description
         <<-'__dfa_description__'.strip!
-          37:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
+          46:5: ( package_spec | package_body | type_spec | type_body | trigger | procedure | function | view )
         __dfa_description__
       end
     end
@@ -1490,49 +1498,57 @@ module Orasource
       @dfa2 = DFA2.new( self, 2 )
 
     end
-    TOKENS_FOLLOWING_T__11_IN_start_rule_58 = Set[ 12, 13, 16, 17, 18, 19, 20 ]
-    TOKENS_FOLLOWING_T__12_IN_start_rule_62 = Set[ 5 ]
-    TOKENS_FOLLOWING_keyREPLACE_IN_start_rule_64 = Set[ 12, 13, 16, 17, 18, 19, 20 ]
-    TOKENS_FOLLOWING_package_spec_IN_start_rule_74 = Set[ 1 ]
-    TOKENS_FOLLOWING_package_body_IN_start_rule_88 = Set[ 1 ]
-    TOKENS_FOLLOWING_type_spec_IN_start_rule_102 = Set[ 1 ]
-    TOKENS_FOLLOWING_type_body_IN_start_rule_116 = Set[ 1 ]
-    TOKENS_FOLLOWING_trigger_IN_start_rule_130 = Set[ 1 ]
-    TOKENS_FOLLOWING_procedure_IN_start_rule_144 = Set[ 1 ]
-    TOKENS_FOLLOWING_function_IN_start_rule_158 = Set[ 1 ]
-    TOKENS_FOLLOWING_view_IN_start_rule_172 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__13_IN_package_spec_190 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_package_spec_192 = Set[ 14, 15 ]
-    TOKENS_FOLLOWING_set_IN_package_spec_194 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__13_IN_package_body_218 = Set[ 5 ]
-    TOKENS_FOLLOWING_keyBODY_IN_package_body_222 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_package_body_226 = Set[ 14, 15 ]
-    TOKENS_FOLLOWING_set_IN_package_body_228 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__16_IN_type_spec_251 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_type_spec_253 = Set[ 14, 15 ]
-    TOKENS_FOLLOWING_set_IN_type_spec_255 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__16_IN_type_body_278 = Set[ 5 ]
-    TOKENS_FOLLOWING_keyBODY_IN_type_body_282 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_type_body_286 = Set[ 14, 15 ]
-    TOKENS_FOLLOWING_set_IN_type_body_288 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__17_IN_trigger_310 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_trigger_312 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__18_IN_procedure_326 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_procedure_328 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__19_IN_function_342 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_function_344 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__20_IN_view_358 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_oracle_object_name_IN_view_360 = Set[ 1 ]
-    TOKENS_FOLLOWING_schema_name_IN_oracle_object_name_376 = Set[ 4 ]
-    TOKENS_FOLLOWING_DOT_IN_oracle_object_name_380 = Set[ 5, 6 ]
-    TOKENS_FOLLOWING_identifier_IN_oracle_object_name_387 = Set[ 1 ]
-    TOKENS_FOLLOWING_identifier_IN_schema_name_400 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_start_rule_77 = Set[ 12, 13, 16, 17, 18, 19, 20 ]
+    TOKENS_FOLLOWING_T__12_IN_start_rule_81 = Set[ 5 ]
+    TOKENS_FOLLOWING_keyREPLACE_IN_start_rule_83 = Set[ 12, 13, 16, 17, 18, 19, 20 ]
+    TOKENS_FOLLOWING_package_spec_IN_start_rule_93 = Set[ 1 ]
+    TOKENS_FOLLOWING_package_body_IN_start_rule_107 = Set[ 1 ]
+    TOKENS_FOLLOWING_type_spec_IN_start_rule_121 = Set[ 1 ]
+    TOKENS_FOLLOWING_type_body_IN_start_rule_135 = Set[ 1 ]
+    TOKENS_FOLLOWING_trigger_IN_start_rule_149 = Set[ 1 ]
+    TOKENS_FOLLOWING_procedure_IN_start_rule_163 = Set[ 1 ]
+    TOKENS_FOLLOWING_function_IN_start_rule_177 = Set[ 1 ]
+    TOKENS_FOLLOWING_view_IN_start_rule_191 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__13_IN_package_spec_209 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_package_spec_211 = Set[ 14, 15 ]
+    TOKENS_FOLLOWING_set_IN_package_spec_213 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__13_IN_package_body_237 = Set[ 5 ]
+    TOKENS_FOLLOWING_keyBODY_IN_package_body_241 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_package_body_245 = Set[ 14, 15 ]
+    TOKENS_FOLLOWING_set_IN_package_body_247 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__16_IN_type_spec_270 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_type_spec_272 = Set[ 14, 15 ]
+    TOKENS_FOLLOWING_set_IN_type_spec_274 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__16_IN_type_body_297 = Set[ 5 ]
+    TOKENS_FOLLOWING_keyBODY_IN_type_body_301 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_type_body_305 = Set[ 14, 15 ]
+    TOKENS_FOLLOWING_set_IN_type_body_307 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__17_IN_trigger_329 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_trigger_331 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__18_IN_procedure_345 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_procedure_347 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__19_IN_function_361 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_function_363 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__20_IN_view_377 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_oracle_object_name_IN_view_379 = Set[ 1 ]
+    TOKENS_FOLLOWING_schema_name_IN_oracle_object_name_395 = Set[ 4 ]
+    TOKENS_FOLLOWING_DOT_IN_oracle_object_name_399 = Set[ 5, 6 ]
+    TOKENS_FOLLOWING_identifier_IN_oracle_object_name_406 = Set[ 1 ]
+    TOKENS_FOLLOWING_identifier_IN_schema_name_419 = Set[ 1 ]
     TOKENS_FOLLOWING_set_IN_identifier_0 = Set[ 1 ]
-    TOKENS_FOLLOWING_ID_IN_keyBODY_456 = Set[ 1 ]
-    TOKENS_FOLLOWING_ID_IN_keyREPLACE_487 = Set[ 1 ]
+    TOKENS_FOLLOWING_ID_IN_keyBODY_475 = Set[ 1 ]
+    TOKENS_FOLLOWING_ID_IN_keyREPLACE_506 = Set[ 1 ]
 
   end # class Parser < ANTLR3::Parser
 
   at_exit { Parser.main( ARGV ) } if __FILE__ == $0
 end
+# - - - - - - begin action @all::footer - - - - - -
+# orasource.ruby.g
+
+
+	end
+
+# - - - - - - end action @all::footer - - - - - - -
+
 

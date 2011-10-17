@@ -5,6 +5,14 @@ options {
   filter=true;
 }
 
+@all::header {
+	module Vorax 
+}
+
+@all::footer {
+	end
+}
+
 @members /*embbed*/ {
 
   attr_reader :pmodules

@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: orasource.ruby.g
-# Generated at: 2011-09-21 12:16:07
+# Generated at: 2011-10-17 09:51:33
 # 
 
 # ~~~> start load path setup
@@ -55,6 +55,14 @@ rescue LoadError
   
 end
 # <~~~ end load path setup
+
+# - - - - - - begin action @all::header - - - - - -
+# orasource.ruby.g
+
+
+	module Vorax 
+
+# - - - - - - end action @all::header - - - - - - -
 
 
 module Orasource
@@ -352,7 +360,7 @@ module Orasource
 
       
       # - - - - main rule block - - - -
-      # at line 113:5: ( 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )* | DOUBLEQUOTED_STRING )
+      # at line 122:5: ( 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )* | DOUBLEQUOTED_STRING )
       alt_2 = 2
       look_2_0 = @input.peek( 1 )
 
@@ -365,9 +373,9 @@ module Orasource
       end
       case alt_2
       when 1
-        # at line 113:7: 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
+        # at line 122:7: 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
         match_range( 0x41, 0x5a )
-        # at line 113:18: ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
+        # at line 122:18: ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
         while true # decision 1
           alt_1 = 2
           look_1_0 = @input.peek( 1 )
@@ -395,7 +403,7 @@ module Orasource
         end # loop for decision 1
 
       when 2
-        # at line 114:7: DOUBLEQUOTED_STRING
+        # at line 123:7: DOUBLEQUOTED_STRING
         doublequoted_string!
 
       end
@@ -417,9 +425,9 @@ module Orasource
 
       
       # - - - - main rule block - - - -
-      # at line 119:4: '\"' (~ ( '\"' ) )* '\"'
+      # at line 128:4: '\"' (~ ( '\"' ) )* '\"'
       match( 0x22 )
-      # at line 119:8: (~ ( '\"' ) )*
+      # at line 128:8: (~ ( '\"' ) )*
       while true # decision 3
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
@@ -430,7 +438,7 @@ module Orasource
         end
         case alt_3
         when 1
-          # at line 119:10: ~ ( '\"' )
+          # at line 128:10: ~ ( '\"' )
           if @input.peek( 1 ).between?( 0x0, 0x21 ) || @input.peek( 1 ).between?( 0x23, 0xff )
             @input.consume
           else
@@ -464,7 +472,7 @@ module Orasource
 
       
       # - - - - main rule block - - - -
-      # at line 122:6: ( ' ' | '\\r' | '\\t' | '\\n' )
+      # at line 131:6: ( ' ' | '\\r' | '\\t' | '\\n' )
       if @input.peek( 1 ).between?( 0x9, 0xa ) || @input.peek(1) == 0xd || @input.peek(1) == 0x20
         @input.consume
       else
@@ -499,9 +507,9 @@ module Orasource
 
       
       # - - - - main rule block - - - -
-      # at line 125:4: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+      # at line 134:4: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
       match( "--" )
-      # at line 125:9: (~ ( '\\n' | '\\r' ) )*
+      # at line 134:9: (~ ( '\\n' | '\\r' ) )*
       while true # decision 4
         alt_4 = 2
         look_4_0 = @input.peek( 1 )
@@ -512,7 +520,7 @@ module Orasource
         end
         case alt_4
         when 1
-          # at line 125:9: ~ ( '\\n' | '\\r' )
+          # at line 134:9: ~ ( '\\n' | '\\r' )
           if @input.peek( 1 ).between?( 0x0, 0x9 ) || @input.peek( 1 ).between?( 0xb, 0xc ) || @input.peek( 1 ).between?( 0xe, 0xff )
             @input.consume
           else
@@ -527,7 +535,7 @@ module Orasource
           break # out of loop for decision 4
         end
       end # loop for decision 4
-      # at line 125:23: ( '\\r' )?
+      # at line 134:23: ( '\\r' )?
       alt_5 = 2
       look_5_0 = @input.peek( 1 )
 
@@ -536,7 +544,7 @@ module Orasource
       end
       case alt_5
       when 1
-        # at line 125:23: '\\r'
+        # at line 134:23: '\\r'
         match( 0xd )
 
       end
@@ -566,9 +574,9 @@ module Orasource
 
       
       # - - - - main rule block - - - -
-      # at line 128:4: '/*' ( options {greedy=false; } : . )* '*/'
+      # at line 137:4: '/*' ( options {greedy=false; } : . )* '*/'
       match( "/*" )
-      # at line 128:9: ( options {greedy=false; } : . )*
+      # at line 137:9: ( options {greedy=false; } : . )*
       while true # decision 6
         alt_6 = 2
         look_6_0 = @input.peek( 1 )
@@ -588,7 +596,7 @@ module Orasource
         end
         case alt_6
         when 1
-          # at line 128:37: .
+          # at line 137:37: .
           match_any
 
         else
@@ -621,7 +629,7 @@ module Orasource
 
       
       # - - - - main rule block - - - -
-      # at line 132:4: POINT
+      # at line 141:4: POINT
       point!
 
       
@@ -642,7 +650,7 @@ module Orasource
 
       
       # - - - - main rule block - - - -
-      # at line 137:4: '.'
+      # at line 146:4: '.'
       match( 0x2e )
 
     ensure
@@ -855,4 +863,12 @@ module Orasource
 
   at_exit { Lexer.main( ARGV ) } if __FILE__ == $0
 end
+# - - - - - - begin action @all::footer - - - - - -
+# orasource.ruby.g
+
+
+	end
+
+# - - - - - - end action @all::footer - - - - - - -
+
 

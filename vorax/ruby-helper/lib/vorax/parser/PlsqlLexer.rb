@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 #
-# /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g
+# plsql.ruby.g
 # --
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
-# Input grammar file: /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g
-# Generated at: 2011-07-19 17:17:26
+# Input grammar file: plsql.ruby.g
+# Generated at: 2011-10-17 09:51:49
 # 
 
 # ~~~> start load path setup
@@ -55,6 +55,14 @@ rescue LoadError
   
 end
 # <~~~ end load path setup
+
+# - - - - - - begin action @all::header - - - - - -
+# plsql.ruby.g
+
+
+	module Vorax 
+
+# - - - - - - end action @all::header - - - - - - -
 
 
 module Plsql
@@ -118,7 +126,7 @@ module Plsql
 
     
     begin
-      generated_using( "/home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
+      generated_using( "plsql.ruby.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
     rescue NoMethodError => error
       # ignore
     end
@@ -191,7 +199,7 @@ module Plsql
     
     # - - - - - - - - - - - lexer rules - - - - - - - - - - - -
     # lexer rule t__50! (T__50)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__50!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 1 )
@@ -215,7 +223,7 @@ module Plsql
     end
 
     # lexer rule t__51! (T__51)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__51!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 2 )
@@ -239,7 +247,7 @@ module Plsql
     end
 
     # lexer rule t__52! (T__52)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__52!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 3 )
@@ -263,7 +271,7 @@ module Plsql
     end
 
     # lexer rule t__53! (T__53)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__53!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 4 )
@@ -287,7 +295,7 @@ module Plsql
     end
 
     # lexer rule t__54! (T__54)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__54!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 5 )
@@ -311,7 +319,7 @@ module Plsql
     end
 
     # lexer rule t__55! (T__55)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__55!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 6 )
@@ -335,7 +343,7 @@ module Plsql
     end
 
     # lexer rule t__56! (T__56)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__56!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 7 )
@@ -359,7 +367,7 @@ module Plsql
     end
 
     # lexer rule t__57! (T__57)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__57!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 8 )
@@ -383,7 +391,7 @@ module Plsql
     end
 
     # lexer rule t__58! (T__58)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__58!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 9 )
@@ -407,7 +415,7 @@ module Plsql
     end
 
     # lexer rule t__59! (T__59)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__59!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 10 )
@@ -431,7 +439,7 @@ module Plsql
     end
 
     # lexer rule t__60! (T__60)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__60!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 11 )
@@ -455,7 +463,7 @@ module Plsql
     end
 
     # lexer rule t__61! (T__61)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__61!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 12 )
@@ -479,7 +487,7 @@ module Plsql
     end
 
     # lexer rule t__62! (T__62)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__62!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 13 )
@@ -503,7 +511,7 @@ module Plsql
     end
 
     # lexer rule t__63! (T__63)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__63!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 14 )
@@ -527,7 +535,7 @@ module Plsql
     end
 
     # lexer rule t__64! (T__64)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__64!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 15 )
@@ -551,7 +559,7 @@ module Plsql
     end
 
     # lexer rule t__65! (T__65)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__65!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 16 )
@@ -575,7 +583,7 @@ module Plsql
     end
 
     # lexer rule t__66! (T__66)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__66!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 17 )
@@ -599,7 +607,7 @@ module Plsql
     end
 
     # lexer rule t__67! (T__67)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__67!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 18 )
@@ -623,7 +631,7 @@ module Plsql
     end
 
     # lexer rule t__68! (T__68)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__68!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 19 )
@@ -647,7 +655,7 @@ module Plsql
     end
 
     # lexer rule t__69! (T__69)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__69!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 20 )
@@ -671,7 +679,7 @@ module Plsql
     end
 
     # lexer rule t__70! (T__70)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__70!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 21 )
@@ -695,7 +703,7 @@ module Plsql
     end
 
     # lexer rule t__71! (T__71)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__71!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 22 )
@@ -719,7 +727,7 @@ module Plsql
     end
 
     # lexer rule t__72! (T__72)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__72!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 23 )
@@ -743,7 +751,7 @@ module Plsql
     end
 
     # lexer rule t__73! (T__73)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__73!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 24 )
@@ -767,7 +775,7 @@ module Plsql
     end
 
     # lexer rule t__74! (T__74)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__74!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 25 )
@@ -791,7 +799,7 @@ module Plsql
     end
 
     # lexer rule t__75! (T__75)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__75!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 26 )
@@ -815,7 +823,7 @@ module Plsql
     end
 
     # lexer rule t__76! (T__76)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__76!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 27 )
@@ -839,7 +847,7 @@ module Plsql
     end
 
     # lexer rule t__77! (T__77)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__77!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 28 )
@@ -863,7 +871,7 @@ module Plsql
     end
 
     # lexer rule t__78! (T__78)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__78!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 29 )
@@ -887,7 +895,7 @@ module Plsql
     end
 
     # lexer rule t__79! (T__79)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__79!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 30 )
@@ -911,7 +919,7 @@ module Plsql
     end
 
     # lexer rule t__80! (T__80)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__80!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 31 )
@@ -935,7 +943,7 @@ module Plsql
     end
 
     # lexer rule t__81! (T__81)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__81!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 32 )
@@ -959,7 +967,7 @@ module Plsql
     end
 
     # lexer rule t__82! (T__82)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__82!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 33 )
@@ -983,7 +991,7 @@ module Plsql
     end
 
     # lexer rule t__83! (T__83)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__83!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 34 )
@@ -1007,7 +1015,7 @@ module Plsql
     end
 
     # lexer rule t__84! (T__84)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__84!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 35 )
@@ -1031,7 +1039,7 @@ module Plsql
     end
 
     # lexer rule t__85! (T__85)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__85!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 36 )
@@ -1055,7 +1063,7 @@ module Plsql
     end
 
     # lexer rule t__86! (T__86)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__86!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 37 )
@@ -1079,7 +1087,7 @@ module Plsql
     end
 
     # lexer rule t__87! (T__87)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__87!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 38 )
@@ -1103,7 +1111,7 @@ module Plsql
     end
 
     # lexer rule t__88! (T__88)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__88!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 39 )
@@ -1127,7 +1135,7 @@ module Plsql
     end
 
     # lexer rule t__89! (T__89)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__89!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 40 )
@@ -1151,7 +1159,7 @@ module Plsql
     end
 
     # lexer rule t__90! (T__90)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__90!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 41 )
@@ -1175,7 +1183,7 @@ module Plsql
     end
 
     # lexer rule t__91! (T__91)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__91!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 42 )
@@ -1199,7 +1207,7 @@ module Plsql
     end
 
     # lexer rule t__92! (T__92)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__92!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 43 )
@@ -1223,7 +1231,7 @@ module Plsql
     end
 
     # lexer rule t__93! (T__93)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__93!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 44 )
@@ -1247,7 +1255,7 @@ module Plsql
     end
 
     # lexer rule t__94! (T__94)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__94!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 45 )
@@ -1271,7 +1279,7 @@ module Plsql
     end
 
     # lexer rule t__95! (T__95)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__95!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 46 )
@@ -1295,7 +1303,7 @@ module Plsql
     end
 
     # lexer rule t__96! (T__96)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__96!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 47 )
@@ -1319,7 +1327,7 @@ module Plsql
     end
 
     # lexer rule t__97! (T__97)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__97!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 48 )
@@ -1343,7 +1351,7 @@ module Plsql
     end
 
     # lexer rule t__98! (T__98)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__98!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 49 )
@@ -1367,7 +1375,7 @@ module Plsql
     end
 
     # lexer rule t__99! (T__99)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__99!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 50 )
@@ -1391,7 +1399,7 @@ module Plsql
     end
 
     # lexer rule t__100! (T__100)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__100!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 51 )
@@ -1415,7 +1423,7 @@ module Plsql
     end
 
     # lexer rule t__101! (T__101)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__101!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 52 )
@@ -1439,7 +1447,7 @@ module Plsql
     end
 
     # lexer rule t__102! (T__102)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__102!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 53 )
@@ -1463,7 +1471,7 @@ module Plsql
     end
 
     # lexer rule t__103! (T__103)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__103!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 54 )
@@ -1487,7 +1495,7 @@ module Plsql
     end
 
     # lexer rule t__104! (T__104)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__104!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 55 )
@@ -1511,7 +1519,7 @@ module Plsql
     end
 
     # lexer rule t__105! (T__105)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__105!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 56 )
@@ -1535,7 +1543,7 @@ module Plsql
     end
 
     # lexer rule t__106! (T__106)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__106!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 57 )
@@ -1559,7 +1567,7 @@ module Plsql
     end
 
     # lexer rule t__107! (T__107)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__107!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 58 )
@@ -1583,7 +1591,7 @@ module Plsql
     end
 
     # lexer rule t__108! (T__108)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__108!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 59 )
@@ -1607,7 +1615,7 @@ module Plsql
     end
 
     # lexer rule t__109! (T__109)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__109!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 60 )
@@ -1631,7 +1639,7 @@ module Plsql
     end
 
     # lexer rule t__110! (T__110)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__110!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 61 )
@@ -1655,7 +1663,7 @@ module Plsql
     end
 
     # lexer rule t__111! (T__111)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__111!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 62 )
@@ -1679,7 +1687,7 @@ module Plsql
     end
 
     # lexer rule t__112! (T__112)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__112!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 63 )
@@ -1703,7 +1711,7 @@ module Plsql
     end
 
     # lexer rule t__113! (T__113)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__113!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 64 )
@@ -1727,7 +1735,7 @@ module Plsql
     end
 
     # lexer rule t__114! (T__114)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__114!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 65 )
@@ -1751,7 +1759,7 @@ module Plsql
     end
 
     # lexer rule t__115! (T__115)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__115!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 66 )
@@ -1775,7 +1783,7 @@ module Plsql
     end
 
     # lexer rule t__116! (T__116)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__116!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 67 )
@@ -1799,7 +1807,7 @@ module Plsql
     end
 
     # lexer rule t__117! (T__117)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__117!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 68 )
@@ -1823,7 +1831,7 @@ module Plsql
     end
 
     # lexer rule t__118! (T__118)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__118!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 69 )
@@ -1847,7 +1855,7 @@ module Plsql
     end
 
     # lexer rule t__119! (T__119)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__119!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 70 )
@@ -1871,7 +1879,7 @@ module Plsql
     end
 
     # lexer rule t__120! (T__120)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__120!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 71 )
@@ -1895,7 +1903,7 @@ module Plsql
     end
 
     # lexer rule t__121! (T__121)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__121!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 72 )
@@ -1919,7 +1927,7 @@ module Plsql
     end
 
     # lexer rule t__122! (T__122)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__122!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 73 )
@@ -1943,7 +1951,7 @@ module Plsql
     end
 
     # lexer rule t__123! (T__123)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__123!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 74 )
@@ -1967,7 +1975,7 @@ module Plsql
     end
 
     # lexer rule t__124! (T__124)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__124!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 75 )
@@ -1991,7 +1999,7 @@ module Plsql
     end
 
     # lexer rule t__125! (T__125)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__125!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 76 )
@@ -2015,7 +2023,7 @@ module Plsql
     end
 
     # lexer rule t__126! (T__126)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__126!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 77 )
@@ -2039,7 +2047,7 @@ module Plsql
     end
 
     # lexer rule t__127! (T__127)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__127!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 78 )
@@ -2063,7 +2071,7 @@ module Plsql
     end
 
     # lexer rule t__128! (T__128)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__128!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 79 )
@@ -2087,7 +2095,7 @@ module Plsql
     end
 
     # lexer rule t__129! (T__129)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__129!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 80 )
@@ -2111,7 +2119,7 @@ module Plsql
     end
 
     # lexer rule t__130! (T__130)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__130!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 81 )
@@ -2135,7 +2143,7 @@ module Plsql
     end
 
     # lexer rule t__131! (T__131)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__131!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 82 )
@@ -2159,7 +2167,7 @@ module Plsql
     end
 
     # lexer rule t__132! (T__132)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__132!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 83 )
@@ -2183,7 +2191,7 @@ module Plsql
     end
 
     # lexer rule t__133! (T__133)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__133!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 84 )
@@ -2207,7 +2215,7 @@ module Plsql
     end
 
     # lexer rule t__134! (T__134)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__134!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 85 )
@@ -2231,7 +2239,7 @@ module Plsql
     end
 
     # lexer rule t__135! (T__135)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__135!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 86 )
@@ -2255,7 +2263,7 @@ module Plsql
     end
 
     # lexer rule t__136! (T__136)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__136!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 87 )
@@ -2279,7 +2287,7 @@ module Plsql
     end
 
     # lexer rule t__137! (T__137)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__137!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 88 )
@@ -2303,7 +2311,7 @@ module Plsql
     end
 
     # lexer rule t__138! (T__138)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__138!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 89 )
@@ -2327,7 +2335,7 @@ module Plsql
     end
 
     # lexer rule t__139! (T__139)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__139!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 90 )
@@ -2351,7 +2359,7 @@ module Plsql
     end
 
     # lexer rule t__140! (T__140)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__140!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 91 )
@@ -2375,7 +2383,7 @@ module Plsql
     end
 
     # lexer rule t__141! (T__141)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__141!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 92 )
@@ -2399,7 +2407,7 @@ module Plsql
     end
 
     # lexer rule t__142! (T__142)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__142!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 93 )
@@ -2423,7 +2431,7 @@ module Plsql
     end
 
     # lexer rule t__143! (T__143)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__143!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 94 )
@@ -2447,7 +2455,7 @@ module Plsql
     end
 
     # lexer rule t__144! (T__144)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__144!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 95 )
@@ -2471,7 +2479,7 @@ module Plsql
     end
 
     # lexer rule t__145! (T__145)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__145!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 96 )
@@ -2495,7 +2503,7 @@ module Plsql
     end
 
     # lexer rule t__146! (T__146)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__146!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 97 )
@@ -2519,7 +2527,7 @@ module Plsql
     end
 
     # lexer rule t__147! (T__147)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__147!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 98 )
@@ -2543,7 +2551,7 @@ module Plsql
     end
 
     # lexer rule t__148! (T__148)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__148!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 99 )
@@ -2567,7 +2575,7 @@ module Plsql
     end
 
     # lexer rule t__149! (T__149)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__149!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 100 )
@@ -2591,7 +2599,7 @@ module Plsql
     end
 
     # lexer rule t__150! (T__150)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__150!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 101 )
@@ -2615,7 +2623,7 @@ module Plsql
     end
 
     # lexer rule t__151! (T__151)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__151!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 102 )
@@ -2639,7 +2647,7 @@ module Plsql
     end
 
     # lexer rule t__152! (T__152)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__152!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 103 )
@@ -2663,7 +2671,7 @@ module Plsql
     end
 
     # lexer rule t__153! (T__153)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__153!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 104 )
@@ -2687,7 +2695,7 @@ module Plsql
     end
 
     # lexer rule t__154! (T__154)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__154!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 105 )
@@ -2711,7 +2719,7 @@ module Plsql
     end
 
     # lexer rule t__155! (T__155)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__155!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 106 )
@@ -2735,7 +2743,7 @@ module Plsql
     end
 
     # lexer rule t__156! (T__156)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__156!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 107 )
@@ -2759,7 +2767,7 @@ module Plsql
     end
 
     # lexer rule t__157! (T__157)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__157!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 108 )
@@ -2783,7 +2791,7 @@ module Plsql
     end
 
     # lexer rule t__158! (T__158)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__158!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 109 )
@@ -2807,7 +2815,7 @@ module Plsql
     end
 
     # lexer rule t__159! (T__159)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__159!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 110 )
@@ -2831,7 +2839,7 @@ module Plsql
     end
 
     # lexer rule t__160! (T__160)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__160!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 111 )
@@ -2855,7 +2863,7 @@ module Plsql
     end
 
     # lexer rule t__161! (T__161)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__161!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 112 )
@@ -2879,7 +2887,7 @@ module Plsql
     end
 
     # lexer rule t__162! (T__162)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__162!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 113 )
@@ -2903,7 +2911,7 @@ module Plsql
     end
 
     # lexer rule t__163! (T__163)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__163!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 114 )
@@ -2927,7 +2935,7 @@ module Plsql
     end
 
     # lexer rule t__164! (T__164)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__164!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 115 )
@@ -2951,7 +2959,7 @@ module Plsql
     end
 
     # lexer rule t__165! (T__165)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__165!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 116 )
@@ -2975,7 +2983,7 @@ module Plsql
     end
 
     # lexer rule t__166! (T__166)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__166!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 117 )
@@ -2999,7 +3007,7 @@ module Plsql
     end
 
     # lexer rule t__167! (T__167)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def t__167!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 118 )
@@ -3023,7 +3031,7 @@ module Plsql
     end
 
     # lexer rule quoted_string! (QUOTED_STRING)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def quoted_string!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 119 )
@@ -3033,8 +3041,8 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1416:4: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
-      # at line 1416:4: ( 'n' )?
+      # at line 1424:4: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
+      # at line 1424:4: ( 'n' )?
       alt_1 = 2
       look_1_0 = @input.peek( 1 )
 
@@ -3043,12 +3051,12 @@ module Plsql
       end
       case alt_1
       when 1
-        # at line 1416:6: 'n'
+        # at line 1424:6: 'n'
         match( 0x6e )
 
       end
       match( 0x27 )
-      # at line 1416:18: ( '\\'\\'' | ~ ( '\\'' ) )*
+      # at line 1424:18: ( '\\'\\'' | ~ ( '\\'' ) )*
       while true # decision 2
         alt_2 = 3
         look_2_0 = @input.peek( 1 )
@@ -3066,11 +3074,11 @@ module Plsql
         end
         case alt_2
         when 1
-          # at line 1416:20: '\\'\\''
+          # at line 1424:20: '\\'\\''
           match( "''" )
 
         when 2
-          # at line 1416:29: ~ ( '\\'' )
+          # at line 1424:29: ~ ( '\\'' )
           if @input.peek( 1 ).between?( 0x0, 0x26 ) || @input.peek( 1 ).between?( 0x28, 0xff )
             @input.consume
           else
@@ -3100,7 +3108,7 @@ module Plsql
     end
 
     # lexer rule id! (ID)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def id!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 120 )
@@ -3110,7 +3118,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1419:5: ( 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )* | DOUBLEQUOTED_STRING )
+      # at line 1427:5: ( 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )* | DOUBLEQUOTED_STRING )
       alt_4 = 2
       look_4_0 = @input.peek( 1 )
 
@@ -3125,9 +3133,9 @@ module Plsql
       end
       case alt_4
       when 1
-        # at line 1419:7: 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
+        # at line 1427:7: 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
         match_range( 0x41, 0x5a )
-        # at line 1419:18: ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
+        # at line 1427:18: ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
         while true # decision 3
           alt_3 = 2
           look_3_0 = @input.peek( 1 )
@@ -3157,7 +3165,7 @@ module Plsql
         end # loop for decision 3
 
       when 2
-        # at line 1420:7: DOUBLEQUOTED_STRING
+        # at line 1428:7: DOUBLEQUOTED_STRING
         doublequoted_string!
 
       end
@@ -3172,7 +3180,7 @@ module Plsql
     end
 
     # lexer rule semi! (SEMI)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def semi!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 121 )
@@ -3182,7 +3190,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1423:4: ';'
+      # at line 1431:4: ';'
       match( 0x3b )
 
       
@@ -3196,7 +3204,7 @@ module Plsql
     end
 
     # lexer rule colon! (COLON)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def colon!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 122 )
@@ -3206,7 +3214,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1426:4: ':'
+      # at line 1434:4: ':'
       match( 0x3a )
 
       
@@ -3220,7 +3228,7 @@ module Plsql
     end
 
     # lexer rule doubledot! (DOUBLEDOT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def doubledot!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 123 )
@@ -3230,7 +3238,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1429:4: POINT POINT
+      # at line 1437:4: POINT POINT
       point!
       point!
 
@@ -3245,7 +3253,7 @@ module Plsql
     end
 
     # lexer rule dot! (DOT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def dot!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 124 )
@@ -3255,7 +3263,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1432:4: POINT
+      # at line 1440:4: POINT
       point!
 
       
@@ -3269,14 +3277,14 @@ module Plsql
     end
 
     # lexer rule point! (POINT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def point!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 125 )
 
       
       # - - - - main rule block - - - -
-      # at line 1436:4: '.'
+      # at line 1444:4: '.'
       match( 0x2e )
 
     ensure
@@ -3286,7 +3294,7 @@ module Plsql
     end
 
     # lexer rule comma! (COMMA)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def comma!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 126 )
@@ -3296,7 +3304,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1439:4: ','
+      # at line 1447:4: ','
       match( 0x2c )
 
       
@@ -3310,7 +3318,7 @@ module Plsql
     end
 
     # lexer rule exponent! (EXPONENT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def exponent!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 127 )
@@ -3320,7 +3328,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1442:4: '**'
+      # at line 1450:4: '**'
       match( "**" )
 
       
@@ -3334,7 +3342,7 @@ module Plsql
     end
 
     # lexer rule asterisk! (ASTERISK)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def asterisk!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 128 )
@@ -3344,7 +3352,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1445:4: '*'
+      # at line 1453:4: '*'
       match( 0x2a )
 
       
@@ -3358,7 +3366,7 @@ module Plsql
     end
 
     # lexer rule at_sign! (AT_SIGN)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def at_sign!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 129 )
@@ -3368,7 +3376,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1448:4: '@'
+      # at line 1456:4: '@'
       match( 0x40 )
 
       
@@ -3382,7 +3390,7 @@ module Plsql
     end
 
     # lexer rule rparen! (RPAREN)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def rparen!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 130 )
@@ -3392,7 +3400,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1451:4: ')'
+      # at line 1459:4: ')'
       match( 0x29 )
 
       
@@ -3406,7 +3414,7 @@ module Plsql
     end
 
     # lexer rule lparen! (LPAREN)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def lparen!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 131 )
@@ -3416,7 +3424,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1454:4: '('
+      # at line 1462:4: '('
       match( 0x28 )
 
       
@@ -3430,7 +3438,7 @@ module Plsql
     end
 
     # lexer rule rbrack! (RBRACK)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def rbrack!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 132 )
@@ -3440,7 +3448,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1457:4: ']'
+      # at line 1465:4: ']'
       match( 0x5d )
 
       
@@ -3454,7 +3462,7 @@ module Plsql
     end
 
     # lexer rule lbrack! (LBRACK)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def lbrack!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 133 )
@@ -3464,7 +3472,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1460:4: '['
+      # at line 1468:4: '['
       match( 0x5b )
 
       
@@ -3478,7 +3486,7 @@ module Plsql
     end
 
     # lexer rule plus! (PLUS)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def plus!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 134 )
@@ -3488,7 +3496,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1463:4: '+'
+      # at line 1471:4: '+'
       match( 0x2b )
 
       
@@ -3502,7 +3510,7 @@ module Plsql
     end
 
     # lexer rule minus! (MINUS)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def minus!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 135 )
@@ -3512,7 +3520,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1466:4: '-'
+      # at line 1474:4: '-'
       match( 0x2d )
 
       
@@ -3526,7 +3534,7 @@ module Plsql
     end
 
     # lexer rule divide! (DIVIDE)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def divide!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 136 )
@@ -3536,7 +3544,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1469:4: '/'
+      # at line 1477:4: '/'
       match( 0x2f )
 
       
@@ -3550,7 +3558,7 @@ module Plsql
     end
 
     # lexer rule eq! (EQ)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def eq!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 137 )
@@ -3560,7 +3568,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1472:4: '='
+      # at line 1480:4: '='
       match( 0x3d )
 
       
@@ -3574,7 +3582,7 @@ module Plsql
     end
 
     # lexer rule percentage! (PERCENTAGE)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def percentage!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 138 )
@@ -3584,7 +3592,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1475:4: '%'
+      # at line 1483:4: '%'
       match( 0x25 )
 
       
@@ -3598,7 +3606,7 @@ module Plsql
     end
 
     # lexer rule llabel! (LLABEL)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def llabel!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 139 )
@@ -3608,7 +3616,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1478:4: '<<'
+      # at line 1486:4: '<<'
       match( "<<" )
 
       
@@ -3622,7 +3630,7 @@ module Plsql
     end
 
     # lexer rule rlabel! (RLABEL)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def rlabel!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 140 )
@@ -3632,7 +3640,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1481:4: '>>'
+      # at line 1489:4: '>>'
       match( ">>" )
 
       
@@ -3646,7 +3654,7 @@ module Plsql
     end
 
     # lexer rule assign! (ASSIGN)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def assign!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 141 )
@@ -3656,7 +3664,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1484:4: ':='
+      # at line 1492:4: ':='
       match( ":=" )
 
       
@@ -3670,7 +3678,7 @@ module Plsql
     end
 
     # lexer rule arrow! (ARROW)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def arrow!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 142 )
@@ -3680,7 +3688,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1487:4: '=>'
+      # at line 1495:4: '=>'
       match( "=>" )
 
       
@@ -3694,7 +3702,7 @@ module Plsql
     end
 
     # lexer rule vertbar! (VERTBAR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def vertbar!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 143 )
@@ -3704,7 +3712,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1490:4: '|'
+      # at line 1498:4: '|'
       match( 0x7c )
 
       
@@ -3718,7 +3726,7 @@ module Plsql
     end
 
     # lexer rule doublevertbar! (DOUBLEVERTBAR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def doublevertbar!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 144 )
@@ -3728,7 +3736,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1493:4: '||'
+      # at line 1501:4: '||'
       match( "||" )
 
       
@@ -3742,7 +3750,7 @@ module Plsql
     end
 
     # lexer rule not_eq! (NOT_EQ)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def not_eq!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 145 )
@@ -3752,7 +3760,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1496:2: ( '<>' | '!=' | '^=' )
+      # at line 1504:2: ( '<>' | '!=' | '^=' )
       alt_5 = 3
       case look_5 = @input.peek( 1 )
       when 0x3c then alt_5 = 1
@@ -3765,15 +3773,15 @@ module Plsql
       end
       case alt_5
       when 1
-        # at line 1496:4: '<>'
+        # at line 1504:4: '<>'
         match( "<>" )
 
       when 2
-        # at line 1496:11: '!='
+        # at line 1504:11: '!='
         match( "!=" )
 
       when 3
-        # at line 1496:18: '^='
+        # at line 1504:18: '^='
         match( "^=" )
 
       end
@@ -3788,7 +3796,7 @@ module Plsql
     end
 
     # lexer rule lth! (LTH)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def lth!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 146 )
@@ -3798,7 +3806,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1499:4: '<'
+      # at line 1507:4: '<'
       match( 0x3c )
 
       
@@ -3812,7 +3820,7 @@ module Plsql
     end
 
     # lexer rule leq! (LEQ)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def leq!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 147 )
@@ -3822,7 +3830,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1502:4: '<='
+      # at line 1510:4: '<='
       match( "<=" )
 
       
@@ -3836,7 +3844,7 @@ module Plsql
     end
 
     # lexer rule gth! (GTH)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def gth!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 148 )
@@ -3846,7 +3854,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1505:4: '>'
+      # at line 1513:4: '>'
       match( 0x3e )
 
       
@@ -3860,7 +3868,7 @@ module Plsql
     end
 
     # lexer rule geq! (GEQ)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def geq!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 149 )
@@ -3870,7 +3878,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1508:4: '>='
+      # at line 1516:4: '>='
       match( ">=" )
 
       
@@ -3884,7 +3892,7 @@ module Plsql
     end
 
     # lexer rule number! (NUMBER)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def number!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 150 )
@@ -3894,28 +3902,28 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1512:3: ( ( N POINT N )=> N POINT N | POINT N | N ) ( 'E' ( PLUS | MINUS )? N )?
-      # at line 1512:3: ( ( N POINT N )=> N POINT N | POINT N | N )
+      # at line 1520:3: ( ( N POINT N )=> N POINT N | POINT N | N ) ( 'E' ( PLUS | MINUS )? N )?
+      # at line 1520:3: ( ( N POINT N )=> N POINT N | POINT N | N )
       alt_6 = 3
       alt_6 = @dfa6.predict( @input )
       case alt_6
       when 1
-        # at line 1512:5: ( N POINT N )=> N POINT N
+        # at line 1520:5: ( N POINT N )=> N POINT N
         n!
         point!
         n!
 
       when 2
-        # at line 1513:5: POINT N
+        # at line 1521:5: POINT N
         point!
         n!
 
       when 3
-        # at line 1514:5: N
+        # at line 1522:5: N
         n!
 
       end
-      # at line 1516:3: ( 'E' ( PLUS | MINUS )? N )?
+      # at line 1524:3: ( 'E' ( PLUS | MINUS )? N )?
       alt_8 = 2
       look_8_0 = @input.peek( 1 )
 
@@ -3924,9 +3932,9 @@ module Plsql
       end
       case alt_8
       when 1
-        # at line 1516:5: 'E' ( PLUS | MINUS )? N
+        # at line 1524:5: 'E' ( PLUS | MINUS )? N
         match( 0x45 )
-        # at line 1516:9: ( PLUS | MINUS )?
+        # at line 1524:9: ( PLUS | MINUS )?
         alt_7 = 2
         look_7_0 = @input.peek( 1 )
 
@@ -3964,16 +3972,16 @@ module Plsql
     end
 
     # lexer rule n! (N)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def n!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 151 )
 
       
       # - - - - main rule block - - - -
-      # at line 1520:4: '0' .. '9' ( '0' .. '9' )*
+      # at line 1528:4: '0' .. '9' ( '0' .. '9' )*
       match_range( 0x30, 0x39 )
-      # at line 1520:15: ( '0' .. '9' )*
+      # at line 1528:15: ( '0' .. '9' )*
       while true # decision 9
         alt_9 = 2
         look_9_0 = @input.peek( 1 )
@@ -3984,7 +3992,7 @@ module Plsql
         end
         case alt_9
         when 1
-          # at line 1520:17: '0' .. '9'
+          # at line 1528:17: '0' .. '9'
           match_range( 0x30, 0x39 )
 
         else
@@ -3999,7 +4007,7 @@ module Plsql
     end
 
     # lexer rule quote! (QUOTE)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def quote!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 152 )
@@ -4009,7 +4017,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1523:4: '\\''
+      # at line 1531:4: '\\''
       match( 0x27 )
 
       
@@ -4023,16 +4031,16 @@ module Plsql
     end
 
     # lexer rule doublequoted_string! (DOUBLEQUOTED_STRING)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def doublequoted_string!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 153 )
 
       
       # - - - - main rule block - - - -
-      # at line 1527:4: '\"' (~ ( '\"' ) )* '\"'
+      # at line 1535:4: '\"' (~ ( '\"' ) )* '\"'
       match( 0x22 )
-      # at line 1527:8: (~ ( '\"' ) )*
+      # at line 1535:8: (~ ( '\"' ) )*
       while true # decision 10
         alt_10 = 2
         look_10_0 = @input.peek( 1 )
@@ -4043,7 +4051,7 @@ module Plsql
         end
         case alt_10
         when 1
-          # at line 1527:10: ~ ( '\"' )
+          # at line 1535:10: ~ ( '\"' )
           if @input.peek( 1 ).between?( 0x0, 0x21 ) || @input.peek( 1 ).between?( 0x23, 0xff )
             @input.consume
           else
@@ -4069,7 +4077,7 @@ module Plsql
     end
 
     # lexer rule ws! (WS)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def ws!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 154 )
@@ -4079,7 +4087,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1529:6: ( ' ' | '\\r' | '\\t' | '\\n' )
+      # at line 1537:6: ( ' ' | '\\r' | '\\t' | '\\n' )
       if @input.peek( 1 ).between?( 0x9, 0xa ) || @input.peek(1) == 0xd || @input.peek(1) == 0x20
         @input.consume
       else
@@ -4109,7 +4117,7 @@ module Plsql
     end
 
     # lexer rule sl_comment! (SL_COMMENT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def sl_comment!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 155 )
@@ -4119,9 +4127,9 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1532:4: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+      # at line 1540:4: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
       match( "--" )
-      # at line 1532:9: (~ ( '\\n' | '\\r' ) )*
+      # at line 1540:9: (~ ( '\\n' | '\\r' ) )*
       while true # decision 11
         alt_11 = 2
         look_11_0 = @input.peek( 1 )
@@ -4132,7 +4140,7 @@ module Plsql
         end
         case alt_11
         when 1
-          # at line 1532:9: ~ ( '\\n' | '\\r' )
+          # at line 1540:9: ~ ( '\\n' | '\\r' )
           if @input.peek( 1 ).between?( 0x0, 0x9 ) || @input.peek( 1 ).between?( 0xb, 0xc ) || @input.peek( 1 ).between?( 0xe, 0xff )
             @input.consume
           else
@@ -4149,7 +4157,7 @@ module Plsql
           break # out of loop for decision 11
         end
       end # loop for decision 11
-      # at line 1532:23: ( '\\r' )?
+      # at line 1540:23: ( '\\r' )?
       alt_12 = 2
       look_12_0 = @input.peek( 1 )
 
@@ -4158,7 +4166,7 @@ module Plsql
       end
       case alt_12
       when 1
-        # at line 1532:23: '\\r'
+        # at line 1540:23: '\\r'
         match( 0xd )
 
       end
@@ -4181,7 +4189,7 @@ module Plsql
     end
 
     # lexer rule ml_comment! (ML_COMMENT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def ml_comment!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 156 )
@@ -4191,9 +4199,9 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1535:4: '/*' ( options {greedy=false; } : . )* '*/'
+      # at line 1543:4: '/*' ( options {greedy=false; } : . )* '*/'
       match( "/*" )
-      # at line 1535:9: ( options {greedy=false; } : . )*
+      # at line 1543:9: ( options {greedy=false; } : . )*
       while true # decision 13
         alt_13 = 2
         look_13_0 = @input.peek( 1 )
@@ -4213,7 +4221,7 @@ module Plsql
         end
         case alt_13
         when 1
-          # at line 1535:37: .
+          # at line 1543:37: .
           match_any
 
         else
@@ -4239,7 +4247,7 @@ module Plsql
     end
 
     # lexer rule type_attr! (TYPE_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def type_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 157 )
@@ -4249,7 +4257,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1538:4: '%TYPE'
+      # at line 1546:4: '%TYPE'
       match( "%TYPE" )
 
       
@@ -4263,7 +4271,7 @@ module Plsql
     end
 
     # lexer rule rowtype_attr! (ROWTYPE_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def rowtype_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 158 )
@@ -4273,7 +4281,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1541:4: '%ROWTYPE'
+      # at line 1549:4: '%ROWTYPE'
       match( "%ROWTYPE" )
 
       
@@ -4287,7 +4295,7 @@ module Plsql
     end
 
     # lexer rule notfound_attr! (NOTFOUND_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def notfound_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 159 )
@@ -4297,7 +4305,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1544:4: '%NOTFOUND'
+      # at line 1552:4: '%NOTFOUND'
       match( "%NOTFOUND" )
 
       
@@ -4311,7 +4319,7 @@ module Plsql
     end
 
     # lexer rule found_attr! (FOUND_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def found_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 160 )
@@ -4321,7 +4329,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1547:4: '%FOUND'
+      # at line 1555:4: '%FOUND'
       match( "%FOUND" )
 
       
@@ -4335,7 +4343,7 @@ module Plsql
     end
 
     # lexer rule isopen_attr! (ISOPEN_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def isopen_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 161 )
@@ -4345,7 +4353,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1550:4: '%ISOPEN'
+      # at line 1558:4: '%ISOPEN'
       match( "%ISOPEN" )
 
       
@@ -4359,7 +4367,7 @@ module Plsql
     end
 
     # lexer rule rowcount_attr! (ROWCOUNT_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def rowcount_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 162 )
@@ -4369,7 +4377,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1553:4: '%ROWCOUNT'
+      # at line 1561:4: '%ROWCOUNT'
       match( "%ROWCOUNT" )
 
       
@@ -4383,7 +4391,7 @@ module Plsql
     end
 
     # lexer rule bulk_rowcount_attr! (BULK_ROWCOUNT_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def bulk_rowcount_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 163 )
@@ -4393,7 +4401,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1556:4: '%BULK_ROWCOUNT'
+      # at line 1564:4: '%BULK_ROWCOUNT'
       match( "%BULK_ROWCOUNT" )
 
       
@@ -4407,7 +4415,7 @@ module Plsql
     end
 
     # lexer rule charset_attr! (CHARSET_ATTR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     def charset_attr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 164 )
@@ -4417,7 +4425,7 @@ module Plsql
 
       
       # - - - - main rule block - - - -
-      # at line 1559:4: '%CHARSET'
+      # at line 1567:4: '%CHARSET'
       match( "%CHARSET" )
 
       
@@ -5091,7 +5099,7 @@ module Plsql
     # 
     # syntactic predicate synpred1_Plsql
     # 
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/plsql.ruby.g)
+    # (in plsql.ruby.g)
     # 
     # 
     # This is an imaginary rule inserted by ANTLR to
@@ -5101,7 +5109,7 @@ module Plsql
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 166 )
 
-      # at line 1512:7: N POINT N
+      # at line 1520:7: N POINT N
       n!
       point!
       n!
@@ -5141,7 +5149,7 @@ module Plsql
 
       def description
         <<-'__dfa_description__'.strip!
-          1512:3: ( ( N POINT N )=> N POINT N | POINT N | N )
+          1520:3: ( ( N POINT N )=> N POINT N | POINT N | N )
         __dfa_description__
       end
     end
@@ -6107,4 +6115,12 @@ module Plsql
 
   at_exit { Lexer.main( ARGV ) } if __FILE__ == $0
 end
+# - - - - - - begin action @all::footer - - - - - -
+# plsql.ruby.g
+
+
+	end
+
+# - - - - - - end action @all::footer - - - - - - -
+
 

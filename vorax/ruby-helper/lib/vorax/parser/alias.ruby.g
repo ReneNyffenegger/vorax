@@ -7,6 +7,14 @@ options {
 	k=100;
 }
 
+@all::header {
+	module Vorax 
+}
+
+@all::footer {
+	end
+}
+
 @members /*embbed*/ {
 
   @@level = 0

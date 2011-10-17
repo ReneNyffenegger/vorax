@@ -11,6 +11,14 @@ options {
   @separators = []
 }
 
+@all::header {
+	module Vorax 
+}
+
+@all::footer {
+	end
+}
+
 @members {
 
   attr_accessor :separators

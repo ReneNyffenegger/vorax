@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 #
-# /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g
+# sql_splitter.rb.g
 # --
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
-# Input grammar file: /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g
-# Generated at: 2011-07-19 17:04:42
+# Input grammar file: sql_splitter.rb.g
+# Generated at: 2011-10-17 09:51:55
 # 
 
 # ~~~> start load path setup
@@ -56,6 +56,14 @@ rescue LoadError
 end
 # <~~~ end load path setup
 
+# - - - - - - begin action @all::header - - - - - -
+# sql_splitter.rb.g
+
+
+	module Vorax 
+
+# - - - - - - end action @all::header - - - - - - -
+
 
 module SqlSplitter
   # TokenData defines all of the token type integer values
@@ -80,7 +88,7 @@ module SqlSplitter
 
     
     begin
-      generated_using( "/home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
+      generated_using( "sql_splitter.rb.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
     rescue NoMethodError => error
       # ignore
     end
@@ -96,7 +104,7 @@ module SqlSplitter
     def initialize( input=nil, options = {} )
       super( input, options )
       # - - - - - - begin action @lexer::init - - - - - -
-      # /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g
+      # sql_splitter.rb.g
 
 
         @separators = []
@@ -106,7 +114,7 @@ module SqlSplitter
     end
     
     # - - - - - - begin action @lexer::members - - - - - -
-    # /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g
+    # sql_splitter.rb.g
 
 
 
@@ -143,7 +151,7 @@ module SqlSplitter
     
     # - - - - - - - - - - - lexer rules - - - - - - - - - - - -
     # lexer rule quoted_string! (QUOTED_STRING)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def quoted_string!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 1 )
@@ -153,8 +161,8 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 46:5: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
-      # at line 46:5: ( 'n' )?
+      # at line 54:5: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
+      # at line 54:5: ( 'n' )?
       alt_1 = 2
       look_1_0 = @input.peek( 1 )
 
@@ -163,12 +171,12 @@ module SqlSplitter
       end
       case alt_1
       when 1
-        # at line 46:7: 'n'
+        # at line 54:7: 'n'
         match( 0x6e )
 
       end
       match( 0x27 )
-      # at line 46:19: ( '\\'\\'' | ~ ( '\\'' ) )*
+      # at line 54:19: ( '\\'\\'' | ~ ( '\\'' ) )*
       while true # decision 2
         alt_2 = 3
         look_2_0 = @input.peek( 1 )
@@ -186,11 +194,11 @@ module SqlSplitter
         end
         case alt_2
         when 1
-          # at line 46:21: '\\'\\''
+          # at line 54:21: '\\'\\''
           match( "''" )
 
         when 2
-          # at line 46:30: ~ ( '\\'' )
+          # at line 54:30: ~ ( '\\'' )
           if @input.peek( 1 ).between?( 0x0, 0x26 ) || @input.peek( 1 ).between?( 0x28, 0xff )
             @input.consume
           else
@@ -220,7 +228,7 @@ module SqlSplitter
     end
 
     # lexer rule sl_comment! (SL_COMMENT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def sl_comment!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 2 )
@@ -230,9 +238,9 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 50:5: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? ( '\\n' | EOF )
+      # at line 58:5: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? ( '\\n' | EOF )
       match( "--" )
-      # at line 50:10: (~ ( '\\n' | '\\r' ) )*
+      # at line 58:10: (~ ( '\\n' | '\\r' ) )*
       while true # decision 3
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
@@ -243,7 +251,7 @@ module SqlSplitter
         end
         case alt_3
         when 1
-          # at line 50:10: ~ ( '\\n' | '\\r' )
+          # at line 58:10: ~ ( '\\n' | '\\r' )
           if @input.peek( 1 ).between?( 0x0, 0x9 ) || @input.peek( 1 ).between?( 0xb, 0xc ) || @input.peek( 1 ).between?( 0xe, 0xff )
             @input.consume
           else
@@ -260,7 +268,7 @@ module SqlSplitter
           break # out of loop for decision 3
         end
       end # loop for decision 3
-      # at line 50:24: ( '\\r' )?
+      # at line 58:24: ( '\\r' )?
       alt_4 = 2
       look_4_0 = @input.peek( 1 )
 
@@ -269,11 +277,11 @@ module SqlSplitter
       end
       case alt_4
       when 1
-        # at line 50:24: '\\r'
+        # at line 58:24: '\\r'
         match( 0xd )
 
       end
-      # at line 50:30: ( '\\n' | EOF )
+      # at line 58:30: ( '\\n' | EOF )
       alt_5 = 2
       look_5_0 = @input.peek( 1 )
 
@@ -284,11 +292,11 @@ module SqlSplitter
       end
       case alt_5
       when 1
-        # at line 50:31: '\\n'
+        # at line 58:31: '\\n'
         match( 0xa )
 
       when 2
-        # at line 50:38: EOF
+        # at line 58:38: EOF
         match( ANTLR3::EOF )
 
 
@@ -305,7 +313,7 @@ module SqlSplitter
     end
 
     # lexer rule ml_comment! (ML_COMMENT)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def ml_comment!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 3 )
@@ -315,9 +323,9 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 54:5: '/*' ( options {greedy=false; } : . )* '*/'
+      # at line 62:5: '/*' ( options {greedy=false; } : . )* '*/'
       match( "/*" )
-      # at line 54:10: ( options {greedy=false; } : . )*
+      # at line 62:10: ( options {greedy=false; } : . )*
       while true # decision 6
         alt_6 = 2
         look_6_0 = @input.peek( 1 )
@@ -337,7 +345,7 @@ module SqlSplitter
         end
         case alt_6
         when 1
-          # at line 54:38: .
+          # at line 62:38: .
           match_any
 
         else
@@ -357,7 +365,7 @@ module SqlSplitter
     end
 
     # lexer rule sql_separator! (SQL_SEPARATOR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def sql_separator!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 4 )
@@ -371,7 +379,7 @@ module SqlSplitter
 
       
       # - - - - main rule block - - - -
-      # at line 58:3: ( SQL_SEPARATOR_1 | SQL_SEPARATOR_2 )
+      # at line 66:3: ( SQL_SEPARATOR_1 | SQL_SEPARATOR_2 )
       alt_7 = 2
       look_7_0 = @input.peek( 1 )
 
@@ -386,14 +394,14 @@ module SqlSplitter
       end
       case alt_7
       when 1
-        # at line 58:5: SQL_SEPARATOR_1
-        __SQL_SEPARATOR_11___start_151 = self.character_index
+        # at line 66:5: SQL_SEPARATOR_1
+        __SQL_SEPARATOR_11___start_169 = self.character_index
         sql_separator_1!
         __SQL_SEPARATOR_11__ = create_token do |t|
           t.input   = @input
           t.type    = ANTLR3::INVALID_TOKEN_TYPE
           t.channel = ANTLR3::DEFAULT_CHANNEL
-          t.start   = __SQL_SEPARATOR_11___start_151
+          t.start   = __SQL_SEPARATOR_11___start_169
           t.stop    = self.character_index - 1
         end
         # syntactic predicate action gate test
@@ -404,14 +412,14 @@ module SqlSplitter
         end
 
       when 2
-        # at line 60:5: SQL_SEPARATOR_2
-        __SQL_SEPARATOR_22___start_166 = self.character_index
+        # at line 68:5: SQL_SEPARATOR_2
+        __SQL_SEPARATOR_22___start_184 = self.character_index
         sql_separator_2!
         __SQL_SEPARATOR_22__ = create_token do |t|
           t.input   = @input
           t.type    = ANTLR3::INVALID_TOKEN_TYPE
           t.channel = ANTLR3::DEFAULT_CHANNEL
-          t.start   = __SQL_SEPARATOR_22___start_166
+          t.start   = __SQL_SEPARATOR_22___start_184
           t.stop    = self.character_index - 1
         end
         # syntactic predicate action gate test
@@ -433,14 +441,14 @@ module SqlSplitter
     end
 
     # lexer rule sql_separator_1! (SQL_SEPARATOR_1)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def sql_separator_1!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 5 )
 
       
       # - - - - main rule block - - - -
-      # at line 65:5: ';'
+      # at line 73:5: ';'
       match( 0x3b )
 
     ensure
@@ -450,16 +458,16 @@ module SqlSplitter
     end
 
     # lexer rule sql_separator_2! (SQL_SEPARATOR_2)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def sql_separator_2!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 6 )
 
       
       # - - - - main rule block - - - -
-      # at line 70:5: CR ( SPACE )* '/' ( SPACE )* ( CR | EOF )
+      # at line 78:5: CR ( SPACE )* '/' ( SPACE )* ( CR | EOF )
       cr!
-      # at line 70:9: ( SPACE )*
+      # at line 78:9: ( SPACE )*
       while true # decision 8
         alt_8 = 2
         look_8_0 = @input.peek( 1 )
@@ -470,7 +478,7 @@ module SqlSplitter
         end
         case alt_8
         when 1
-          # at line 70:9: SPACE
+          # at line 78:9: SPACE
           space!
 
         else
@@ -478,7 +486,7 @@ module SqlSplitter
         end
       end # loop for decision 8
       match( 0x2f )
-      # at line 70:20: ( SPACE )*
+      # at line 78:20: ( SPACE )*
       while true # decision 9
         alt_9 = 2
         look_9_0 = @input.peek( 1 )
@@ -489,14 +497,14 @@ module SqlSplitter
         end
         case alt_9
         when 1
-          # at line 70:20: SPACE
+          # at line 78:20: SPACE
           space!
 
         else
           break # out of loop for decision 9
         end
       end # loop for decision 9
-      # at line 70:27: ( CR | EOF )
+      # at line 78:27: ( CR | EOF )
       alt_10 = 2
       look_10_0 = @input.peek( 1 )
 
@@ -507,11 +515,11 @@ module SqlSplitter
       end
       case alt_10
       when 1
-        # at line 70:28: CR
+        # at line 78:28: CR
         cr!
 
       when 2
-        # at line 70:33: EOF
+        # at line 78:33: EOF
         match( ANTLR3::EOF )
 
 
@@ -524,15 +532,15 @@ module SqlSplitter
     end
 
     # lexer rule cr! (CR)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def cr!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 7 )
 
       
       # - - - - main rule block - - - -
-      # at line 75:5: ( '\\n' )+
-      # at file 75:5: ( '\\n' )+
+      # at line 83:5: ( '\\n' )+
+      # at file 83:5: ( '\\n' )+
       match_count_11 = 0
       while true
         alt_11 = 2
@@ -544,7 +552,7 @@ module SqlSplitter
         end
         case alt_11
         when 1
-          # at line 75:5: '\\n'
+          # at line 83:5: '\\n'
           match( 0xa )
 
         else
@@ -567,15 +575,15 @@ module SqlSplitter
     end
 
     # lexer rule space! (SPACE)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def space!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 8 )
 
       
       # - - - - main rule block - - - -
-      # at line 80:5: ( ' ' | '\\t' )+
-      # at file 80:5: ( ' ' | '\\t' )+
+      # at line 88:5: ( ' ' | '\\t' )+
+      # at file 88:5: ( ' ' | '\\t' )+
       match_count_12 = 0
       while true
         alt_12 = 2
@@ -620,15 +628,15 @@ module SqlSplitter
     end
 
     # lexer rule ws! (WS)
-    # (in /home/likewise-open/FITS/alec/vorax/vorax/ruby-helper/lib/vorax/parser/sql_splitter.rb.g)
+    # (in sql_splitter.rb.g)
     def ws!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 9 )
 
       
       # - - - - main rule block - - - -
-      # at line 85:5: ( ' ' | '\\t' | '\\n' )+
-      # at file 85:5: ( ' ' | '\\t' | '\\n' )+
+      # at line 93:5: ( ' ' | '\\t' | '\\n' )+
+      # at file 93:5: ( ' ' | '\\t' | '\\n' )+
       match_count_13 = 0
       while true
         alt_13 = 2
@@ -716,4 +724,12 @@ module SqlSplitter
 
   at_exit { Lexer.main( ARGV ) } if __FILE__ == $0
 end
+# - - - - - - begin action @all::footer - - - - - -
+# sql_splitter.rb.g
+
+
+	end
+
+# - - - - - - end action @all::footer - - - - - - -
+
 

@@ -272,7 +272,7 @@ endfunction"}}}
 function! s:ArgumentSpotBelongsTo(statement, relpos)"{{{
   if s:log.isTraceEnabled() | call s:log.trace('BEGIN s:ArgumentSpotBelongsTo(' .string(a:statement) . ', ' . a:relpos . ')') | endif
   let module = ''
-  ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Argument::Lexer.arguments_for(VIM::evaluate('a:statement'), VIM::evaluate('a:relpos')))}"
+  ruby VIM::command "let module = #{Vorax::VimUtils.to_vim(Vorax::Argument::Lexer.arguments_for(VIM::evaluate('a:statement'), VIM::evaluate('a:relpos')))}"
   if s:log.isTraceEnabled() | call s:log.trace('END s:ArgumentSpotBelongsTo() => ' . string(module)) | endif
   return module
 endfunction"}}}
@@ -343,7 +343,7 @@ endfunction"}}}
 function! s:GetAllPosibileColumns(statement, prefix)"{{{
   let statement = toupper(a:statement)
   let raw_columns = []
-  ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Alias::Lexer.all_columns_for(VIM::evaluate('statement')))}"
+  ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Vorax::Alias::Lexer.all_columns_for(VIM::evaluate('statement')))}"
   let columns = []
   let schemas = []
   let tables = []
@@ -377,7 +377,7 @@ function! s:ResolveAlias(statement, alias, prefix)"{{{
   endif
   let statement = toupper(a:statement)
   let raw_columns = []
-  ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Alias::Lexer.columns_for(VIM::evaluate('statement'), VIM::evaluate('a:alias')))}"
+  ruby VIM::command "let raw_columns = #{Vorax::VimUtils.to_vim(Vorax::Alias::Lexer.columns_for(VIM::evaluate('statement'), VIM::evaluate('a:alias')))}"
   let columns = []
   for column in raw_columns
     if column =~ '\.\*$'

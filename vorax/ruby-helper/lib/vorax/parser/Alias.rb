@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: alias.ruby.g
-# Generated at: 2011-09-14 15:17:04
+# Generated at: 2011-10-17 09:47:29
 # 
 
 # ~~~> start load path setup
@@ -55,6 +55,14 @@ rescue LoadError
   
 end
 # <~~~ end load path setup
+
+# - - - - - - begin action @all::header - - - - - -
+# alias.ruby.g
+
+
+	module Vorax 
+
+# - - - - - - end action @all::header - - - - - - -
 
 
 module Alias
@@ -251,8 +259,8 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 138:5: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
-      # at line 138:5: ( 'n' )?
+      # at line 146:5: ( 'n' )? '\\'' ( '\\'\\'' | ~ ( '\\'' ) )* '\\''
+      # at line 146:5: ( 'n' )?
       alt_1 = 2
       look_1_0 = @input.peek( 1 )
 
@@ -261,12 +269,12 @@ module Alias
       end
       case alt_1
       when 1
-        # at line 138:7: 'n'
+        # at line 146:7: 'n'
         match( 0x6e )
 
       end
       match( 0x27 )
-      # at line 138:19: ( '\\'\\'' | ~ ( '\\'' ) )*
+      # at line 146:19: ( '\\'\\'' | ~ ( '\\'' ) )*
       while true # decision 2
         alt_2 = 3
         look_2_0 = @input.peek( 1 )
@@ -284,11 +292,11 @@ module Alias
         end
         case alt_2
         when 1
-          # at line 138:21: '\\'\\''
+          # at line 146:21: '\\'\\''
           match( "''" )
 
         when 2
-          # at line 138:30: ~ ( '\\'' )
+          # at line 146:30: ~ ( '\\'' )
           if @input.peek( 1 ).between?( 0x0, 0x26 ) || @input.peek( 1 ).between?( 0x28, 0xff )
             @input.consume
           else
@@ -328,9 +336,9 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 142:5: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+      # at line 150:5: '--' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
       match( "--" )
-      # at line 142:10: (~ ( '\\n' | '\\r' ) )*
+      # at line 150:10: (~ ( '\\n' | '\\r' ) )*
       while true # decision 3
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
@@ -358,7 +366,7 @@ module Alias
           break # out of loop for decision 3
         end
       end # loop for decision 3
-      # at line 142:24: ( '\\r' )?
+      # at line 150:24: ( '\\r' )?
       alt_4 = 2
       look_4_0 = @input.peek( 1 )
 
@@ -394,9 +402,9 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 146:5: '/*' ( options {greedy=false; } : . )* '*/'
+      # at line 154:5: '/*' ( options {greedy=false; } : . )* '*/'
       match( "/*" )
-      # at line 146:10: ( options {greedy=false; } : . )*
+      # at line 154:10: ( options {greedy=false; } : . )*
       while true # decision 5
         alt_5 = 2
         look_5_0 = @input.peek( 1 )
@@ -416,7 +424,7 @@ module Alias
         end
         case alt_5
         when 1
-          # at line 146:38: .
+          # at line 154:38: .
           match_any
 
         else
@@ -446,11 +454,11 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 150:5: 'FROM' WS TABLE_REFERENCE ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
+      # at line 158:5: 'FROM' WS TABLE_REFERENCE ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
       match( "FROM" )
       ws!
       table_reference!
-      # at line 150:31: ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
+      # at line 158:31: ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
       while true # decision 8
         alt_8 = 2
         look_8_0 = @input.peek( 1 )
@@ -461,8 +469,8 @@ module Alias
         end
         case alt_8
         when 1
-          # at line 150:32: ( WS )? ',' ( WS )? TABLE_REFERENCE
-          # at line 150:32: ( WS )?
+          # at line 158:32: ( WS )? ',' ( WS )? TABLE_REFERENCE
+          # at line 158:32: ( WS )?
           alt_6 = 2
           look_6_0 = @input.peek( 1 )
 
@@ -476,7 +484,7 @@ module Alias
 
           end
           match( 0x2c )
-          # at line 150:40: ( WS )?
+          # at line 158:40: ( WS )?
           alt_7 = 2
           look_7_0 = @input.peek( 1 )
 
@@ -517,11 +525,11 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 154:5: 'INTO' WS TABLE_REFERENCE ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
+      # at line 162:5: 'INTO' WS TABLE_REFERENCE ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
       match( "INTO" )
       ws!
       table_reference!
-      # at line 154:31: ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
+      # at line 162:31: ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
       while true # decision 11
         alt_11 = 2
         look_11_0 = @input.peek( 1 )
@@ -532,8 +540,8 @@ module Alias
         end
         case alt_11
         when 1
-          # at line 154:32: ( WS )? ',' ( WS )? TABLE_REFERENCE
-          # at line 154:32: ( WS )?
+          # at line 162:32: ( WS )? ',' ( WS )? TABLE_REFERENCE
+          # at line 162:32: ( WS )?
           alt_9 = 2
           look_9_0 = @input.peek( 1 )
 
@@ -547,7 +555,7 @@ module Alias
 
           end
           match( 0x2c )
-          # at line 154:40: ( WS )?
+          # at line 162:40: ( WS )?
           alt_10 = 2
           look_10_0 = @input.peek( 1 )
 
@@ -588,11 +596,11 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 158:5: 'UPDATE' WS TABLE_REFERENCE ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
+      # at line 166:5: 'UPDATE' WS TABLE_REFERENCE ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
       match( "UPDATE" )
       ws!
       table_reference!
-      # at line 158:33: ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
+      # at line 166:33: ( ( WS )? ',' ( WS )? TABLE_REFERENCE )*
       while true # decision 14
         alt_14 = 2
         look_14_0 = @input.peek( 1 )
@@ -603,8 +611,8 @@ module Alias
         end
         case alt_14
         when 1
-          # at line 158:34: ( WS )? ',' ( WS )? TABLE_REFERENCE
-          # at line 158:34: ( WS )?
+          # at line 166:34: ( WS )? ',' ( WS )? TABLE_REFERENCE
+          # at line 166:34: ( WS )?
           alt_12 = 2
           look_12_0 = @input.peek( 1 )
 
@@ -618,7 +626,7 @@ module Alias
 
           end
           match( 0x2c )
-          # at line 158:42: ( WS )?
+          # at line 166:42: ( WS )?
           alt_13 = 2
           look_13_0 = @input.peek( 1 )
 
@@ -659,11 +667,11 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 162:5: 'JOIN' WS TABLE_REFERENCE ( WS )?
+      # at line 170:5: 'JOIN' WS TABLE_REFERENCE ( WS )?
       match( "JOIN" )
       ws!
       table_reference!
-      # at line 162:31: ( WS )?
+      # at line 170:31: ( WS )?
       alt_15 = 2
       look_15_0 = @input.peek( 1 )
 
@@ -698,8 +706,8 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 166:5: ( ' ' | '\\t' | '\\n' )+
-      # at file 166:5: ( ' ' | '\\t' | '\\n' )+
+      # at line 174:5: ( ' ' | '\\t' | '\\n' )+
+      # at file 174:5: ( ' ' | '\\t' | '\\n' )+
       match_count_16 = 0
       while true
         alt_16 = 2
@@ -755,7 +763,7 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 171:5: ( 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )* | DOUBLEQUOTED_STRING )
+      # at line 179:5: ( 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )* | DOUBLEQUOTED_STRING )
       alt_18 = 2
       look_18_0 = @input.peek( 1 )
 
@@ -770,9 +778,9 @@ module Alias
       end
       case alt_18
       when 1
-        # at line 171:7: 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
+        # at line 179:7: 'A' .. 'Z' ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
         match_range( 0x41, 0x5a )
-        # at line 171:18: ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
+        # at line 179:18: ( 'A' .. 'Z' | '0' .. '9' | '_' | '$' | '#' )*
         while true # decision 17
           alt_17 = 2
           look_17_0 = @input.peek( 1 )
@@ -802,7 +810,7 @@ module Alias
         end # loop for decision 17
 
       when 2
-        # at line 172:7: DOUBLEQUOTED_STRING
+        # at line 180:7: DOUBLEQUOTED_STRING
         doublequoted_string!
 
       end
@@ -820,9 +828,9 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 177:5: '\"' (~ ( '\"' ) )* '\"'
+      # at line 185:5: '\"' (~ ( '\"' ) )* '\"'
       match( 0x22 )
-      # at line 177:9: (~ ( '\"' ) )*
+      # at line 185:9: (~ ( '\"' ) )*
       while true # decision 19
         alt_19 = 2
         look_19_0 = @input.peek( 1 )
@@ -833,7 +841,7 @@ module Alias
         end
         case alt_19
         when 1
-          # at line 177:11: ~ ( '\"' )
+          # at line 185:11: ~ ( '\"' )
           if @input.peek( 1 ).between?( 0x0, 0x21 ) || @input.peek( 1 ).between?( 0x23, 0xff )
             @input.consume
           else
@@ -869,7 +877,7 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 181:5: '('
+      # at line 189:5: '('
       match( 0x28 )
       # syntactic predicate action gate test
       if @state.backtracking == 1
@@ -899,7 +907,7 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 185:5: ')'
+      # at line 193:5: ')'
       match( 0x29 )
       # syntactic predicate action gate test
       if @state.backtracking == 1
@@ -926,9 +934,9 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 190:5: '(' ( SUB_SELECT | ~ ( ')' ) )* ')'
+      # at line 198:5: '(' ( SUB_SELECT | ~ ( ')' ) )* ')'
       match( 0x28 )
-      # at line 190:9: ( SUB_SELECT | ~ ( ')' ) )*
+      # at line 198:9: ( SUB_SELECT | ~ ( ')' ) )*
       while true # decision 20
         alt_20 = 3
         look_20_0 = @input.peek( 1 )
@@ -948,11 +956,11 @@ module Alias
         end
         case alt_20
         when 1
-          # at line 190:11: SUB_SELECT
+          # at line 198:11: SUB_SELECT
           sub_select!
 
         when 2
-          # at line 190:24: ~ ( ')' )
+          # at line 198:24: ~ ( ')' )
           if @input.peek( 1 ).between?( 0x0, 0x28 ) || @input.peek( 1 ).between?( 0x2a, 0xff )
             @input.consume
           else
@@ -988,19 +996,19 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 195:5: {...}? ID
+      # at line 203:5: {...}? ID
       unless ( ( (KEYS.find { |key| next_word() == key }).nil?  ) )
         @state.backtracking > 0 and raise( ANTLR3::Error::BacktrackingFailed )
 
         raise FailedPredicate( "OBJ_ALIAS", "(KEYS.find { |key| next_word() == key }).nil? " )
       end
-      __ID1___start_446 = self.character_index
+      __ID1___start_464 = self.character_index
       id!
       __ID1__ = create_token do |t|
         t.input   = @input
         t.type    = ANTLR3::INVALID_TOKEN_TYPE
         t.channel = ANTLR3::DEFAULT_CHANNEL
-        t.start   = __ID1___start_446
+        t.start   = __ID1___start_464
         t.stop    = self.character_index - 1
       end
       # syntactic predicate action gate test
@@ -1031,35 +1039,35 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 203:5: (owner= ID '.' )? table= ID ( '@' dblink= ID )?
-      # at line 203:5: (owner= ID '.' )?
+      # at line 211:5: (owner= ID '.' )? table= ID ( '@' dblink= ID )?
+      # at line 211:5: (owner= ID '.' )?
       alt_21 = 2
       alt_21 = @dfa21.predict( @input )
       case alt_21
       when 1
-        # at line 203:6: owner= ID '.'
-        owner_start_470 = self.character_index
+        # at line 211:6: owner= ID '.'
+        owner_start_488 = self.character_index
         id!
         owner = create_token do |t|
           t.input   = @input
           t.type    = ANTLR3::INVALID_TOKEN_TYPE
           t.channel = ANTLR3::DEFAULT_CHANNEL
-          t.start   = owner_start_470
+          t.start   = owner_start_488
           t.stop    = self.character_index - 1
         end
         match( 0x2e )
 
       end
-      table_start_478 = self.character_index
+      table_start_496 = self.character_index
       id!
       table = create_token do |t|
         t.input   = @input
         t.type    = ANTLR3::INVALID_TOKEN_TYPE
         t.channel = ANTLR3::DEFAULT_CHANNEL
-        t.start   = table_start_478
+        t.start   = table_start_496
         t.stop    = self.character_index - 1
       end
-      # at line 203:30: ( '@' dblink= ID )?
+      # at line 211:30: ( '@' dblink= ID )?
       alt_22 = 2
       look_22_0 = @input.peek( 1 )
 
@@ -1068,15 +1076,15 @@ module Alias
       end
       case alt_22
       when 1
-        # at line 203:31: '@' dblink= ID
+        # at line 211:31: '@' dblink= ID
         match( 0x40 )
-        dblink_start_485 = self.character_index
+        dblink_start_503 = self.character_index
         id!
         dblink = create_token do |t|
           t.input   = @input
           t.type    = ANTLR3::INVALID_TOKEN_TYPE
           t.channel = ANTLR3::DEFAULT_CHANNEL
-          t.start   = dblink_start_485
+          t.start   = dblink_start_503
           t.stop    = self.character_index - 1
         end
 
@@ -1106,7 +1114,7 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 212:5: PLAIN_TABLE_REF WS OBJ_ALIAS
+      # at line 220:5: PLAIN_TABLE_REF WS OBJ_ALIAS
       plain_table_ref!
       ws!
       obj_alias!
@@ -1128,7 +1136,7 @@ module Alias
 
       
       # - - - - main rule block - - - -
-      # at line 217:3: ( (ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )? ) | ( TABLE_REFERENCE_WITH_ALIAS ( WS )? ) | ( PLAIN_TABLE_REF ( WS )? ) )
+      # at line 225:3: ( (ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )? ) | ( TABLE_REFERENCE_WITH_ALIAS ( WS )? ) | ( PLAIN_TABLE_REF ( WS )? ) )
       alt_27 = 3
       case look_27 = @input.peek( 1 )
       when 0x28 then alt_27 = 1
@@ -1161,19 +1169,19 @@ module Alias
       end
       case alt_27
       when 1
-        # at line 217:5: (ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )? )
-        # at line 217:5: (ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )? )
-        # at line 217:6: ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )?
-        ss_start_526 = self.character_index
+        # at line 225:5: (ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )? )
+        # at line 225:5: (ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )? )
+        # at line 225:6: ss= SUB_SELECT ( WS )? ( OBJ_ALIAS )?
+        ss_start_544 = self.character_index
         sub_select!
         ss = create_token do |t|
           t.input   = @input
           t.type    = ANTLR3::INVALID_TOKEN_TYPE
           t.channel = ANTLR3::DEFAULT_CHANNEL
-          t.start   = ss_start_526
+          t.start   = ss_start_544
           t.stop    = self.character_index - 1
         end
-        # at line 217:20: ( WS )?
+        # at line 225:20: ( WS )?
         alt_23 = 2
         look_23_0 = @input.peek( 1 )
 
@@ -1186,7 +1194,7 @@ module Alias
           ws!
 
         end
-        # at line 217:24: ( OBJ_ALIAS )?
+        # at line 225:24: ( OBJ_ALIAS )?
         alt_24 = 2
         look_24_0 = @input.peek( 1 )
 
@@ -1217,11 +1225,11 @@ module Alias
         end
 
       when 2
-        # at line 229:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
-        # at line 229:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
-        # at line 229:6: TABLE_REFERENCE_WITH_ALIAS ( WS )?
+        # at line 237:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
+        # at line 237:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
+        # at line 237:6: TABLE_REFERENCE_WITH_ALIAS ( WS )?
         table_reference_with_alias!
-        # at line 229:33: ( WS )?
+        # at line 237:33: ( WS )?
         alt_25 = 2
         look_25_0 = @input.peek( 1 )
 
@@ -1245,11 +1253,11 @@ module Alias
         end
 
       when 3
-        # at line 234:5: ( PLAIN_TABLE_REF ( WS )? )
-        # at line 234:5: ( PLAIN_TABLE_REF ( WS )? )
-        # at line 234:6: PLAIN_TABLE_REF ( WS )?
+        # at line 242:5: ( PLAIN_TABLE_REF ( WS )? )
+        # at line 242:5: ( PLAIN_TABLE_REF ( WS )? )
+        # at line 242:6: PLAIN_TABLE_REF ( WS )?
         plain_table_ref!
-        # at line 234:22: ( WS )?
+        # at line 242:22: ( WS )?
         alt_26 = 2
         look_26_0 = @input.peek( 1 )
 
@@ -1346,7 +1354,7 @@ module Alias
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 47 )
 
-      # at line 190:11: SUB_SELECT
+      # at line 198:11: SUB_SELECT
       sub_select!
 
     ensure
@@ -1367,7 +1375,7 @@ module Alias
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 48 )
 
-      # at line 190:24: ~ ( ')' )
+      # at line 198:24: ~ ( ')' )
       if @input.peek( 1 ).between?( 0x0, 0x28 ) || @input.peek( 1 ).between?( 0x2a, 0xff )
         @input.consume
       else
@@ -1399,14 +1407,14 @@ module Alias
       # trace_in( __method__, 49 )
       owner = nil
 
-      # at line 203:6: owner= ID '.'
-      owner_start_470 = self.character_index
+      # at line 211:6: owner= ID '.'
+      owner_start_488 = self.character_index
       id!
       owner = create_token do |t|
         t.input   = @input
         t.type    = ANTLR3::INVALID_TOKEN_TYPE
         t.channel = ANTLR3::DEFAULT_CHANNEL
-        t.start   = owner_start_470
+        t.start   = owner_start_488
         t.stop    = self.character_index - 1
       end
       match( 0x2e )
@@ -1429,11 +1437,11 @@ module Alias
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 55 )
 
-      # at line 229:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
-      # at line 229:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
-      # at line 229:6: TABLE_REFERENCE_WITH_ALIAS ( WS )?
+      # at line 237:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
+      # at line 237:5: ( TABLE_REFERENCE_WITH_ALIAS ( WS )? )
+      # at line 237:6: TABLE_REFERENCE_WITH_ALIAS ( WS )?
       table_reference_with_alias!
-      # at line 229:33: ( WS )?
+      # at line 237:33: ( WS )?
       alt_38 = 2
       look_38_0 = @input.peek( 1 )
 
@@ -2671,7 +2679,7 @@ module Alias
 
       def description
         <<-'__dfa_description__'.strip!
-          203:5: (owner= ID '.' )?
+          211:5: (owner= ID '.' )?
         __dfa_description__
       end
     end
@@ -3670,4 +3678,12 @@ module Alias
 
   at_exit { Lexer.main( ARGV ) } if __FILE__ == $0
 end
+# - - - - - - begin action @all::footer - - - - - -
+# alias.ruby.g
+
+
+	end
+
+# - - - - - - end action @all::footer - - - - - - -
+
 

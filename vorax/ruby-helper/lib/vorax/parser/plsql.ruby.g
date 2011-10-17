@@ -8,6 +8,14 @@ options {
 	output=AST;
 }
 
+@all::header {
+	module Vorax 
+}
+
+@all::footer {
+	end
+}
+
 @members {
   attr_reader :columns, :tables
   @is_sql = false;

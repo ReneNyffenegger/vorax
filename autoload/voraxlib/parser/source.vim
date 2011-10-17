@@ -12,7 +12,7 @@ set cpo&vim
 
 " Split the provided script content in its corresponding sql statements.
 function! voraxlib#parser#source#Describe(source_content)
-  ruby VIM::command(%!return #{Vorax::VimUtils.to_vim(Orasource::Parser::describe(VIM::evaluate('a:source_content')))}!)
+  ruby VIM::command(%!return #{Vorax::VimUtils.to_vim(Vorax::Orasource::Parser::describe(VIM::evaluate('a:source_content')))}!)
 endfunction
 
 let &cpo = s:cpo_save
