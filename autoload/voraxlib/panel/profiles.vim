@@ -524,7 +524,7 @@ endfunction"}}}
 function! s:PromptForCategory()"{{{
   let category = ''
   let response = voraxlib#utils#PickOption(
-        \ 'Do you want to assign this profile to a category?',
+        \ "\nDo you want to assign this profile to a category?",
         \ ['(Y)es', '(N)o'])
   if response == 'Y'
     let category = input('Category: ', '', 
