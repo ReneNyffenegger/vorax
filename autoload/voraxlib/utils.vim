@@ -615,8 +615,8 @@ function! voraxlib#utils#GetQuickFixCompilationErrors(owner, object, type)"{{{
                     \ "position, " . 
                     \ "replace(replace(text, chr(10), ' '), chr(92), chr(92) || chr(92)) text " .
                   \ "from all_errors " . 
-                  \ "where owner = " . owner . " " .
-                  \ "and name = '" . a:object . "' " .
+                  \ "where owner = " . substitute(owner, '"', '', 'g') . " " .
+                  \ "and name = '" . substitute(a:object, '"', '', 'g') . "' " .
                   \ "and type in " . filter_clause . " order by 1;"
   let data = vorax#GetSqlplusHandler().Query(query)
   if empty(data.errors)

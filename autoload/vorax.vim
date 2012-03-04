@@ -275,6 +275,7 @@ function! vorax#CompileBuffer()"{{{
               \ ])})
       " look for errors in ALL_ERRORS view
       let buffer_metadata = voraxlib#utils#DescribeCurrentBuffer()
+      if s:log.isDebugEnabled() | call s:log.debug('buffer metadata: '. string(buffer_metadata)) | endif
       let qerr = voraxlib#utils#GetQuickFixCompilationErrors(buffer_metadata['object_owner'], 
                                                  \ buffer_metadata['object_name'], 
                                                  \ buffer_metadata['object_type'])
